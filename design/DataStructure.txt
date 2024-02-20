@@ -5,6 +5,7 @@ ToDo:
 -time
 -description
 -typeId
+-state
 
 Type:
 -typeId
