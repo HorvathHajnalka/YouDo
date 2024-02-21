@@ -98,6 +98,6 @@
         android:textSize="16dp"
         android:textColor="@color/white"
         android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
+        android:layout_margin="10dp"
         />
 </RelativeLayout>
