@@ -1,10 +1,6 @@
 package com.example.youdo;
 
 
-import androidx.annotation.NonNull;
-
-
-
 public class User {
     private int userId;
     private String userName;
@@ -12,7 +8,7 @@ public class User {
     private String password;
 
     // functions
-    public User(@NonNull String userName, @NonNull String email, @NonNull String password) {
+    public User(String userName, String email, String password) {
         this.userName = userName;
         this.email = email;
         this.password = password;
@@ -21,36 +17,27 @@ public class User {
     public int getUserId() {
         return userId;
     }
-
-    @NonNull
     public String getUserName() {
         return userName;
     }
-
-    @NonNull
     public String getEmail() {
         return email;
     }
-
-    @NonNull
     public String getPassword() {
         return password;
     }
 
-    // Setterek
+    // Setters
     public void setUserId(int userId) {
         this.userId = userId;
     }
-
-    public void setUserName(@NonNull String userName) {
+    public void setUserName(String userName) {
         this.userName = userName;
     }
-
-    public void setEmail(@NonNull String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
-
-    public void setPassword(@NonNull String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 }

@@ -3,7 +3,6 @@ package com.example.youdo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -29,11 +28,11 @@ public class RegisterActivity extends AppCompatActivity {
         password2Reg = findViewById(R.id.password2);
 
         MaterialButton regbtn  = (MaterialButton) findViewById(R.id.regbtn);
-        TextView newaccountbtn  = (TextView) findViewById(R.id.alreadyHaveAccount);
+        TextView haveaccountbtn  = (TextView) findViewById(R.id.alreadyHaveAccount);
 
 
         // switch to login page
-        newaccountbtn.setOnClickListener(new View.OnClickListener() {
+        haveaccountbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
@@ -54,12 +53,15 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Empty fields!", Toast.LENGTH_SHORT).show();
                 } else if(db.checkEmail(strEmail)){
                     Toast.makeText(RegisterActivity.this, "Email has already registered!", Toast.LENGTH_SHORT).show();
+                } else if(db.checkName(strUserName)){
+                    Toast.makeText(RegisterActivity.this, "Username has already registered!", Toast.LENGTH_SHORT).show();
                 } else if (! strPassword.equals(strPassword2)) {
                     Toast.makeText(RegisterActivity.this, "Passwords not matching!", Toast.LENGTH_SHORT).show();
                 } else {
                     User newuser = new User(strUserName, strEmail, strPassword);
                     db.addUser(newuser);
                     Toast.makeText(RegisterActivity.this, "Successful Registration!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(RegisterActivity.this,LoginActivity.class));
 
                 }
             }
