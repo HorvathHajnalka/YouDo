@@ -37,6 +37,30 @@ public class dbConnect extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public boolean checkEmail(String emailcheck){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = " SELECT * FROM "+ userTable + " WHERE " + email + " =?";
+        Cursor cursor = db.rawQuery(query, new String[]{emailcheck});
+        if (cursor.moveToFirst()){
+            // email has already registered
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean checkName(String namecheck){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = " SELECT * FROM "+ userTable + " WHERE " + userName + " =?";
+        Cursor cursor = db.rawQuery(query, new String[]{namecheck});
+        if (cursor.moveToFirst()){
+            // username has already registered
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public void addUser(User user){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -75,10 +99,10 @@ public class dbConnect extends SQLiteOpenHelper {
         }
     }
 
-    public boolean checkUser(User user){
+    public boolean checkUser(String userNameLogIn, String passwordLogIn){
         SQLiteDatabase db = this.getReadableDatabase();
         String query = " SELECT * FROM "+ userTable + " WHERE " + userName + " =? AND " + password + " =?";
-        Cursor cursor = db.rawQuery(query, new String[]{user.getEmail(), user.getPassword()});
+        Cursor cursor = db.rawQuery(query,new String[]{userNameLogIn, passwordLogIn});
         if (cursor.moveToFirst()){
             return true;
         }else{
@@ -86,15 +110,5 @@ public class dbConnect extends SQLiteOpenHelper {
         }
     }
 
-    public boolean checkEmail(String emailcheck){
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = " SELECT * FROM "+ userTable + " WHERE " + email + " =?";
-        Cursor cursor = db.rawQuery(query, new String[]{emailcheck});
-        if (cursor.moveToFirst()){
-            // email has already registered
-            return true;
-        }else{
-            return false;
-        }
-    }
+
 }
