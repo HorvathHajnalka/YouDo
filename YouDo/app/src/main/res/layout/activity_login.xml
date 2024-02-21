@@ -30,7 +30,7 @@
         android:textColorHint="@color/white"
         android:textColor="@color/white"
         android:layout_margin="10dp"
-        android:padding="20dp"
+        android:padding="15dp"
         android:drawableLeft="@drawable/baseline_person_outline_24"
         android:drawablePadding="20dp"/>
 
@@ -44,7 +44,7 @@
         android:textColorHint="@color/white"
         android:textColor="@color/white"
         android:layout_margin="10dp"
-        android:padding="20dp"
+        android:padding="15dp"
         android:drawableLeft="@drawable/baseline_arrow_forward_ios_24"
         android:drawablePadding="20dp"
         android:inputType="textPassword"/>
@@ -55,6 +55,7 @@
         android:id="@+id/forgotpass"
         android:layout_below="@id/password"
         android:text="Forgot password?"
+        android:textSize="13dp"
         android:textColor="@color/white"
         android:layout_centerHorizontal="false"
         android:layout_margin="10dp"
@@ -65,7 +66,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/loginbtn"
         android:layout_below="@id/forgotpass"
-        android:text="Login"
+        android:text="Log in"
+        android:textSize="18dp"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
         />
@@ -86,19 +88,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@id/or"
-        android:layout_margin="10dp"
+        android:layout_margin="0dp"
         android:layout_centerHorizontal="true">
 
         <TextView
             android:id="@+id/newaccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/loginbtn"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:text="Create a New Account"
+            android:textSize="16dp"
             android:textColor="@color/white" />
     </LinearLayout>
 

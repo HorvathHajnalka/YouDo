@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -51,6 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if(strUserName.isEmpty() || strEmail.isEmpty() || strPassword.isEmpty() || strPassword2.isEmpty()) {
                     Toast.makeText(RegisterActivity.this, "Empty fields!", Toast.LENGTH_SHORT).show();
+                }else if(! Patterns.EMAIL_ADDRESS.matcher(strEmail).matches()){
+                    Toast.makeText(RegisterActivity.this, "Invalid Email!", Toast.LENGTH_SHORT).show();
                 } else if(db.checkEmail(strEmail)){
                     Toast.makeText(RegisterActivity.this, "Email has already registered!", Toast.LENGTH_SHORT).show();
                 } else if(db.checkName(strUserName)){

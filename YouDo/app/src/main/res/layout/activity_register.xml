@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/register"
-        android:text="Register"
+        android:text="New Account"
         android:textColor="@color/white"
         android:textSize="35dp"
         android:textStyle="bold"
@@ -30,7 +30,7 @@
         android:textColorHint="@color/white"
         android:textColor="@color/white"
         android:layout_margin="10dp"
-        android:padding="20dp"
+        android:padding="15dp"
         android:drawableLeft="@drawable/baseline_alternate_email_24"
         android:drawablePadding="20dp"/>
 
@@ -44,7 +44,7 @@
         android:textColorHint="@color/white"
         android:textColor="@color/white"
         android:layout_margin="10dp"
-        android:padding="20dp"
+        android:padding="15dp"
         android:drawableLeft="@drawable/baseline_person_outline_24"
         android:drawablePadding="20dp"/>
 
@@ -58,7 +58,7 @@
         android:textColorHint="@color/white"
         android:textColor="@color/white"
         android:layout_margin="10dp"
-        android:padding="20dp"
+        android:padding="15dp"
         android:drawableLeft="@drawable/baseline_arrow_forward_ios_24"
         android:drawablePadding="20dp"
         android:inputType="textPassword"/>
@@ -73,7 +73,7 @@
         android:textColorHint="@color/white"
         android:textColor="@color/white"
         android:layout_margin="10dp"
-        android:padding="20dp"
+        android:padding="15dp"
         android:drawableLeft="@drawable/baseline_arrow_forward_ios_24"
         android:drawablePadding="20dp"
         android:inputType="textPassword"/>
@@ -84,6 +84,7 @@
         android:id="@+id/regbtn"
         android:layout_below="@id/password2"
         android:text="Register"
+        android:textSize="18dp"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         />
@@ -94,6 +95,7 @@
         android:id="@+id/alreadyHaveAccount"
         android:layout_below="@id/regbtn"
         android:text="Already have an account?"
+        android:textSize="16dp"
         android:textColor="@color/white"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
