@@ -2,6 +2,7 @@ package com.example.youdo;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -44,7 +45,6 @@ public class dbConnect extends SQLiteOpenHelper {
         values.put(email, user.getEmail());
         values.put(password, user.getPassword());
 
-        // db.insert(userTable, null, values);
         db.insert(userTable,null,values);
     }
 
@@ -56,7 +56,7 @@ public class dbConnect extends SQLiteOpenHelper {
         values.put(email, user.getEmail());
         values.put(password, user.getPassword());
 
-        int endResult = db.update(userTable, values, userId = "=?", new String[]{String.valueOf(user.getUserId())});
+        int endResult = db.update(userTable, values, userId = " =?", new String[]{String.valueOf(user.getUserId())});
         if (endResult > 0){
             return true;
         }else{
@@ -67,8 +67,31 @@ public class dbConnect extends SQLiteOpenHelper {
     public boolean deleteUser(User user){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        int endResult = db.delete(userTable,userId = "=?", new String[]{String.valueOf(user.getUserId())});
+        int endResult = db.delete(userTable,userId = " =?", new String[]{String.valueOf(user.getUserId())});
         if (endResult > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean checkUser(User user){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = " SELECT * FROM "+ userTable + " WHERE " + userName + " =? AND " + password + " =?";
+        Cursor cursor = db.rawQuery(query, new String[]{user.getEmail(), user.getPassword()});
+        if (cursor.moveToFirst()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean checkEmail(String emailcheck){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = " SELECT * FROM "+ userTable + " WHERE " + email + " =?";
+        Cursor cursor = db.rawQuery(query, new String[]{emailcheck});
+        if (cursor.moveToFirst()){
+            // email has already registered
             return true;
         }else{
             return false;
