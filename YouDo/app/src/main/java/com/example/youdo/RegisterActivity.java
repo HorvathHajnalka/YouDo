@@ -15,7 +15,7 @@ import com.google.android.material.button.MaterialButton;
 public class RegisterActivity extends AppCompatActivity {
 
     EditText emailReg, userNameReg, passwordReg, password2Reg;
-    dbConnect db = new dbConnect(this);
+    dbConnectUser db = new dbConnectUser(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
