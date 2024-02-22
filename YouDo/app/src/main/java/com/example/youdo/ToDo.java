@@ -3,7 +3,6 @@ package com.example.youdo;
 
 public class ToDo {
     private int todoId;
-
     private String name;
     private String date;
     private String time;
@@ -22,7 +21,6 @@ public class ToDo {
     public void setTodoId(int todoId) {
         this.todoId = todoId;
     }
-
     public String getName() {
         return name;
     }
