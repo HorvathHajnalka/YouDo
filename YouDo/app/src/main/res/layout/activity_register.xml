@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:icon="@mipmap/my_icon"
     android:background="@drawable/background"
+    android:nestedScrollingEnabled="true"
     tools:context=".RegisterActivity">
 
     <TextView
