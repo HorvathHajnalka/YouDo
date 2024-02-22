@@ -4,10 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-public class dbConnectType{
+public class dbConnectToDoType{
     private dbConnect dbHelper;
 
-    public dbConnectType(Context context) {
+    public dbConnectToDoType(Context context) {
         dbHelper = new dbConnect(context);
     }
 
