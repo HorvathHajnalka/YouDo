@@ -1,4 +1,4 @@
-package com.example.youdo;
+/*package com.example.youdo;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -111,6 +111,40 @@ public class dbConnect extends SQLiteOpenHelper {
     }
 
 
+}*/
 
+package com.example.youdo;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class dbConnect extends SQLiteOpenHelper {
+    // db parameters
+    private static String dbName = "youDo_DB";
+    private static int dbVersion = 1;
+    public static String userTable = "users";
+    public static String userId = "userId";
+    public static String userName = "userName";
+    public static String email = "email";
+    public static String password = "password";
+
+    public dbConnect(@Nullable Context context) {
+        super(context, dbName, null, dbVersion);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String query = "CREATE TABLE " + userTable + "(" + userId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + userName + " TEXT, "+ email + " TEXT, "+ password + " TEXT)";
+        db.execSQL(query);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS "+ userTable);
+        onCreate(db);
+    }
 }
