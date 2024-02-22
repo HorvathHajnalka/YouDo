@@ -39,7 +39,6 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="30dp"
         android:src="@drawable/add"
-
         />
 
 
