@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">YouDo</string>
+    <string name="successfully_logged_in">Successfully logged in</string>
 </resources>

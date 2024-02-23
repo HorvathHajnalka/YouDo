@@ -1,5 +1,6 @@
 package com.example.youdo;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -66,5 +67,20 @@ public class dbConnectUser {
         boolean hasUser = cursor.moveToFirst();
         cursor.close();
         return hasUser;
+    }
+
+    public int getUserId(String username, String password) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT " + dbConnect.userId + " FROM " + dbConnect.userTable + " WHERE " + dbConnect.userName + " =? AND " + dbConnect.password + " =?";
+        Cursor cursor = db.rawQuery(query, new String[]{username, password});
+
+        if (cursor.moveToFirst()) {
+            @SuppressLint("Range") int userId = cursor.getInt(cursor.getColumnIndex(dbConnect.userId));
+            cursor.close();
+            return userId;
+        } else {
+            cursor.close();
+            return -1; // user not found
+        }
     }
 }
