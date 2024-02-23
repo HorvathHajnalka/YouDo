@@ -1,8 +1,14 @@
 package com.example.youdo;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class dbConnectToDo {
     private dbConnect dbHelper;
@@ -11,6 +17,7 @@ public class dbConnectToDo {
         dbHelper = new dbConnect(context);
     }
 
+
     public void addToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -18,10 +25,13 @@ public class dbConnectToDo {
         values.put(dbConnect.todoName, todo.getName());
         values.put(dbConnect.todoDesc, todo.getDescription());
         values.put(dbConnect.todoState, todo.getState());
-        values.put(dbConnect.todoState, todo.getDate());
-        values.put(dbConnect.todoState, todo.getTime());
+        values.put(dbConnect.todoDate, todo.getDate());
+        values.put(dbConnect.todoTime, todo.getTime());
+        values.put(dbConnect.todoTypeId, todo.getTypeId());
+        values.put(dbConnect.todoUserId, todo.getUserId());
 
         db.insert(dbConnect.todoTable, null, values);
+        db.close();
     }
 
     public boolean updateToDo(ToDo todo){
@@ -31,18 +41,55 @@ public class dbConnectToDo {
         values.put(dbConnect.todoName, todo.getName());
         values.put(dbConnect.todoDesc, todo.getDescription());
         values.put(dbConnect.todoState, todo.getState());
-        values.put(dbConnect.todoState, todo.getDate());
-        values.put(dbConnect.todoState, todo.getTime());
+        values.put(dbConnect.todoDate, todo.getDate());
+        values.put(dbConnect.todoTime, todo.getTime());
+        values.put(dbConnect.todoTypeId, todo.getTypeId());
+        values.put(dbConnect.todoUserId, todo.getUserId());
 
         int endResult = db.update(dbConnect.todoTable, values, dbConnect.todoId + " =?", new String[]{String.valueOf(todo.getTodoId())});
+        db.close();
         return endResult > 0;
     }
+
 
     public boolean deleteToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int endResult = db.delete(dbConnect.todoTable, dbConnect.todoId + " =?", new String[]{String.valueOf(todo.getUserId())});
+        int endResult = db.delete(dbConnect.todoTable, dbConnect.todoId + " =?", new String[]{String.valueOf(todo.getTodoId())}); // Javítva
+        db.close();
         return endResult > 0;
     }
 
 
+    public List<ToDo> getAllToDoPerUser(int uId) {
+        List<ToDo> todoList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selection = dbConnect.todoUserId + " =?";
+        String[] selectionArgs = {String.valueOf(uId)};
+
+        Cursor cursor = db.query(dbConnect.todoTable,
+                new String[]{dbConnect.todoId, dbConnect.todoName, dbConnect.todoDesc},
+                selection, selectionArgs, null, null, null);
+
+
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                ToDo todo = new ToDo();
+                int todoIdIndex = cursor.getColumnIndex(dbConnect.todoId);
+                int nameIndex = cursor.getColumnIndex(dbConnect.todoName);
+                int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
+
+                if (todoIdIndex != -1) todo.setTodoId(cursor.getInt(todoIdIndex));
+                if (nameIndex != -1) todo.setName(cursor.getString(nameIndex));
+                if (descIndex != -1) todo.setDescription(cursor.getString(descIndex));
+
+                todoList.add(todo);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return todoList;
+    }
 }

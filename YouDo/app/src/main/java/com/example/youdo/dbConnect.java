@@ -11,7 +11,8 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 1;
+    private static int dbVersion = 2;
+
 
     // users
     public static String userTable = "user";
@@ -51,9 +52,12 @@ public class dbConnect extends SQLiteOpenHelper {
                 + userName + " TEXT, "+ email + " TEXT, "+ password + " TEXT)";
         db.execSQL(makeUserQuery);
 
-        // todo table
+        // to do table
         String makeTodoQuery = "CREATE TABLE " + todoTable + "(" + todoId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoState + " TEXT, " + todoDate + " TEXT, "+ todoTime + " TEXT)";
+                + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoState + " TEXT, " + todoDate + " TEXT, "
+                + todoTime + " TEXT, " + todoTypeId + " INTEGER, " + todoUserId + " INTEGER, "
+                + "FOREIGN KEY(" + todoTypeId + ") REFERENCES " + typeTable + "(" + typeId + "), "
+                + "FOREIGN KEY(" + todoUserId + ") REFERENCES " + userTable + "(" + userId + "))";
         db.execSQL(makeTodoQuery);
 
         // type table
