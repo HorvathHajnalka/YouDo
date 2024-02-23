@@ -39,6 +39,8 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="30dp"
         android:src="@drawable/add"
+        android:backgroundTint="@color/purple_light"
+        app:tint="@color/white"
         />
 
 
