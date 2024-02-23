@@ -49,27 +49,17 @@
         android:drawablePadding="20dp"
         android:inputType="textPassword"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/forgotpass"
-        android:layout_below="@id/password"
-        android:text="Forgot password?"
-        android:textSize="13dp"
-        android:textColor="@color/white"
-        android:layout_centerHorizontal="false"
-        android:layout_margin="10dp"
-        />
+
 
     <com.google.android.material.button.MaterialButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/loginbtn"
-        android:layout_below="@id/forgotpass"
+        android:layout_below="@id/password"
         android:text="Log in"
         android:textSize="18dp"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
+        android:layout_margin="40dp"
         />
 
     <TextView
@@ -80,7 +70,7 @@
         android:text="Or"
         android:textColor="@color/white"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         />
 
     <LinearLayout
@@ -101,7 +91,9 @@
             android:layout_marginBottom="10dp"
             android:text="Create a New Account"
             android:textSize="16dp"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:style="text-decoration: underline;"
+            />
     </LinearLayout>
 
 </RelativeLayout>
