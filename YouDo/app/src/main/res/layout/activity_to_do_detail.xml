@@ -1,33 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".ToDoDetailActivity"
-    android:background="@color/black">
+    android:background="@color/dark_grey">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/detailTitle"
-        android:text="ToDoName"
-        android:layout_marginTop="14dp"
-        android:textSize="24sp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="12dp"
-        android:textColor="@color/white"/>
-
-    <TextView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/detailDesc"
-        android:text="Description"
-        android:layout_marginTop="10dp"
-        android:textSize="18sp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="12dp"
-        android:textColor="@color/white"/>
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        app:cardCornerRadius="30dp"
+        app:cardBackgroundColor="@color/black"
+        app:cardElevation="20dp">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:padding="20dp"
+
+            android:background="@drawable/blue_border">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detailTitle"
+                android:text="ToDoName"
+                android:layout_marginTop="14dp"
+                android:textSize="24sp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/detailDesc"
+                android:text="Description"
+                android:layout_marginTop="10dp"
+                android:textSize="18sp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"
+                android:textColor="@color/white"/>
+
+
+
+            <LinearLayout
+                android:id="@+id/LinearLayout02"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editTodoBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/blue_border"
+                    android:text="Edit ToDo"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="18dp"
+                    android:layout_weight="1"
+                    app:backgroundTint="@null" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/delTodoBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="20dp"
+                    android:background="@drawable/blue_border"
+                    android:text="Delete ToDo"
+                    android:textColor="@color/dark_purple"
+                    android:textSize="18dp"
+                    android:layout_weight="1"
+                    app:backgroundTint="@null" />
+
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/doneTodoBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/white"
+                android:text="ToDo is Done!"
+                android:textColor="@color/dark_purple"
+                android:textSize="18dp"
+                android:layout_weight="1"
+                app:backgroundTint="@null" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</ScrollView>
