@@ -54,7 +54,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dbConnectToDo.deleteToDoById(todoId);
-                Toast.makeText(ToDoDetailActivity.this, "ToDo has deleted!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ToDoDetailActivity.this, "ToDo has been deleted!", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(ToDoDetailActivity.this, ToDoMainActivity.class);
                 i.putExtra("userId", userId);
                 startActivity(i);

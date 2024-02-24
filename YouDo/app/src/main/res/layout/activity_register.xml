@@ -102,8 +102,8 @@
             android:bottomLeftRadius="10dp"
             android:topLeftRadius="10dp"
             android:topRightRadius="10dp"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/purple_light"
+            android:textColor="@color/dark_purple"
+            android:backgroundTint="@color/white"
             />
 
         <TextView
