@@ -92,4 +92,45 @@ public class dbConnectToDo {
         db.close();
         return todoList;
     }
+
+    public ToDo getTodoById(int todoId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String selection = dbConnect.todoId + " =?";
+        String[] selectionArgs = {String.valueOf(todoId)};
+
+        Cursor cursor = db.query(dbConnect.todoTable,
+                new String[]{dbConnect.todoId, dbConnect.todoName, dbConnect.todoDesc, dbConnect.todoState, dbConnect.todoDate, dbConnect.todoTime, dbConnect.todoTypeId, dbConnect.todoUserId},
+                selection, selectionArgs, null, null, null);
+
+        ToDo todo = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            todo = new ToDo();
+            int idIndex = cursor.getColumnIndex(dbConnect.todoId);
+            int nameIndex = cursor.getColumnIndex(dbConnect.todoName);
+            int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
+            int stateIndex = cursor.getColumnIndex(dbConnect.todoState);
+            int dateIndex = cursor.getColumnIndex(dbConnect.todoDate);
+            int timeIndex = cursor.getColumnIndex(dbConnect.todoTime);
+            int typeIdIndex = cursor.getColumnIndex(dbConnect.todoTypeId);
+            int userIdIndex = cursor.getColumnIndex(dbConnect.todoUserId);
+
+            if (idIndex != -1) todo.setTodoId(cursor.getInt(idIndex));
+            if (nameIndex != -1) todo.setName(cursor.getString(nameIndex));
+            if (descIndex != -1) todo.setDescription(cursor.getString(descIndex));
+            if (stateIndex != -1) todo.setState(cursor.getString(stateIndex));
+            if (dateIndex != -1) todo.setDate(cursor.getString(dateIndex));
+            if (timeIndex != -1) todo.setTime(cursor.getString(timeIndex));
+            if (typeIdIndex != -1) todo.setTypeId(cursor.getInt(typeIdIndex));
+            if (userIdIndex != -1) todo.setUserId(cursor.getInt(userIdIndex));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return todo;
+    }
+
 }
