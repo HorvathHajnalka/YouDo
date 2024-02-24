@@ -1,104 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:icon="@mipmap/my_icon"
-    android:background="@drawable/background"
     tools:context=".LoginActivity">
-
-    <TextView
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/signin"
-        android:text="Sign in"
-        android:textColor="@color/white"
-        android:textSize="35dp"
-        android:textStyle="bold"
-        android:layout_margin="50dp"
-        android:gravity="center"
-        />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/username"
-        android:layout_below="@id/signin"
-        android:background="#50ffffff"
-        android:hint="Username"
-        android:textColorHint="@color/white"
-        android:textColor="@color/white"
-        android:layout_margin="10dp"
-        android:padding="15dp"
-        android:drawableLeft="@drawable/baseline_person_outline_24"
-        android:drawablePadding="20dp"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/password"
-        android:layout_below="@id/username"
-        android:background="#50ffffff"
-        android:hint="Password"
-        android:textColorHint="@color/white"
-        android:textColor="@color/white"
-        android:layout_margin="10dp"
-        android:padding="15dp"
-        android:drawableLeft="@drawable/baseline_arrow_forward_ios_24"
-        android:drawablePadding="20dp"
-        android:inputType="textPassword"/>
-
-
-
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/loginbtn"
-        android:layout_below="@id/password"
-        android:text="Log in"
-        android:textSize="18dp"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="40dp"
-
-        android:bottomRightRadius="10dp"
-        android:bottomLeftRadius="10dp"
-        android:topLeftRadius="10dp"
-        android:topRightRadius="10dp"
-        android:textColor="@color/white"
-        android:backgroundTint="@color/dark_purple"
-        />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/or"
-        android:layout_below="@id/loginbtn"
-        android:text="Or"
-        android:textColor="@color/white"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/or"
-        android:layout_margin="0dp"
-        android:layout_centerHorizontal="true">
+        android:layout_height="match_parent"
+        android:icon="@mipmap/my_icon"
+        android:background="@drawable/background"
+        tools:context=".LoginActivity">
 
         <TextView
-            android:id="@+id/newaccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/signin"
+            android:text="Sign in"
+            android:textColor="@color/white"
+            android:textSize="35dp"
+            android:textStyle="bold"
+            android:layout_margin="50dp"
+            android:gravity="center"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/username"
+            android:layout_below="@id/signin"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Username"
+            android:textColorHint="@color/white"
+            android:textColor="@color/white"
+            android:layout_margin="10dp"
+            android:padding="15dp"
+            android:drawableLeft="@drawable/baseline_person_outline_24"
+            android:drawablePadding="20dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/password"
+            android:layout_below="@id/username"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Password"
+            android:textColorHint="@color/white"
+            android:textColor="@color/white"
+            android:layout_margin="10dp"
+            android:padding="15dp"
+            android:drawableLeft="@drawable/baseline_arrow_forward_ios_24"
+            android:drawablePadding="20dp"
+            android:inputType="textPassword"/>
+
+
+
+        <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="Create a New Account"
-            android:textSize="16dp"
-            android:textColor="@color/white" />
-    </LinearLayout>
+            android:id="@+id/loginbtn"
+            android:layout_below="@id/password"
+            android:text="Log in"
+            android:textSize="23dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
 
-</RelativeLayout>
+            android:bottomRightRadius="10dp"
+            android:bottomLeftRadius="10dp"
+            android:topLeftRadius="10dp"
+            android:topRightRadius="10dp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/purple_light"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/or"
+            android:layout_below="@id/loginbtn"
+            android:text="Or"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/or"
+            android:layout_margin="0dp"
+            android:layout_centerHorizontal="true">
+
+            <TextView
+                android:id="@+id/newaccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:text="Create a New Account"
+                android:textSize="16dp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</ScrollView>
