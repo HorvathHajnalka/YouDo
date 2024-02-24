@@ -52,26 +52,40 @@ public class dbConnectToDo {
     }
 
 
-    public boolean deleteToDo(ToDo todo){
+    public boolean deleteToDoById(int todoId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int endResult = db.delete(dbConnect.todoTable, dbConnect.todoId + " =?", new String[]{String.valueOf(todo.getTodoId())}); // Javítva
+        int endResult = db.delete(dbConnect.todoTable, dbConnect.todoId + " =?", new String[]{String.valueOf(todoId)});
         db.close();
         return endResult > 0;
     }
+
 
 
     public List<ToDo> getAllToDoPerUser(int uId) {
         List<ToDo> todoList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
+        String[] projection = {
+                dbConnect.todoId,
+                dbConnect.todoName,
+                dbConnect.todoDesc,
+                dbConnect.todoDate,
+                dbConnect.todoTime,
+                dbConnect.todoTypeId,
+                dbConnect.todoUserId,
+                dbConnect.todoState
+        };
+
         String selection = dbConnect.todoUserId + " =?";
         String[] selectionArgs = {String.valueOf(uId)};
 
         Cursor cursor = db.query(dbConnect.todoTable,
-                new String[]{dbConnect.todoId, dbConnect.todoName, dbConnect.todoDesc},
-                selection, selectionArgs, null, null, null);
-
-
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -79,19 +93,32 @@ public class dbConnectToDo {
                 int todoIdIndex = cursor.getColumnIndex(dbConnect.todoId);
                 int nameIndex = cursor.getColumnIndex(dbConnect.todoName);
                 int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
+                int dateIndex = cursor.getColumnIndex(dbConnect.todoDate);
+                int timeIndex = cursor.getColumnIndex(dbConnect.todoTime);
+                int typeIdIndex = cursor.getColumnIndex(dbConnect.todoTypeId);
+                int userIdIndex = cursor.getColumnIndex(dbConnect.todoUserId);
+                int stateIndex = cursor.getColumnIndex(dbConnect.todoState);
 
                 if (todoIdIndex != -1) todo.setTodoId(cursor.getInt(todoIdIndex));
                 if (nameIndex != -1) todo.setName(cursor.getString(nameIndex));
                 if (descIndex != -1) todo.setDescription(cursor.getString(descIndex));
+                if (dateIndex != -1) todo.setDate(cursor.getString(dateIndex));
+                if (timeIndex != -1) todo.setTime(cursor.getString(timeIndex));
+                if (typeIdIndex != -1) todo.setTypeId(cursor.getInt(typeIdIndex));
+                if (userIdIndex != -1) todo.setUserId(cursor.getInt(userIdIndex));
+                if (stateIndex != -1) todo.setState(cursor.getString(stateIndex));
 
                 todoList.add(todo);
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
         db.close();
         return todoList;
     }
+
 
     public ToDo getTodoById(int todoId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();

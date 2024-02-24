@@ -27,6 +27,8 @@ public class ToDoMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_main);
 
+
+
         fab = findViewById(R.id.addToDobtn);
         recyclerView = findViewById(R.id.todoRecyclerView);
 
@@ -34,6 +36,7 @@ public class ToDoMainActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("userId")) {
             userId = intent.getIntExtra("userId", -1); // -1 if we don't know the "userId"
         }
+
 
         dbConnectToDo = new dbConnectToDo(this);
         todoList = dbConnectToDo.getAllToDoPerUser(userId);
@@ -52,4 +55,16 @@ public class ToDoMainActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadToDos();
+    }
+    public void loadToDos() {
+        todoList = dbConnectToDo.getAllToDoPerUser(userId);
+        ToDoAdapter adapter = new ToDoAdapter(todoList, this);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
 }

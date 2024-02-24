@@ -66,7 +66,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                     newtodo.setDescription(strToDoDesc);
                     newtodo.setUserId(userId);
                     db.addToDo(newtodo);
-                    Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(UploadToDoActivity.this, ToDoMainActivity.class);
                     intent.putExtra("userId", userId);
                     startActivity(intent);

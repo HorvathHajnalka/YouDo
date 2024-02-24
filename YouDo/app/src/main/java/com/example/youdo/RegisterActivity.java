@@ -16,6 +16,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText emailReg, userNameReg, passwordReg, password2Reg;
     dbConnectUser db = new dbConnectUser(this);
+    MaterialButton regbtn;
+    TextView haveaccountbtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +30,8 @@ public class RegisterActivity extends AppCompatActivity {
         passwordReg = findViewById(R.id.password);
         password2Reg = findViewById(R.id.password2);
 
-        MaterialButton regbtn  = (MaterialButton) findViewById(R.id.regbtn);
-        TextView haveaccountbtn  = (TextView) findViewById(R.id.alreadyHaveAccount);
+        regbtn  = (MaterialButton) findViewById(R.id.regbtn);
+        haveaccountbtn  = (TextView) findViewById(R.id.alreadyHaveAccount);
 
 
         // switch to login page
