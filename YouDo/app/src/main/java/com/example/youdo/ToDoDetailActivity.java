@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
     dbConnectToDo dbConnectToDo;
     ToDo todo;
     int todoId = -1; // has to be updated
+    int userId = -1; // has to be updated
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,15 +33,15 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("todoId")) {
+        if (intent != null && intent.hasExtra("todoId") && intent.hasExtra("userId")) {
             todoId = intent.getIntExtra("todoId", -1); // -1 if we don't know the "todoId"
+            userId = intent.getIntExtra("userId", -1); // -1 if we don't know the "userId"
         }
 
         dbConnectToDo = new dbConnectToDo(this);
         todo = dbConnectToDo.getTodoById(todoId);
 
         if (todo != null) {
-
             detailTitle.setText(todo.getName());
             detailDesc.setText(todo.getDescription());
 
@@ -47,5 +49,17 @@ public class ToDoDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "ToDo not found", Toast.LENGTH_SHORT).show();
             finish(); // last activity
         }
+
+        delTodoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbConnectToDo.deleteToDoById(todoId);
+                Toast.makeText(ToDoDetailActivity.this, "ToDo has deleted!", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(ToDoDetailActivity.this, ToDoMainActivity.class);
+                i.putExtra("userId", userId);
+                startActivity(i);
+            }
+        });
+
     }
 }

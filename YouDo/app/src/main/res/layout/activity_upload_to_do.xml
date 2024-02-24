@@ -36,7 +36,7 @@
                 android:textColor="@color/white"/>
             <EditText
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/addToDoName"
                 android:layout_marginTop="20dp"
                 android:padding="16dp"
@@ -47,7 +47,7 @@
                 android:background="@drawable/rounded_edittext"/>
             <EditText
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/addToDoDesc"
                 android:layout_marginTop="20dp"
                 android:padding="16dp"
