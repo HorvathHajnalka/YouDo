@@ -60,6 +60,13 @@
         android:textSize="18dp"
         android:layout_centerHorizontal="true"
         android:layout_margin="40dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/dark_purple"
         />
 
     <TextView

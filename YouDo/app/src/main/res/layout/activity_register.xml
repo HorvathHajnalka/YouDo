@@ -79,14 +79,25 @@
         android:inputType="textPassword"/>
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/regbtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/regbtn"
         android:layout_below="@id/password2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:text="Register"
         android:textSize="18dp"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/dark_purple"
         />
 
     <TextView
