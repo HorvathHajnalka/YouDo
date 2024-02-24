@@ -46,7 +46,8 @@
                 android:textSize="18sp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="12dp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textStyle="italic"/>
 
 
 
