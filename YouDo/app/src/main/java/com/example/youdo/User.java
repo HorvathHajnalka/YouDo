@@ -6,7 +6,7 @@ public class User {
     private String userName;
     private String email;
     private String password;
-
+    private String googleId;
     // functions
     public User(String userName, String email, String password) {
         this.userName = userName;
@@ -14,9 +14,13 @@ public class User {
         this.password = password;
     }
 
+    public User() {
+    }
+
     public int getUserId() {
         return userId;
     }
+    public String getGoogleId() { return googleId; }
     public String getUserName() {
         return userName;
     }
@@ -40,4 +44,6 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public void setGoogleId(String googleId) {this.googleId = googleId; }
 }

@@ -1,5 +1,7 @@
 package com.example.youdo;
 
+import static android.app.DownloadManager.COLUMN_ID;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -12,6 +14,10 @@ public class dbConnectUser {
     public dbConnectUser(Context context) {
         dbHelper = new dbConnect(context);
     }
+
+    String COLUMN_ID = dbConnect.userId;
+    String TABLE_USERS = dbConnect.userTable;
+    String COLUMN_GOOGLE_ACCOUNT_ID = dbConnect.googleId;
 
     public boolean checkEmail(String emailcheck) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -38,6 +44,7 @@ public class dbConnectUser {
         values.put(dbConnect.userName, user.getUserName());
         values.put(dbConnect.email, user.getEmail());
         values.put(dbConnect.password, user.getPassword());
+        values.put(dbConnect.googleId, user.getGoogleId());
 
         db.insert(dbConnect.userTable, null, values);
     }
@@ -83,4 +90,24 @@ public class dbConnectUser {
             return -1; // user not found
         }
     }
+
+    @SuppressLint("Range")
+    public int getUserIdByGoogleAccountId(String googleAccountId) {
+        int userId = -1;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT " + COLUMN_ID + " FROM " + TABLE_USERS + " WHERE " + COLUMN_GOOGLE_ACCOUNT_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{googleAccountId});
+
+        if (cursor.moveToFirst()) {
+            userId = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
+        }
+
+        cursor.close();
+        db.close();
+
+        return userId;
+    }
+
 }
