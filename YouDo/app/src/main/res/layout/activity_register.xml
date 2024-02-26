@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RegisterActivity">
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -87,14 +85,14 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/regbtn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:layout_below="@id/password2"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="45dp"
 
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="45dp"
             android:text="Register"
             android:textSize="23dp"
 
@@ -102,7 +100,7 @@
             android:bottomLeftRadius="10dp"
             android:topLeftRadius="10dp"
             android:topRightRadius="10dp"
-            android:textColor="@color/dark_purple"
+            android:textColor="@color/purple_blue"
             android:backgroundTint="@color/white"
             />
 
@@ -111,7 +109,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/alreadyHaveAccount"
             android:layout_below="@id/regbtn"
-            android:text="Already have an account?"
+            android:text="@string/have_account"
             android:textSize="16dp"
             android:textColor="@color/white"
             android:layout_centerHorizontal="true"
