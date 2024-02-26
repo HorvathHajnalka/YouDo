@@ -135,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             if (userId != -1) {
-                Toast.makeText(this, "Google sign in successful.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Signed in with your Google account.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, ToDoMainActivity.class);
                 intent.putExtra("userId", userId);
                 startActivity(intent);
