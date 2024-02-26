@@ -11,7 +11,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 2;
+    private static int dbVersion = 3;
 
 
     // users
@@ -20,6 +20,7 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String userName = "userName";
     public static String email = "email";
     public static String password = "password";
+    public static String googleId = "googleId";
 
     // todos
     public static String todoTable = "todo";
@@ -49,7 +50,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
         // user table
         String makeUserQuery = "CREATE TABLE " + userTable + "(" + userId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + userName + " TEXT, "+ email + " TEXT, "+ password + " TEXT)";
+                + userName + " TEXT, " + email + " TEXT, " + password + " TEXT, " + googleId + " TEXT UNIQUE)";
         db.execSQL(makeUserQuery);
 
         // to do table

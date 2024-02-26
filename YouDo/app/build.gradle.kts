@@ -7,6 +7,10 @@ android {
     namespace = "com.example.youdo"
     compileSdk = 34
 
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+    }
+
     defaultConfig {
         applicationId = "com.example.youdo"
         minSdk = 33
@@ -30,6 +34,9 @@ android {
 }
 
 dependencies {
+    // google sign-in apis
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")
