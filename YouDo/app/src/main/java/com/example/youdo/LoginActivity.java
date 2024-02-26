@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.content.Intent;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -13,9 +14,13 @@ import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
 
+
 public class LoginActivity extends AppCompatActivity {
 
+    TextView newaccountbtn;
+
     EditText userNameLogIn, passwordLogIn;
+    MaterialButton loginbtn, googlebtn;
     dbConnectUser db = new dbConnectUser(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +30,9 @@ public class LoginActivity extends AppCompatActivity {
         userNameLogIn = findViewById(R.id.username);
         passwordLogIn = findViewById(R.id.password);
 
-        MaterialButton loginbtn  = (MaterialButton) findViewById(R.id.loginbtn);
-        TextView newaccountbtn  = (TextView) findViewById(R.id.newaccount);
+        loginbtn  = (MaterialButton) findViewById(R.id.loginbtn);
+        googlebtn  = (MaterialButton) findViewById(R.id.googlebtn);
+        newaccountbtn  = (TextView) findViewById(R.id.newaccount);
 
         // switch to registerpage
         newaccountbtn.setOnClickListener(new View.OnClickListener() {
@@ -63,7 +69,19 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        googlebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
+            }
+        });
+
 
     }
+
+
 }
+
+
+
 
