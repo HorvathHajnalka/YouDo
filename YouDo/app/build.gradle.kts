@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -29,6 +30,17 @@ android {
 }
 
 dependencies {
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    // google credential manager
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+    implementation("androidx.credentials:credentials:1.3.0-alpha01")
+
+    // google calendar
+    implementation("com.google.api-client:google-api-client-android:2.3.0")
+    implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")

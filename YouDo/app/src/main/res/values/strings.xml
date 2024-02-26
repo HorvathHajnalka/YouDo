@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">YouDo</string>
     <string name="successfully_logged_in">Successfully logged in</string>
+    <string name="web_client_id">377347138306-455ik1k4438aoqc11e4sfg3dv0heckfo.apps.googleusercontent.com</string>
 </resources>
