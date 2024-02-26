@@ -59,7 +59,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:id="@+id/loginbtn"
             android:layout_below="@id/password"
             android:text="Log in"
@@ -68,30 +68,40 @@
             android:layout_marginTop="40dp"
             android:layout_marginBottom="20dp"
 
-            android:bottomRightRadius="10dp"
-            android:bottomLeftRadius="10dp"
-            android:topLeftRadius="10dp"
-            android:topRightRadius="10dp"
-            android:textColor="@color/dark_purple"
+            android:textColor="@color/purple_blue"
             android:backgroundTint="@color/white"
             />
-        <com.google.android.material.button.MaterialButton
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
+            />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/googlebtn"
-            android:text="Google"
-            android:textSize="23dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cornerRadius="10dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/purple_blue"
+            android:outlineSpotShadowColor="@color/white"
+            android:text="Continue With Google"
+            android:textColor="@color/white"
+            app:icon="@drawable/googleg_standard_color_18"
+            app:iconPadding="10dp"
+            app:iconTint="#00100D0D"
+            app:iconTintMode="src_atop"
             android:layout_centerHorizontal="true"
-
             android:layout_below="@id/loginbtn"
-
             android:bottomRightRadius="10dp"
             android:bottomLeftRadius="10dp"
             android:topLeftRadius="10dp"
             android:topRightRadius="10dp"
-            android:textColor="@color/dark_purple"
-            android:backgroundTint="@color/white"
+            android:layout_marginBottom="50dp"
             />
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -101,7 +111,7 @@
             android:text="Or"
             android:textColor="@color/white"
             android:layout_centerHorizontal="true"
-            android:layout_margin="20dp"
+            android:layout_margin="25dp"
             />
 
         <LinearLayout
@@ -120,10 +130,11 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                android:text="Create a New Account"
+                android:text="@string/create_new_account"
                 android:textSize="16dp"
                 android:textColor="@color/white" />
         </LinearLayout>
+
 
 
 
