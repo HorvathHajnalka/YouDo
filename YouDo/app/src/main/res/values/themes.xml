@@ -12,4 +12,8 @@
         <item name="cornerSize">50%</item>
 
     </style>
+    <style name="DatePickerDialogTheme" parent="ThemeOverlay.Material3.Dialog">
+        <!-- Customize your theme here. -->
+    </style>
+
 </resources>

@@ -15,15 +15,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.api.services.calendar.CalendarScopes;
+
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -33,7 +28,8 @@ public class LoginActivity extends AppCompatActivity {
     dbConnectUser db = new dbConnectUser(this);
 
     private static final int RC_SIGN_IN = 9001; // code for Google Sign-In authentications
-    GoogleSignInClient mGoogleSignInClient;
+
+    private GoogleServicesHelper googleServicesHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         googlebtn = (MaterialButton) findViewById(R.id.googlebtn);
         newaccountbtn = (TextView) findViewById(R.id.newaccount);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestScopes(new Scope(CalendarScopes.CALENDAR))
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleServicesHelper = new GoogleServicesHelper(this);
 
         // switch to registerpage
         newaccountbtn.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // admin and admin
 
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
         googlebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                Intent signInIntent = googleServicesHelper.getSignInIntent();
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
@@ -103,49 +93,33 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
+            GoogleSignInAccount account = googleServicesHelper.getSignInAccountFromIntent(data);
+            googleServicesHelper.handleSignInResult(account, new GoogleServicesHelper.GoogleSignInResultCallback() {
+                @Override
+                public void onSignInSuccess(GoogleSignInAccount account) {
+                    updateUI(account);
+                }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            // successful login
-            updateUI(account);
-        } catch (ApiException e) {
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
+                @Override
+                public void onSignInFailure(Exception e) {
+                    Log.w(TAG, "signInResult:failed", e);
+                    updateUI(null);
+                }
+            });
         }
     }
 
     private void updateUI(GoogleSignInAccount account) {
         if (account != null) {
-            // check if the user enabled to use its google calendar
-            if (!account.getGrantedScopes().contains(new Scope(CalendarScopes.CALENDAR))) {
-                // if not, ask for it
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .requestScopes(new Scope(CalendarScopes.CALENDAR))
-                        .build();
-                GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-                return;
-            }
-
+            // google calendar api calls
             int userId = db.getUserIdByGoogleAccountId(account.getId());
 
             if (userId == -1) {
-
                 User newUser = new User();
                 newUser.setUserName(account.getDisplayName());
                 newUser.setEmail(account.getEmail());
-                // Google Account ID
                 newUser.setGoogleId(account.getId());
                 db.addUser(newUser);
-
                 userId = db.getUserIdByGoogleAccountId(account.getId());
             }
 
@@ -163,8 +137,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "Google sign in failed.", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
-
 
 
