@@ -1,3 +1,5 @@
+import io.grpc.internal.SharedResourceHolder.release
+
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -19,6 +21,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = "my_release_key"
+            keyPassword = "LiHa0166!"
+            storeFile = file("C:/android_projects/my_release_key.jks")
+            storePassword = "LiHa0166!"
+        }
     }
 
     buildTypes {

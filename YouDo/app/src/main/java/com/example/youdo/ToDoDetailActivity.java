@@ -12,7 +12,7 @@ import com.google.android.material.button.MaterialButton;
 
 public class ToDoDetailActivity extends AppCompatActivity {
 
-    TextView detailTitle, detailDesc;
+    TextView detailTitle, detailDesc, detailDate;
     MaterialButton editTodoBtn, delTodoBtn, doneTodoBtn;
     dbConnectToDo dbConnectToDo;
     ToDo todo;
@@ -29,6 +29,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
         editTodoBtn = findViewById(R.id.editTodoBtn);
         delTodoBtn = findViewById(R.id.delTodoBtn);
         doneTodoBtn = findViewById(R.id.doneTodoBtn);
+        detailDate = findViewById(R.id.detailDate);
 
 
 
@@ -44,6 +45,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
         if (todo != null) {
             detailTitle.setText(todo.getName());
             detailDesc.setText(todo.getDescription());
+            detailDate.setText("Date: " + todo.getDate());
 
         } else {
             Toast.makeText(this, "ToDo not found", Toast.LENGTH_SHORT).show();
