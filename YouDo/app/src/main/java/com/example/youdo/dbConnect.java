@@ -11,7 +11,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 3;
+    private static int dbVersion = 4;
 
 
     // users

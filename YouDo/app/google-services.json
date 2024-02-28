@@ -18,6 +18,14 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.youdo",
+            "certificate_hash": "badf607e29873a8138bc1e481c5d7daac986d46f"
+          }
+        },
+        {
+          "client_id": "377347138306-qsj14joslr0lpu9fmrcipbvnsn99qlsh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.youdo",
             "certificate_hash": "78def191bb949dc119a119fe9599760538799cfe"
           }
         },

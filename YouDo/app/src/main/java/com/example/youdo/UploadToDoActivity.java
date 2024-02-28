@@ -1,14 +1,14 @@
 package com.example.youdo;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Patterns;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -16,17 +16,32 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Scope;
-import com.google.android.material.button.MaterialButton;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Set;
-
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.material.button.MaterialButton;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventDateTime;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+
+import com.google.api.client.http.javanet.NetHttpTransport;
+
+
+
+
+
 
 public class UploadToDoActivity extends AppCompatActivity {
 
@@ -42,13 +57,23 @@ public class UploadToDoActivity extends AppCompatActivity {
     private GoogleServicesHelper googleServicesHelper;
     GoogleSignInAccount googleSignInAccount;
     dbConnectToDo db = new dbConnectToDo(this);
+
+
+    // google api
+    private static final String API_KEY = "AIzaSyD9w0afG7qAhm5zMGDZSYi5WSt3TR7FY7c";
+
+    private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    private static final int REQUEST_ACCOUNT_PICKER = 1000;
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR_EVENTS};
+
+    private GoogleAccountCredential credential;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_to_do);
 
         googleServicesHelper = new GoogleServicesHelper(this);
-        googleSignInAccount = GoogleServicesHelper.getSignedInAccount(UploadToDoActivity.this);
+        googleSignInAccount = googleServicesHelper.getSignedInAccount(UploadToDoActivity.this);
 
 
         initDatePicker();
@@ -69,6 +94,9 @@ public class UploadToDoActivity extends AppCompatActivity {
         datePickerBtn = (Button) findViewById(R.id.datePickerBtn);
         datePickerBtn.setText(getTodaysDate());
 
+        credential = GoogleAccountCredential.usingOAuth2(this, Arrays.asList(SCOPES))
+                .setBackOff(new ExponentialBackOff());
+
         datePickerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,59 +110,48 @@ public class UploadToDoActivity extends AppCompatActivity {
             }
         });
 
+
+
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (hasGoogleCalendarAccess()) {
+                    String strToDoName = uploadName.getText().toString();
+                    String strToDoDesc = uploadDesc.getText().toString();
 
-                String strToDoName = uploadName.getText().toString();
-                String strToDoDesc = uploadDesc.getText().toString();
+                    // Date picker values
+                    DatePicker datePicker = datePickerDialog.getDatePicker();
+                    int year = datePicker.getYear();
+                    int month = datePicker.getMonth();
+                    int day = datePicker.getDayOfMonth();
 
+                    Calendar startTime = Calendar.getInstance();
+                    startTime.set(year, month, day, 0, 0);
+                    Calendar endTime = (Calendar) startTime.clone();
+                    endTime.add(Calendar.DAY_OF_MONTH, 1); // to-do for all day
 
-                // Date picker values
-                DatePicker datePicker = datePickerDialog.getDatePicker();
-                int year = datePicker.getYear();
-                int month = datePicker.getMonth();
-                int day = datePicker.getDayOfMonth();
+                    if (strToDoName.isEmpty()) {
+                        Toast.makeText(UploadToDoActivity.this, "Empty name!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        ToDo newtodo = new ToDo();
+                        newtodo.setName(strToDoName);
+                        newtodo.setDescription(strToDoDesc);
+                        newtodo.setUserId(userId);
 
-                Calendar startTime = Calendar.getInstance();
-                startTime.set(year, month, day, 0, 0);
-                Calendar endTime = (Calendar) startTime.clone();
-                endTime.add(Calendar.DAY_OF_MONTH, 1); // to-do for all day
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        String strDate = dateFormat.format(startTime.getTime());
+                        newtodo.setDate(strDate);
 
-                if(strToDoName.isEmpty()) {
-                    Toast.makeText(UploadToDoActivity.this, "Empty name!", Toast.LENGTH_SHORT).show();
+                        db.addToDo(newtodo);
+                        addEventToCalendar(newtodo.getName(),newtodo.getDescription(), startTime, endTime);
+
+                        Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(UploadToDoActivity.this, ToDoMainActivity.class);
+                        intent.putExtra("userId", userId);
+                        startActivity(intent);
+                    }
                 } else {
-                    ToDo newtodo = new ToDo();
-                    newtodo.setName(strToDoName);
-                    newtodo.setDescription(strToDoDesc);
-                    newtodo.setUserId(userId);
-
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    String strDate = dateFormat.format(startTime.getTime());
-                    newtodo.setDate(strDate);
-
-                    db.addToDo(newtodo);
-
-                    googleServicesHelper.createGoogleCalendarEvent(googleSignInAccount, strToDoName, strToDoDesc, startTime, endTime, new GoogleServicesHelper.GoogleCalendarEventCallback() {
-                        @Override
-                        public void onEventCreated(Event event) {
-                            runOnUiThread(() -> Toast.makeText(UploadToDoActivity.this, "Event successfully added to Google Calendar", Toast.LENGTH_SHORT).show());
-                        }
-
-                        @Override
-                        public void onEventCreationError(Exception e) {
-                            runOnUiThread(() -> {
-                                Toast.makeText(UploadToDoActivity.this, "Failed to add event to Google Calendar"+ e.getMessage(), Toast.LENGTH_SHORT).show();
-                                // Itt logoljuk a hibaüzenetet
-                                Log.e("GoogleCalendarError", "Error adding event to Google Calendar: " + e.getMessage());
-                            });
-                        }
-                    });
-
-                    Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(UploadToDoActivity.this, ToDoMainActivity.class);
-                    intent.putExtra("userId", userId);
-                    startActivity(intent);
+                    Toast.makeText(UploadToDoActivity.this, "No access to Google Calendar", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -198,4 +215,82 @@ public class UploadToDoActivity extends AppCompatActivity {
     }
 
 
+    private void addEventToCalendar(String eventName,String eventDesc, Calendar startTime, Calendar endTime) {
+        try {
+            if (eventName == null || eventName.trim().isEmpty()) {
+                Log.e("Calendar Event", "Event name is empty or null");
+                return;
+            }
+
+            GoogleSignInAccount googleSignInAccount = googleServicesHelper.getSignedInAccount(UploadToDoActivity.this);
+
+            if (googleSignInAccount == null) {
+                Log.e("Calendar Event", "No GoogleSignInAccount. Authorization required.");
+                // Handle the case where no GoogleSignInAccount is available
+                // You might want to redirect the user to sign in or handle the authorization flow
+                return;
+            }
+
+            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
+                    UploadToDoActivity.this, Collections.singleton(CalendarScopes.CALENDAR));
+
+            credential.setSelectedAccount(googleSignInAccount.getAccount());
+
+            com.google.api.services.calendar.Calendar service = getCalendarService();
+
+            Log.i("Calendar Event", "Event Name: " + eventName);
+
+            Event event = new Event();
+
+            event.set("name", eventName);
+            event.set("summary", eventName);
+
+            event.setDescription(eventDesc);
+
+
+            DateTime startDateTime = new DateTime(startTime.getTime());
+            EventDateTime start = new EventDateTime().setDateTime(startDateTime).setTimeZone("CET");
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime(endTime.getTime());
+            EventDateTime end = new EventDateTime().setDateTime(endDateTime).setTimeZone("CET");
+            event.setEnd(end);
+
+            // Insert event using the authenticated service
+            service.events().insert("primary", event).execute();
+            Log.i("Calendar Event", "Event created successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Calendar Event", "Error creating event: " + e.getMessage());
+        }
+    }
+
+
+    private com.google.api.services.calendar.Calendar getCalendarService() throws IOException {
+        return new com.google.api.services.calendar.Calendar.Builder(
+                new NetHttpTransport(),
+                JacksonFactory.getDefaultInstance(),
+                credential)
+                .setApplicationName("YouDo")
+                .build();
+    }
+
+    private boolean hasGoogleCalendarAccess() {
+        if (googleSignInAccount != null) {
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestScopes(new Scope(CalendarScopes.CALENDAR))
+                    .build();
+
+            GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+            if (GoogleSignIn.hasPermissions(account, new Scope(CalendarScopes.CALENDAR))) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
 }
+
