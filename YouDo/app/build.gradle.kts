@@ -47,9 +47,12 @@ dependencies {
     implementation("androidx.credentials:credentials:1.3.0-alpha01")
 
     // google calendar
-    implementation("com.google.api-client:google-api-client-android:2.3.0")
+    implementation("com.google.api-client:google-api-client-android:2.3.0"){
+        exclude("org.apache.httpcomponents")
+    }
     implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
     implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.35.0")
 
 
     implementation("androidx.appcompat:appcompat:1.6.1")
