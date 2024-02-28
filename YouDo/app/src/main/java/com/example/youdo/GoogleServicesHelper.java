@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -100,7 +101,9 @@ public class GoogleServicesHelper {
 
     public void createGoogleCalendarEvent(GoogleSignInAccount account, String title, String description, java.util.Calendar startTime, java.util.Calendar endTime, GoogleCalendarEventCallback callback) {
         try {
-            Calendar service = getGoogleCalendarService(account);
+
+            com.google.api.services.calendar.Calendar service = getGoogleCalendarService(account);
+
             Event event = new Event()
                     .setSummary(title)
                     .setDescription(description);

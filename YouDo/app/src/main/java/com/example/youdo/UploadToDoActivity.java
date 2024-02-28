@@ -114,6 +114,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                     newtodo.setDate(strDate);
 
                     db.addToDo(newtodo);
+                    
 
                     googleServicesHelper.createGoogleCalendarEvent(googleSignInAccount, strToDoName, strToDoDesc, startTime, endTime, new GoogleServicesHelper.GoogleCalendarEventCallback() {
                         @Override
