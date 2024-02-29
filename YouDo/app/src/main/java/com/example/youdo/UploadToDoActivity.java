@@ -295,6 +295,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                 .build();
     }
 
+
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
         InputStreamReader clientSecretsReader = new InputStreamReader(

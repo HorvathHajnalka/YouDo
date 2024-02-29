@@ -21,19 +21,29 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
+    signingConfigs {
+        create("debug-test") {
+            storeFile = file("C:/android_projects/YouDo/YouDo/test-keystore.jks")
+            storePassword = "testtest"
+            keyAlias = "test-key"
+            keyPassword = "testtest"
+        }
+    }
 
     buildTypes {
         debug {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("debug-test")
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -57,6 +67,7 @@ dependencies {
 
     // Google Calendar
     implementation("com.google.api-client:google-api-client-android:2.3.0")
+    // implementation("com.google.api-client:google-api-client:2.3.0")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.35.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
     implementation("com.google.android.material:material:1.11.0")
@@ -84,3 +95,4 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata:2.7.0")
 }
+
