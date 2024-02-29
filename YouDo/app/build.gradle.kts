@@ -36,12 +36,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
 dependencies {
+
     // Google Sign-In APIs
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
@@ -59,6 +60,7 @@ dependencies {
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.35.0")
     implementation("com.google.apis:google-api-services-calendar:v3-rev411-1.25.0")
     implementation("com.google.android.material:material:1.11.0")
+    // implementation("com.google.api-client:google-api-client:2.3.0")
 
     // AndroidX dependencies
     implementation("androidx.appcompat:appcompat:1.6.1")
