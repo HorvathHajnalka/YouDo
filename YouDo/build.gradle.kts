@@ -7,6 +7,9 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://maven.google.com")
+        }
     }
     dependencies {
         classpath("com.google.gms:google-services:4.4.1")
