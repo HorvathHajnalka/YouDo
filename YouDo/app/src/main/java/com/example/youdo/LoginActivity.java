@@ -145,8 +145,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
-                Toast.makeText(this, "Successfully signed in with Google: " + account.getEmail(), Toast.LENGTH_SHORT).show();
-                createAndAddEventToGoogleCalendar(account);
+                Toast.makeText(this, "Successfully signed in as " + account.getEmail(), Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(LoginActivity.this, ToDoMainActivity.class);
+                intent.putExtra("userId", googleAccountId);
+                startActivity(intent);
+                finish();
+                // createAndAddEventToGoogleCalendar(account);
             }
         } catch (ApiException e) {
             // Handle ApiException
