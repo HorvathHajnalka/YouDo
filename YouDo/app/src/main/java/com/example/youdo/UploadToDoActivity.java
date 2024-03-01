@@ -214,7 +214,7 @@ private void createAndAddEventToGoogleCalendar(GoogleSignInAccount account, Stri
     String googleAccountId = account.getId();
 
 
-    DateTime startTime= new DateTime(dateStr + "T23:00:00Z"); // Set time to midnight UTC
+    DateTime startTime= new DateTime(dateStr + "T00:00:00Z"); // Set time to midnight UTC
 
     // Create a new DateTime object for the end time by adding one day in milliseconds.
     long oneDayInMilliseconds = TimeUnit.DAYS.toMillis(1);
