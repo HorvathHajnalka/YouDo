@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +43,7 @@ import com.google.api.services.calendar.model.EventDateTime;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
@@ -85,8 +88,18 @@ public class UploadToDoActivity extends AppCompatActivity {
     private GoogleAccountCredential credential;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_to_do);
+
+        Context context;
+        AssetManager assetManager = getAssets();
+        try {
+            InputStream inputStream = assetManager.open("testkeystore.jks");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         googleServicesHelper = new GoogleServicesHelper(this);
         googleSignInAccount = googleServicesHelper.getSignedInAccount(UploadToDoActivity.this);

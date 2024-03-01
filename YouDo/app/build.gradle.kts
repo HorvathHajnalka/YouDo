@@ -21,12 +21,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resValue ( "string",  "rawtestjks", "C:\\android_projects\\YouDo\\YouDo\\testkeystore.jks")
 
     }
 
     signingConfigs {
         create("debug-test") {
-            storeFile = file("C:/android_projects/YouDo/YouDo/test-keystore.jks")
+            storeFile = file("C:\\android_projects\\YouDo\\YouDo\\testkeystore.jks")
             storePassword = "testtest"
             keyAlias = "test-key"
             keyPassword = "testtest"
