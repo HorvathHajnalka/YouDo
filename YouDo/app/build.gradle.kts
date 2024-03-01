@@ -56,7 +56,7 @@ dependencies {
 
     // Google Sign-In APIs
     implementation("com.google.android.gms:play-services-auth:21.0.0")
-
+    implementation("com.google.android.gms:play-services-identity:18.0.1")
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")

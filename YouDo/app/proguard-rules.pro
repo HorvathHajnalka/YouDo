@@ -24,3 +24,4 @@
 -keep class androidx.credentials.playservices.** {
   *;
 }
+-keep class com.google.android.gms.auth.** { *; }
