@@ -3,6 +3,7 @@ package com.example.youdo;
 
 public class ToDo {
     private int todoId;
+    private String googleTodoId;
     private String name;
     private String date;
     private String time;
@@ -62,5 +63,13 @@ public class ToDo {
     }
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getGoogleTodoId() {
+        return googleTodoId;
+    }
+
+    public void setGoogleTodoId(String googleTodoId) {
+        this.googleTodoId = googleTodoId;
     }
 }
