@@ -1,7 +1,6 @@
 package com.example.youdo;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -19,23 +18,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Collections;
-
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 
 
 
@@ -65,11 +50,18 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
-                .requestScopes(new Scope(CalendarScopes.CALENDAR)) // Hozzáférés a naptár API-hoz
+                .requestProfile()
+                .requestScopes(new Scope(CalendarScopes.CALENDAR)) // enable apis
                 .build();
 
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            // User is already signed in. Sign them out.
+            signOut(mGoogleSignInClient);
+        }
 
         // switch to registerpage
         newaccountbtn.setOnClickListener(new View.OnClickListener() {
@@ -112,9 +104,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         });
     }
 
+    private void signOut(GoogleSignInClient mGoogleSignInClient) {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, task -> {
+                    // Handle sign out (update UI, navigate to login screen, etc.)
+                    // Toast.makeText(this, "Successfully signed out", Toast.LENGTH_SHORT).show();
+                    // Here you can update your UI or navigate back to your login screen, etc.
+                });
+    }
+
     private void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        // Megszakítja a felhasználó aktuális bejelentkezési állapotát
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // Ezután indítja el a bejelentkezési szándékot
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
     }
 
     @Override
@@ -135,7 +140,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     handleSignInResult(task, googleAccountId);
                 }
             } else {
-                // Kezeljük a sikertelenséget, például logolással vagy Toast üzenettel
+                // fail
                 Toast.makeText(this, "Google Sign In failed", Toast.LENGTH_SHORT).show();
             }
         }
@@ -165,92 +170,5 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Handle GoogleApiClient connection failure
         Toast.makeText(this, "Connection to Google Play Services failed", Toast.LENGTH_SHORT).show();
     }
-
-    private void createAndAddEventToGoogleCalendar(GoogleSignInAccount account) {
-
-        String googleAccountId = account.getId();
-        // You can customize the event details here
-        String title = "Test Event";
-        String description = "This is a test event.";
-
-        // Set the start and end time for the event (you may customize these)
-        DateTime startTime = new DateTime("2024-03-01T10:00:00Z"); // Example: 10:00 AM UTC
-        DateTime endTime = new DateTime("2024-03-01T11:00:00Z");   // Example: 11:00 AM UTC
-
-        // Use GoogleAccountCredential for authentication
-        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                this, Collections.singleton(CalendarScopes.CALENDAR));
-
-        credential.setSelectedAccountName(account.getAccount().name);
-
-        // Build the Calendar service
-        com.google.api.services.calendar.Calendar service = null;
-        HttpTransport httpTransport = new NetHttpTransport();
-        service = new com.google.api.services.calendar.Calendar.Builder(
-                httpTransport, new GsonFactory(), credential)
-                .setApplicationName("YouDo")
-                .build();
-
-
-
-        addEventToGoogleCalendar(service, title, description, startTime, endTime);
-    }
-    private void addEventToGoogleCalendar(com.google.api.services.calendar.Calendar service,
-                                          String title, String description, DateTime startTime, DateTime endTime) {
-        new AddEventTask(service, title, description, startTime, endTime).execute();
-    }
-
-    private class AddEventTask extends AsyncTask<Void, Void, Boolean> {
-        private com.google.api.services.calendar.Calendar service;
-        private String title;
-        private String description;
-        private DateTime startTime;
-        private DateTime endTime;
-
-        public AddEventTask(com.google.api.services.calendar.Calendar service,
-                            String title, String description, DateTime startTime, DateTime endTime) {
-            this.service = service;
-            this.title = title;
-            this.description = description;
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                Event event = new Event()
-                        .setSummary(title)
-                        .setDescription(description);
-
-                EventDateTime start = new EventDateTime()
-                        .setDateTime(startTime)
-                        .setTimeZone("UTC");
-                event.setStart(start);
-
-                EventDateTime end = new EventDateTime()
-                        .setDateTime(endTime)
-                        .setTimeZone("UTC");
-                event.setEnd(end);
-
-                service.events().insert("primary", event).execute();
-                return true; // Indicates success
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false; // Indicates failure
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                Toast.makeText(LoginActivity.this, "Event added to Google Calendar", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(LoginActivity.this, "Error adding event to Google Calendar", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
 
 }

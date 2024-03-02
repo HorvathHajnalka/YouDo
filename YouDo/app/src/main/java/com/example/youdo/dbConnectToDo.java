@@ -18,11 +18,12 @@ public class dbConnectToDo {
     }
 
 
-    public void addToDo(ToDo todo){
+    public int addToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
         values.put(dbConnect.todoName, todo.getName());
+        values.put(dbConnect.googleTodoId, todo.getGoogleTodoId());
         values.put(dbConnect.todoDesc, todo.getDescription());
         values.put(dbConnect.todoState, todo.getState());
         values.put(dbConnect.todoDate, todo.getDate());
@@ -30,8 +31,11 @@ public class dbConnectToDo {
         values.put(dbConnect.todoTypeId, todo.getTypeId());
         values.put(dbConnect.todoUserId, todo.getUserId());
 
-        db.insert(dbConnect.todoTable, null, values);
+
+        int id = (int) db.insert(dbConnect.todoTable, null, values);
         db.close();
+
+        return id;
     }
 
     public boolean updateToDo(ToDo todo){
@@ -39,6 +43,7 @@ public class dbConnectToDo {
         ContentValues values = new ContentValues();
 
         values.put(dbConnect.todoName, todo.getName());
+        values.put(dbConnect.googleTodoId, todo.getGoogleTodoId());
         values.put(dbConnect.todoDesc, todo.getDescription());
         values.put(dbConnect.todoState, todo.getState());
         values.put(dbConnect.todoDate, todo.getDate());
@@ -59,6 +64,24 @@ public class dbConnectToDo {
         return endResult > 0;
     }
 
+    public boolean getToDoByGoogleId(String googleId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] columns = {dbConnect.googleTodoId};
+        String selection = dbConnect.googleTodoId + " =?";
+        String[] selectionArgs = {googleId};
+
+        Cursor cursor = db.query(dbConnect.todoTable, columns, selection, selectionArgs, null, null, null);
+
+        boolean exists = cursor.getCount() > 0;
+
+        cursor.close();
+
+        db.close();
+
+        return exists;
+    }
+
 
 
     public List<ToDo> getAllToDoPerUser(int uId) {
@@ -67,6 +90,7 @@ public class dbConnectToDo {
 
         String[] projection = {
                 dbConnect.todoId,
+                dbConnect.googleTodoId,
                 dbConnect.todoName,
                 dbConnect.todoDesc,
                 dbConnect.todoDate,
@@ -91,6 +115,7 @@ public class dbConnectToDo {
             do {
                 ToDo todo = new ToDo();
                 int todoIdIndex = cursor.getColumnIndex(dbConnect.todoId);
+                int googleTodoIdIndex = cursor.getColumnIndex(dbConnect.googleTodoId);
                 int nameIndex = cursor.getColumnIndex(dbConnect.todoName);
                 int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
                 int dateIndex = cursor.getColumnIndex(dbConnect.todoDate);
@@ -100,6 +125,7 @@ public class dbConnectToDo {
                 int stateIndex = cursor.getColumnIndex(dbConnect.todoState);
 
                 if (todoIdIndex != -1) todo.setTodoId(cursor.getInt(todoIdIndex));
+                if (googleTodoIdIndex != -1) todo.setGoogleTodoId(cursor.getString(googleTodoIdIndex));
                 if (nameIndex != -1) todo.setName(cursor.getString(nameIndex));
                 if (descIndex != -1) todo.setDescription(cursor.getString(descIndex));
                 if (dateIndex != -1) todo.setDate(cursor.getString(dateIndex));
@@ -127,13 +153,14 @@ public class dbConnectToDo {
         String[] selectionArgs = {String.valueOf(todoId)};
 
         Cursor cursor = db.query(dbConnect.todoTable,
-                new String[]{dbConnect.todoId, dbConnect.todoName, dbConnect.todoDesc, dbConnect.todoState, dbConnect.todoDate, dbConnect.todoTime, dbConnect.todoTypeId, dbConnect.todoUserId},
+                new String[]{dbConnect.todoId,dbConnect.googleTodoId, dbConnect.todoName, dbConnect.todoDesc, dbConnect.todoState, dbConnect.todoDate, dbConnect.todoTime, dbConnect.todoTypeId, dbConnect.todoUserId},
                 selection, selectionArgs, null, null, null);
 
         ToDo todo = null;
         if (cursor != null && cursor.moveToFirst()) {
             todo = new ToDo();
             int idIndex = cursor.getColumnIndex(dbConnect.todoId);
+            int googleIdIndex = cursor.getColumnIndex(dbConnect.googleTodoId);
             int nameIndex = cursor.getColumnIndex(dbConnect.todoName);
             int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
             int stateIndex = cursor.getColumnIndex(dbConnect.todoState);
@@ -143,6 +170,7 @@ public class dbConnectToDo {
             int userIdIndex = cursor.getColumnIndex(dbConnect.todoUserId);
 
             if (idIndex != -1) todo.setTodoId(cursor.getInt(idIndex));
+            if (googleIdIndex != -1) todo.setGoogleTodoId(cursor.getString(googleIdIndex));
             if (nameIndex != -1) todo.setName(cursor.getString(nameIndex));
             if (descIndex != -1) todo.setDescription(cursor.getString(descIndex));
             if (stateIndex != -1) todo.setState(cursor.getString(stateIndex));

@@ -11,7 +11,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 4;
+    private static int dbVersion = 5;
 
 
     // users
@@ -25,6 +25,7 @@ public class dbConnect extends SQLiteOpenHelper {
     // todos
     public static String todoTable = "todo";
     public static String todoId = "todoId";
+    public static String googleTodoId = "googleTodoId";
     public static String todoName = "todoName";
     public static String todoDesc = "todoDesc";
     public static String todoState = "todoState"; // Boolean?
@@ -55,7 +56,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
         // to do table
         String makeTodoQuery = "CREATE TABLE " + todoTable + "(" + todoId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoState + " TEXT, " + todoDate + " TEXT, "
+                + googleTodoId + " TEXT, " + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoState + " TEXT, " + todoDate + " TEXT, "
                 + todoTime + " TEXT, " + todoTypeId + " INTEGER, " + todoUserId + " INTEGER, "
                 + "FOREIGN KEY(" + todoTypeId + ") REFERENCES " + typeTable + "(" + typeId + "), "
                 + "FOREIGN KEY(" + todoUserId + ") REFERENCES " + userTable + "(" + userId + "))";
