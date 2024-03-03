@@ -66,6 +66,16 @@ public class ToDoDetailActivity extends AppCompatActivity {
             finish(); // last activity
         }
 
+        editTodoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ToDoDetailActivity.this, UploadToDoActivity.class);
+                intent.putExtra("userId", userId);
+                intent.putExtra("todoId", todoId);
+                startActivity(intent);
+            }
+        });
+
         delTodoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,10 +98,9 @@ public class ToDoDetailActivity extends AppCompatActivity {
             }
         });
     }
-    // Ez a metódus törli az eseményt a Google Naptárból
     @SuppressLint("StaticFieldLeak")
     private void deleteEventFromGoogleCalendar(String eventId, GoogleSignInAccount account) {
-        // Itt futtatjuk az aszinkron műveletet az esemény törlésére
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -109,8 +118,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
                             .setApplicationName("YouDo")
                             .build();
 
-                    // Feltehetően már rendelkezésre áll egy Google Naptár API kliens példány
-                    // Töröljük az eseményt az esemény azonosító alapján
+                    // delete event
                     service.events().delete("primary", eventId).execute();
                 } catch (Exception e) {
                     Log.e("deleteEvent", "Error deleting event from Google Calendar", e);
@@ -121,7 +129,6 @@ public class ToDoDetailActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                // Itt kezelhetjük az esemény törlés utáni logikát, pl. UI frissítése
                 Toast.makeText(ToDoDetailActivity.this, "Event deleted from Google Calendar", Toast.LENGTH_SHORT).show();
             }
         }.execute();
