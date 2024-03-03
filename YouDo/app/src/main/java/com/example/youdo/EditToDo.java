@@ -1,6 +1,6 @@
 package com.example.youdo;
 
-import static java.util.TimeZone.getTimeZone;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -15,8 +15,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.button.MaterialButton;
@@ -30,7 +28,6 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -39,25 +36,18 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.concurrent.CompletableFuture;
 
-
-public class UploadToDoActivity extends AppCompatActivity {
-
+public class EditToDo extends AppCompatActivity {
 
     EditText uploadName, uploadDesc;
     Button datePickerBtn;
     MaterialButton addNewTypeBtn, saveBtn;
     private DatePickerDialog datePickerDialog;
-    TextView mainTitle;
 
     String strUserId;
     int userId;
-    int editTodoId;
     Bundle extras;
     dbConnectToDo db = new dbConnectToDo(this);
-    ToDo editTodo;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,45 +59,19 @@ public class UploadToDoActivity extends AppCompatActivity {
 
         uploadName = findViewById(R.id.addToDoName);
         uploadDesc = findViewById(R.id.addToDoDesc);
-        mainTitle = findViewById(R.id.mainTitle);
-        addNewTypeBtn = findViewById(R.id.newtypebtn);
-        saveBtn = findViewById(R.id.saveTodoBtn);
-        datePickerBtn = findViewById(R.id.datePickerBtn);
 
-
+        userId = -1;
         extras = getIntent().getExtras();
         if (extras != null) {
             userId = extras.getInt("userId", -1);
             strUserId = String.valueOf(userId);
-            editTodoId = extras.getInt("todoId", -1);
         }
 
-        if (editTodoId != -1) {
-            editTodo = db.getTodoById(editTodoId);
-            mainTitle.setText("Edit ToDo");
-            uploadName.setText(editTodo.getName());
-            uploadDesc.setText(editTodo.getDescription());
+        MaterialButton addNewTypeBtn = (MaterialButton) findViewById(R.id.newtypebtn);
+        TextView saveBtn = (TextView) findViewById(R.id.saveTodoBtn);
 
-            // convert from yyyy-mm-dd to yyyy/mm/dd
-
-            String originalDateString = editTodo.getDate();
-            String formattedDateString = "";
-
-            SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy/MM/dd  ");
-
-            try {
-                Date date = originalFormat.parse(originalDateString);
-                formattedDateString = targetFormat.format(date);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            datePickerBtn.setText(formattedDateString);
-
-        } else {
-            datePickerBtn.setText(getTodaysDate());
-        }
+        datePickerBtn = (Button) findViewById(R.id.datePickerBtn);
+        datePickerBtn.setText(getTodaysDate());
 
         datePickerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +82,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         addNewTypeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(UploadToDoActivity.this, NewTypeActivity.class));
+                startActivity(new Intent(EditToDo.this, NewTypeActivity.class));
             }
         });
 
@@ -142,87 +106,64 @@ public class UploadToDoActivity extends AppCompatActivity {
                 endTime.add(Calendar.DAY_OF_MONTH, 1); // to-do for all day
 
                 if (strToDoName.isEmpty()) {
-                    Toast.makeText(UploadToDoActivity.this, "Empty name!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditToDo.this, "Empty name!", Toast.LENGTH_SHORT).show();
                 } else {
+                    ToDo newtodo = new ToDo();
+                    newtodo.setName(strToDoName);
+                    newtodo.setDescription(strToDoDesc);
+                    newtodo.setUserId(userId);
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String strDate = dateFormat.format(startTime.getTime());
+                    newtodo.setDate(strDate);
+
+                    Context context;
+
+                    int todoId = db.addToDo(newtodo);
+                    newtodo.setTodoId(todoId);
+
+                    GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(EditToDo.this);
+
+                    if (account != null) {
+                        createAndAddEventToGoogleCalendar(newtodo, account, strToDoName, strToDoDesc, strDate, new EditToDo.EventCallback() {
+                            /**
+                             * @param eventId
+                             */
+                            @Override
+                            public void onEventAdded(String eventId) {
+
+                                newtodo.setGoogleTodoId(eventId);
+                                db.updateToDo(newtodo);
+
+                                // Toast.makeText(EditToDo.this, "Event updated"+eventId, Toast.LENGTH_LONG).show();
+                                // Log success and notify user through UI
+                                Log.d("GoogleCalendarEvent", "Event added successfully. ID: " + eventId);
+
+                                runOnUiThread(() -> {
+                                    // Toast.makeText(EditToDo.this, "Event successfully added to Google Calendar", Toast.LENGTH_LONG).show();
+                                });
 
 
-                    GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(UploadToDoActivity.this);
+                            }
 
-                    int todoId = -1;
+                            /**
+                             *
+                             */
+                            @Override
+                            public void onError() {
+                                Log.e("GoogleCalendarEvent", "Failed to add event to Google Calendar");
+                                runOnUiThread(() -> {
+                                    // Toast.makeText(EditToDo.this, "Failed to add event to Google Calendar", Toast.LENGTH_LONG).show();
+                                });
 
-                    // new to do
-                    if (editTodoId == -1) {
-                        ToDo newtodo = new ToDo();
-                        newtodo.setName(strToDoName);
-                        newtodo.setDescription(strToDoDesc);
-                        newtodo.setUserId(userId);
-
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        String strDate = dateFormat.format(startTime.getTime());
-                        newtodo.setDate(strDate);
-
-                        todoId = db.addToDo(newtodo);
-                        newtodo.setTodoId(todoId);
-
-                        Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
-
-                        if (account != null) {
-                            createAndAddEventToGoogleCalendar(newtodo, account, strToDoName, strToDoDesc, strDate, new EventCallback() {
-                                /**
-                                 * @param eventId
-                                 */
-                                @Override
-                                public void onEventAdded(String eventId) {
-                                    newtodo.setGoogleTodoId(eventId);
-                                    db.updateToDo(newtodo);
-                                    Log.d("GoogleCalendarEvent", "Event added successfully. ID: " + eventId);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    Log.e("GoogleCalendarEvent", "Failed to add event to Google Calendar");
-                                }
-                            });
-                        }
-                    }
-                    // edit old to do
-                    else {
-                        editTodo.setName(strToDoName);
-                        editTodo.setDescription(strToDoDesc);
-                        editTodo.setUserId(userId);
-
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        String strDate = dateFormat.format(startTime.getTime());
-                        editTodo.setDate(strDate);
-
-                        boolean updated = db.updateToDo(editTodo);
-                        if (updated) {
-                            Toast.makeText(UploadToDoActivity.this, "ToDo has been updated successfully!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(UploadToDoActivity.this, "ToDo update failed!", Toast.LENGTH_SHORT).show();
-                        }
-
-                        String eventId = editTodo.getGoogleTodoId();
-                        if (account != null && eventId != null) {
-                            CompletableFuture.runAsync(() -> {
-                                try {
-                                    updateEvent(account, eventId, strToDoName, strToDoDesc, strDate);
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }).thenRun(() -> {
-                                // UI frissítése vagy más tevékenység, ami a hívás befejezése után szükséges
-                                // Ezt a kódot a fő szálon kell futtatni, pl. használhatod a runOnUiThread ha Activity-ből hívod
-
-                            });
-                            Toast.makeText(UploadToDoActivity.this, "ToDo has been updated in Google Calendar!", Toast.LENGTH_SHORT).show();
-                        }
-
+                            }
+                        });
                     }
 
 
-                    Intent intent = new Intent(UploadToDoActivity.this, ToDoMainActivity.class);
+
+                    Toast.makeText(EditToDo.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(EditToDo.this, ToDoMainActivity.class);
                     intent.putExtra("userId", userId);
                     startActivity(intent);
                 }
@@ -289,7 +230,15 @@ public class UploadToDoActivity extends AppCompatActivity {
     }
 
 
-    private void createAndAddEventToGoogleCalendar(ToDo newtodo, GoogleSignInAccount account, String title, String description, String dateStr, EventCallback callback) {
+    private void createAndAddEventToGoogleCalendar(ToDo newtodo, GoogleSignInAccount account, String title, String description, String dateStr, EditToDo.EventCallback callback) {
+
+
+        // String title = "Test Event";
+        // String description = "This is a test event.";
+
+        // Set the start and end time for the event (you may customize these)
+        // 'day' format: "YYYY-MM-DD"
+
 
         String googleAccountId = account.getId();
 
@@ -322,7 +271,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                 .build();
 
 
-        addEventToGoogleCalendar(newtodo, service, title, description, startTime, endTime, new EventCallback() {
+        addEventToGoogleCalendar(newtodo, service, title, description, startTime, endTime, new EditToDo.EventCallback() {
             @Override
             public void onEventAdded(String eventId) {
 
@@ -341,8 +290,8 @@ public class UploadToDoActivity extends AppCompatActivity {
     private void addEventToGoogleCalendar(ToDo newtodo, com.google.api.services.calendar.Calendar service,
                                           String title, String description,
                                           ZonedDateTime startTime, ZonedDateTime endTime,
-                                          EventCallback callback) {
-        new AddEventTask(newtodo, service, title, description, startTime, endTime, callback).execute();
+                                          EditToDo.EventCallback callback) {
+        new EditToDo.AddEventTask(newtodo, service, title, description, startTime, endTime, callback).execute();
     }
 
 
@@ -353,12 +302,12 @@ public class UploadToDoActivity extends AppCompatActivity {
         private String description;
         private ZonedDateTime startTime;
         private ZonedDateTime endTime;
-        private EventCallback callback;
+        private EditToDo.EventCallback callback;
 
         public AddEventTask(ToDo newtodo, com.google.api.services.calendar.Calendar service,
                             String title, String description,
                             ZonedDateTime startTime, ZonedDateTime endTime,
-                            EventCallback callback) {
+                            EditToDo.EventCallback callback) {
             this.newtodo = newtodo;
             this.service = service;
             this.title = title;
@@ -401,7 +350,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                 // String val = String.valueOf(db.getToDoByGoogleId(eventId));
 
 
-                // Toast.makeText(UploadToDoActivity.this, "Event updated"+ newtodo.getTodoId(), Toast.LENGTH_LONG).show();
+                // Toast.makeText(EditToDo.this, "Event updated"+ newtodo.getTodoId(), Toast.LENGTH_LONG).show();
 
             } else {
                 Toast.makeText(getApplicationContext(), "Failed to add even to your Google Calendar", Toast.LENGTH_LONG).show();
@@ -414,56 +363,4 @@ public class UploadToDoActivity extends AppCompatActivity {
 
         void onError();
     }
-
-    // update event
-    private void updateEvent(GoogleSignInAccount account, String eventId, String strToDoName, String strToDoDesc, String strDate) {
-        // Use GoogleAccountCredential for authentication
-        GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
-                this, Collections.singleton(CalendarScopes.CALENDAR));
-
-        credential.setSelectedAccountName(account.getAccount().name);
-        // Build the Calendar service
-        com.google.api.services.calendar.Calendar service = null;
-        HttpTransport httpTransport = new NetHttpTransport();
-        service = new com.google.api.services.calendar.Calendar.Builder(
-                httpTransport, new GsonFactory(), credential)
-                .setApplicationName("YouDo")
-                .build();
-        if (service == null) {
-            Log.w("UpdateEvent", "Google Calendar API service not initialized.");
-            return;
-        }
-
-        try {
-            // Find the event
-            Event event = service.events().get("primary", eventId).execute();
-
-            // Update the event details
-            event.setSummary(strToDoName);
-            event.setDescription(strToDoDesc);
-
-            LocalDate startDate = LocalDate.parse(strDate);
-
-            ZonedDateTime startTime = startDate.atStartOfDay(ZoneId.of("Europe/Budapest"));
-            ZonedDateTime endTime = startTime.plusDays(1);
-
-            // Adjust start and end time if necessary, considering daylight saving
-            EventDateTime start = new EventDateTime().setDateTime(new DateTime(startTime.toInstant().toString())).setTimeZone("Europe/Budapest");
-            event.setStart(start);
-
-            EventDateTime end = new EventDateTime().setDateTime(new DateTime(endTime.toInstant().toString())).setTimeZone("Europe/Budapest");
-            event.setEnd(end);
-
-            // Save the event
-            event = service.events().update("primary", event.getId(), event).execute();
-
-            Log.d("UpdateEvent", "Event updated: " + event.getHtmlLink());
-
-
-        } catch (Exception e) {
-            Log.e("UpdateEvent", "Exception occurred: " + e.getMessage());
-        }
-    }
 }
-
-
