@@ -29,6 +29,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/mainTitle"
                 android:text="Add a ToDo"
                 android:textStyle="bold"
                 android:textSize="25sp"
@@ -90,20 +91,21 @@
                         />
             </LinearLayout>
 
+            <!--
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="Select a time:"
                 android:textSize="20sp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"/>-->
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
                 android:text="Select a type:"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textColor="@color/white"
                 />
             <com.google.android.material.button.MaterialButton

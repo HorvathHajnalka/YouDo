@@ -1,35 +1,38 @@
 package com.example.youdo;
 
-
-import static android.content.ContentValues.TAG;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-
 import android.content.Intent;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.api.services.calendar.CalendarScopes;
 
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     TextView newaccountbtn;
     EditText userNameLogIn, passwordLogIn;
     MaterialButton loginbtn, googlebtn;
     dbConnectUser db = new dbConnectUser(this);
 
-    private static final int RC_SIGN_IN = 9001; // code for Google Sign-In authentications
-
-    private GoogleServicesHelper googleServicesHelper;
+    private static final int RC_SIGN_IN = 100;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +42,26 @@ public class LoginActivity extends AppCompatActivity {
         userNameLogIn = findViewById(R.id.username);
         passwordLogIn = findViewById(R.id.password);
 
-        loginbtn = (MaterialButton) findViewById(R.id.loginbtn);
-        googlebtn = (MaterialButton) findViewById(R.id.googlebtn);
-        newaccountbtn = (TextView) findViewById(R.id.newaccount);
+        loginbtn = findViewById(R.id.loginbtn);
+        googlebtn = findViewById(R.id.googlebtn);
+        newaccountbtn = findViewById(R.id.newaccount);
 
-        googleServicesHelper = new GoogleServicesHelper(this);
+        // Configure Google Sign-In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .requestProfile()
+                .requestScopes(new Scope(CalendarScopes.CALENDAR)) // enable apis
+                .build();
+
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null) {
+            // User is already signed in. Sign them out.
+            signOut(mGoogleSignInClient);
+        }
 
         // switch to registerpage
         newaccountbtn.setOnClickListener(new View.OnClickListener() {
@@ -52,7 +70,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
-
 
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,64 +96,79 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
         googlebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent signInIntent = googleServicesHelper.getSignInIntent();
-                startActivityForResult(signInIntent, RC_SIGN_IN);
+                signIn();
             }
         });
     }
+
+    private void signOut(GoogleSignInClient mGoogleSignInClient) {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, task -> {
+                    // Handle sign out (update UI, navigate to login screen, etc.)
+                    // Toast.makeText(this, "Successfully signed out", Toast.LENGTH_SHORT).show();
+                    // Here you can update your UI or navigate back to your login screen, etc.
+                });
+    }
+
+    private void signIn() {
+        // Megszakítja a felhasználó aktuális bejelentkezési állapotát
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // Ezután indítja el a bejelentkezési szándékot
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
-            GoogleSignInAccount account = googleServicesHelper.getSignInAccountFromIntent(data);
-            googleServicesHelper.handleSignInResult(account, new GoogleServicesHelper.GoogleSignInResultCallback() {
-                @Override
-                public void onSignInSuccess(GoogleSignInAccount account) {
-                    updateUI(account);
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            if (resultCode == RESULT_OK && task.isSuccessful()) {
+                GoogleSignInAccount account = null;
+                try {
+                    account = task.getResult(ApiException.class);
+                } catch (ApiException e) {
+                    throw new RuntimeException(e);
                 }
-
-                @Override
-                public void onSignInFailure(Exception e) {
-                    Log.w(TAG, "signInResult:failed", e);
-                    updateUI(null);
+                if (account != null) {
+                    String googleAccountId = account.getId();
+                    handleSignInResult(task, googleAccountId);
                 }
-            });
+            } else {
+                // fail
+                Toast.makeText(this, "Google Sign In failed", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private void updateUI(GoogleSignInAccount account) {
-        if (account != null) {
-            // google calendar api calls
-            int userId = db.getUserIdByGoogleAccountId(account.getId());
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask, String googleAccountId) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if (account != null) {
+                Toast.makeText(this, "Successfully signed in as " + account.getEmail(), Toast.LENGTH_SHORT).show();
 
-            if (userId == -1) {
-                User newUser = new User();
-                newUser.setUserName(account.getDisplayName());
-                newUser.setEmail(account.getEmail());
-                newUser.setGoogleId(account.getId());
-                db.addUser(newUser);
-                userId = db.getUserIdByGoogleAccountId(account.getId());
-            }
-
-            if (userId != -1) {
-                Toast.makeText(this, "Signed in with your Google account.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, ToDoMainActivity.class);
-                intent.putExtra("userId", userId);
+                intent.putExtra("userId", googleAccountId);
                 startActivity(intent);
                 finish();
-            } else {
-                Toast.makeText(LoginActivity.this, "Error with Google sign in", Toast.LENGTH_SHORT).show();
+                // createAndAddEventToGoogleCalendar(account);
             }
-
-        } else {
-            Toast.makeText(this, "Google sign in failed.", Toast.LENGTH_SHORT).show();
+        } catch (ApiException e) {
+            // Handle ApiException
+            Toast.makeText(this, "Google Sign In failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // Handle GoogleApiClient connection failure
+        Toast.makeText(this, "Connection to Google Play Services failed", Toast.LENGTH_SHORT).show();
+    }
+
 }
-
-
