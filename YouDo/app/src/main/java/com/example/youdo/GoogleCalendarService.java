@@ -46,6 +46,7 @@ public class GoogleCalendarService {
                 .build();
     }
 
+
     public void createAndAddEventToGoogleCalendar(ToDo newtodo, GoogleSignInAccount account, String title, String description, String dateStr, EventCallback callback) {
 
         String googleAccountId = account.getId();
