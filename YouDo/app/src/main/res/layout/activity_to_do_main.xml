@@ -37,29 +37,35 @@
         android:id="@+id/addToDobtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="30dp"
-        android:src="@drawable/add"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
         android:backgroundTint="@color/dark_purple"
-        app:tint="@color/white"
-        />
+        android:src="@drawable/add"
+        app:tint="@color/white" />
+
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/stepCounterbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_alignParentBottom="true"
+
 
         android:layout_gravity="center"
         android:layout_marginStart="30dp"
         android:layout_marginTop="30dp"
 
-        android:background="@null"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="30dp"
         android:src="@drawable/walk"
-        app:backgroundTint="@color/white" />
+
+        app:backgroundTint = "@color/white"
+        app:tint="@color/dark_purple"/>
 
 
 </RelativeLayout>

@@ -15,7 +15,8 @@ import java.util.List;
 
 public class ToDoMainActivity extends AppCompatActivity {
 
-    FloatingActionButton fab;
+    FloatingActionButton addTodoBtn;
+    FloatingActionButton stepCounterBtn;
     RecyclerView recyclerView;
     List<ToDo> todoList;
     dbConnectToDo dbConnectToDo;
@@ -29,7 +30,8 @@ public class ToDoMainActivity extends AppCompatActivity {
 
 
 
-        fab = findViewById(R.id.addToDobtn);
+        addTodoBtn = findViewById(R.id.addToDobtn);
+        stepCounterBtn = findViewById(R.id.stepCounterbtn);
         recyclerView = findViewById(R.id.todoRecyclerView);
 
         Intent intent = getIntent();
@@ -46,10 +48,20 @@ public class ToDoMainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        addTodoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ToDoMainActivity.this, UploadToDoActivity.class);
+                i.putExtra("userId", userId);
+                startActivity(i);
+            }
+        });
+
+
+        stepCounterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ToDoMainActivity.this, StepCounterActivity.class);
                 i.putExtra("userId", userId);
                 startActivity(i);
             }
