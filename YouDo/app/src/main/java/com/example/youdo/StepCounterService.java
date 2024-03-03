@@ -27,10 +27,40 @@ public class StepCounterService extends Service implements SensorEventListener {
         super.onCreate();
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
         if (mStepSensor != null) {
             mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
         loadInitialStepCount(); // load the initial step count
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Lépésszámláló Szolgáltatás";
+            String description = "Megjeleníti az aktuális lépésszámot";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("stepCounterServiceChannel", name, importance);
+            channel.setDescription(description);
+            // Ne felejtsd el regisztrálni a csatornát a rendszerben
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+        // Itt hozzuk létre az előtérben futó szolgáltatás értesítését
+        startForegroundServiceWithNotification();
+
+    }
+
+    @SuppressLint("ForegroundServiceType")
+    private void startForegroundServiceWithNotification() {
+        int notificationId = 1;
+        Notification.Builder builder = new Notification.Builder(this, "stepCounterServiceChannel")
+                .setContentTitle("Lépésszámláló Szolgáltatás Fut")
+                .setContentText("Az aktuális lépésszám nyomon követése.")
+                .setSmallIcon(R.drawable.ic_launcher_playstore) // Cseréld le a megfelelő ikonnal
+                .setPriority(Notification.PRIORITY_DEFAULT);
+
+        // Android O és újabb verzióihoz szükséges
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(notificationId, builder.build());
+        }
     }
 
     private void loadInitialStepCount() {

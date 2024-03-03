@@ -40,7 +40,7 @@ public class StepCounterActivity extends AppCompatActivity {
         resetSteps();
         loadData();
 
-        progressBar.setMax(400);
+        progressBar.setMax(7500);
 
         startService(new Intent(this, StepCounterService.class));
 

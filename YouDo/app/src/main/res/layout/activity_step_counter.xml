@@ -33,7 +33,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:max="400"
+            android:max="7500"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:background="@drawable/circular_shape"
@@ -59,7 +59,7 @@
             android:layout_below="@id/steps"
             android:layout_marginTop="8dp"
             android:layout_centerHorizontal="true"
-            android:text="Goal: 400"
+            android:text="Goal: 7500"
             android:textColor="@color/light_grey"
             android:textSize="20dp" />
     </RelativeLayout>
