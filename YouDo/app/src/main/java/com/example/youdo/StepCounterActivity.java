@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,8 +29,19 @@ public class StepCounterActivity extends AppCompatActivity {
     private TextView steps;
     int userId;
 
-    public StepCounterActivity() {
-    }
+    private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
+                // number of steps
+                int stepsCount = intent.getIntExtra("steps", 0);
+                // daily steps
+                int currentSteps = stepsCount - previewsTotalSteps;
+                steps.setText(String.valueOf(currentSteps));
+                progressBar.setProgress(currentSteps);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,38 +59,27 @@ public class StepCounterActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{ACTIVITY_RECOGNITION}, 1);
         } else {
-            startService(new Intent(this, StepCounterService.class));
+            initiateStepCounterService();
         }
     }
-
-
-    private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
-                // number of steps
-                int stepsCount = intent.getIntExtra("steps", 0);
-                // daily steps
-                int currentSteps = stepsCount - previewsTotalSteps;
-                steps.setText(String.valueOf(currentSteps));
-                progressBar.setProgress(currentSteps);
-            }
-        }
-    };
-
 
     @Override
     protected void onResume() {
         super.onResume();
         // register the BroadcastReceiver
-        IntentFilter stepUpdateIntentFilter = new IntentFilter("com.example.youdo.STEP_UPDATE");
-        registerReceiver(stepUpdateReceiver, stepUpdateIntentFilter);
+        IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // For Android 12 and above, manage the export state explicitly if needed
+            registerReceiver(stepUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            // For Android 11 and below, register as before
+            registerReceiver(stepUpdateReceiver, filter);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         unregisterReceiver(stepUpdateReceiver);
         Log.d("ActivityLifecycle", "Az alkalmazás valószínűleg háttérbe került: onPause()");
 
@@ -90,32 +91,33 @@ public class StepCounterActivity extends AppCompatActivity {
     }
 
 
-    private void resetSteps(){
-        steps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(StepCounterActivity.this,"Long press to reset steps", Toast.LENGTH_SHORT).show();
-            }
-        });
-        steps.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                // Reset UI
-                previewsTotalSteps = totalSteps;
-                steps.setText("0");
-                progressBar.setProgress(0);
-                savedData();
+    private void resetSteps() {
+        steps.setOnClickListener(v -> Toast.makeText(StepCounterActivity.this,"Long press to reset steps", Toast.LENGTH_SHORT).show());
 
-                // update initialStepCount
-                Intent resetIntent = new Intent(StepCounterActivity.this, StepCounterService.class);
-                resetIntent.putExtra("resetSteps", true);
-                startService(resetIntent);
-
-                return true;
-            }
+        steps.setOnLongClickListener(v -> {
+            previewsTotalSteps = totalSteps;
+            steps.setText("0");
+            progressBar.setProgress(0);
+            savedData();
+            resetStepCountInService();
+            return true;
         });
     }
 
+    private void initiateStepCounterService() {
+        Intent serviceIntent = new Intent(this, StepCounterService.class);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
+    }
+
+    private void resetStepCountInService() {
+        Intent resetIntent = new Intent(this, StepCounterService.class);
+        resetIntent.putExtra("resetSteps", true);
+        initiateStepCounterService();
+    }
 
     private void savedData(){
         SharedPreferences sharedPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);
@@ -140,12 +142,10 @@ public class StepCounterActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1 && permissions.length > 0 && permissions[0].equals(ACTIVITY_RECOGNITION)) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startService(new Intent(this, StepCounterService.class));
-            } else {
-                Toast.makeText(this, "Activity recognition permission required for step counting", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            initiateStepCounterService();
+        } else {
+            Toast.makeText(this, "Activity recognition permission required for step counting", Toast.LENGTH_SHORT).show();
         }
     }
 }

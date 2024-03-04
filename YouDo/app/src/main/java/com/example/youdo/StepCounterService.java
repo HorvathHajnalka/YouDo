@@ -22,6 +22,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     private Sensor mStepSensor;
     private int mInitialStepCount = 0;
 
+    @SuppressLint("ForegroundServiceType")
     @Override
     public void onCreate() {
         super.onCreate();

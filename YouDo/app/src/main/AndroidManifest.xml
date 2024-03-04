@@ -59,7 +59,15 @@
             android:name=".MainActivity"
             android:exported="true" />
 
-        <service android:name=".StepCounterService"></service>
+        <service
+            android:name=".StepCounterService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="" >
+        </service>
+
+
+
 
 
 
