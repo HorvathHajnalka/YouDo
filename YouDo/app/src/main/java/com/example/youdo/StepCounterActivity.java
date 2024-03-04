@@ -1,17 +1,24 @@
 package com.example.youdo;
 
+import static android.Manifest.permission.ACTIVITY_RECOGNITION;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class StepCounterActivity extends AppCompatActivity {
 
@@ -29,11 +36,6 @@ public class StepCounterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_counter);
 
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("userId")) {
-            userId = intent.getIntExtra("userId", -1); // -1 if we don't know the "userId"
-        }
-
         progressBar = findViewById(R.id.progressBar);
         steps = findViewById(R.id.steps);
 
@@ -42,9 +44,13 @@ public class StepCounterActivity extends AppCompatActivity {
 
         progressBar.setMax(7500);
 
-        startService(new Intent(this, StepCounterService.class));
-
+        if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{ACTIVITY_RECOGNITION}, 1);
+        } else {
+            startService(new Intent(this, StepCounterService.class));
+        }
     }
+
 
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -74,6 +80,13 @@ public class StepCounterActivity extends AppCompatActivity {
         super.onPause();
 
         unregisterReceiver(stepUpdateReceiver);
+        Log.d("ActivityLifecycle", "Az alkalmazás valószínűleg háttérbe került: onPause()");
+
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("ActivityLifecycle", "Az alkalmazás valószínűleg háttérbe került: onStop()");
     }
 
 
@@ -122,5 +135,17 @@ public class StepCounterActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this, StepCounterService.class));
+        Log.d("ServiceLifecycle", "A szolgáltatás leállítva: onDestroy()");
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && permissions.length > 0 && permissions[0].equals(ACTIVITY_RECOGNITION)) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startService(new Intent(this, StepCounterService.class));
+            } else {
+                Toast.makeText(this, "Activity recognition permission required for step counting", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

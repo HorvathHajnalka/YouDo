@@ -36,7 +36,7 @@ public class StepCounterService extends Service implements SensorEventListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Lépésszámláló Szolgáltatás";
             String description = "Megjeleníti az aktuális lépésszámot";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel("stepCounterServiceChannel", name, importance);
             channel.setDescription(description);
             // Ne felejtsd el regisztrálni a csatornát a rendszerben
@@ -44,7 +44,9 @@ public class StepCounterService extends Service implements SensorEventListener {
             notificationManager.createNotificationChannel(channel);
         }
         // Itt hozzuk létre az előtérben futó szolgáltatás értesítését
-        startForegroundServiceWithNotification();
+        Notification notification = buildForegroundNotification();
+        int SERVICE_NOTIFICATION_ID = 1;
+        startForeground(SERVICE_NOTIFICATION_ID, notification);
 
     }
 
@@ -109,9 +111,12 @@ public class StepCounterService extends Service implements SensorEventListener {
             // A tényleges resetelést az onSensorChanged-ben kell megtenni, mivel itt van friss információnk.
             mInitialStepCount = -1; // Egy speciális jelzőérték, ami jelzi, hogy resetelni kell.
         }
-        startForeground(1, buildForegroundNotification());
+        Notification notification = buildForegroundNotification();
+        int SERVICE_NOTIFICATION_ID = 1;
+        startForeground(SERVICE_NOTIFICATION_ID, notification);
         return START_STICKY;
     }
+
 
     private void saveInitialStepCount(int initialStepCount) {
         SharedPreferences sharedPreferences = getSharedPreferences("myPref", MODE_PRIVATE);
@@ -137,7 +142,7 @@ public class StepCounterService extends Service implements SensorEventListener {
                 .setContentTitle("Step Counter Running") // Értesítés címe
                 .setContentText("Counting your steps in the background") // Értesítés szövege
                 .setSmallIcon(R.drawable.ic_launcher_playstore) // Értesítés ikonja, cseréld le a saját ikonodra
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT); // Értesítés prioritása
+                .setPriority(NotificationCompat.PRIORITY_HIGH); // Értesítés prioritása
 
         // Értesítés visszaadása
         return builder.build();

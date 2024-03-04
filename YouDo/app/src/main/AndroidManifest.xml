@@ -12,6 +12,10 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.SENSOR_ACCELEROMETER" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+
+
 
 
     <application
@@ -54,7 +58,16 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+
         <service android:name=".StepCounterService"></service>
+
+
+
+        <receiver android:name=".BootCompletedReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
