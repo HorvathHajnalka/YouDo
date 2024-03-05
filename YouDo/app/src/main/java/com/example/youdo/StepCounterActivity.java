@@ -10,15 +10,19 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 public class StepCounterActivity extends AppCompatActivity {
@@ -28,6 +32,8 @@ public class StepCounterActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView steps;
     int userId;
+    private ActivityResultLauncher<String> notificationPermissionLauncher;
+    private static final int REQUEST_CODE = 100;
 
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -77,7 +83,35 @@ public class StepCounterActivity extends AppCompatActivity {
         } else {
             initiateStepCounterService();
         }
+
+        notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                // Az engedély megadva, kezdd el az értesítések küldését
+                Log.d("NotificationPermission", "Értesítési engedély megadva.");
+            } else {
+                // Az engedély megtagadva, kezelje ennek megfelelően
+                Toast.makeText(this, "Enable notifications for counting steps in the background.", Toast.LENGTH_SHORT).show();
+
+                Log.d("NotificationPermission", "Értesítési engedély megtagadva.");
+            }
+        });
+        checkAndRequestNotificationPermission();
     }
+
+    private void checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                // Értesítések nincsenek engedélyezve, irányítsuk a felhasználót az alkalmazás értesítési beállításaihoz
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                // Android O és felette
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                startActivity(intent);
+            }
+        }
+        // Itt folytathatod a többi, értesítésekkel kapcsolatos logikád implementálását
+    }
+
 
     @Override
     protected void onResume() {
@@ -88,9 +122,10 @@ public class StepCounterActivity extends AppCompatActivity {
         resetSteps();
         updateUI(); // Az updateUI() már tartalmazza a loadData() hívást, így redundáns volt itt meghívni
 
-        // Regisztráljuk a BroadcastReceiver-t
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
-        registerReceiver(stepUpdateReceiver, filter);
+        // filter.addFlags(Intent.FLAG_RECEIVER_NOT_EXPORTED);
+        registerReceiver(stepUpdateReceiver, filter, RECEIVER_NOT_EXPORTED);
+        // registerReceiver(stepUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED, Context.RECEIVER_TAKE_PERSISTABLE_UPDATES, null);
     }
 
     @Override

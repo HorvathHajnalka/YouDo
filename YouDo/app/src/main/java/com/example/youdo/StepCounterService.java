@@ -17,6 +17,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+
 import androidx.core.app.NotificationCompat;
 
 public class StepCounterService extends Service implements SensorEventListener {
@@ -118,32 +119,12 @@ public class StepCounterService extends Service implements SensorEventListener {
         return hasServiceRestarted;
     }
 
-    private Notification getNotification() {
-        Intent notificationIntent = new Intent(this, StepCounterActivity.class);
-        PendingIntent pendingIntent;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            pendingIntent = PendingIntent.getActivity(this,
-                    0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-        } else {
-            pendingIntent = PendingIntent.getActivity(this,
-                    0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
-        }
-
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("YouDo Step Counter")
-                .setContentText("Your YouDo step counter is active.")
-                .setSmallIcon(R.drawable.ic_launcher_playstore)
-                .setContentIntent(pendingIntent)
-                .build();
-    }
-
-
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
-                    "Lépésszámláló Szolgáltatás Csatorna",
+                    "Step Counter Notification Channel",
                     NotificationManager.IMPORTANCE_HIGH); // Módosítsd ezt a sort
 
             NotificationManager manager = getSystemService(NotificationManager.class);
@@ -167,7 +148,8 @@ public class StepCounterService extends Service implements SensorEventListener {
                 .setContentText(getString(R.string.notification_content))
                 .setSmallIcon(R.drawable.ic_launcher_playstore)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(Notification.CATEGORY_SERVICE);
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setOngoing(true); // Ez teszi az értesítést eltávolíthatatlanná
 
         Log.d("StepCounterService", "Foreground notification built.");
         return builder.build();
