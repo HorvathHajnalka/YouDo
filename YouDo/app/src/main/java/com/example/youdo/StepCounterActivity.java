@@ -116,8 +116,13 @@ public class StepCounterActivity extends AppCompatActivity {
     private void resetStepCountInService() {
         Intent resetIntent = new Intent(this, StepCounterService.class);
         resetIntent.putExtra("resetSteps", true);
-        initiateStepCounterService();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(resetIntent);
+        } else {
+            startService(resetIntent);
+        }
     }
+
 
     private void savedData(){
         SharedPreferences sharedPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);
@@ -136,7 +141,7 @@ public class StepCounterActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this, StepCounterService.class));
+        // stopService(new Intent(this, StepCounterService.class));
         Log.d("ServiceLifecycle", "A szolgáltatás leállítva: onDestroy()");
     }
     @Override
