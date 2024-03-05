@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -24,6 +25,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     private int mInitialStepCount = 0;
     public static final String CHANNEL_ID = "step_counter_service_channel";
     public static final int NOTIFICATION_ID = 1;
+    private static boolean isServiceRunningInForeground = false;
 
     @SuppressLint("ForegroundServiceType")
     @Override
@@ -37,10 +39,13 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         loadInitialStepCount();
 
-        createNotificationChannel();
+        if (!isServiceRunningInForeground) {
+            createNotificationChannel();
 
-        Notification notification = buildForegroundNotification();
-        startForeground(NOTIFICATION_ID, notification);
+            Notification notification = buildForegroundNotification();
+            startForeground(NOTIFICATION_ID, notification);
+            isServiceRunningInForeground = true;
+        }
     }
 
     private void loadInitialStepCount() {
@@ -51,6 +56,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        StepCounterActivity.updateServiceState(this, false);
         mSensorManager.unregisterListener(this);
     }
 
@@ -81,6 +87,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     @SuppressLint("ForegroundServiceType")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        StepCounterActivity.updateServiceState(this, true);
         // Ellenőrizd, hogy van-e 'resetSteps' extra az intentben, és ha igen, kezeld.
         if (intent.getBooleanExtra("resetSteps", false)) {
             // Itt lenne a reset logika
@@ -146,6 +153,9 @@ public class StepCounterService extends Service implements SensorEventListener {
         Log.d("StepCounterService", "Foreground notification built.");
         return builder.build();
     }
+
+
+
 
 
 }
