@@ -76,6 +76,9 @@ public class StepCounterActivity extends AppCompatActivity {
 
         updateUI();
 
+        Log.d("Mylogs", "Broadcastreceiver activityben: onCreate()");
+
+
         progressBar.setMax(7500);
 
         if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
@@ -124,7 +127,8 @@ public class StepCounterActivity extends AppCompatActivity {
 
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
         // filter.addFlags(Intent.FLAG_RECEIVER_NOT_EXPORTED);
-        registerReceiver(stepUpdateReceiver, filter, RECEIVER_NOT_EXPORTED);
+        filter.addAction("ACTION_NOTIFICATION_CLEARED");
+        registerReceiver(stepUpdateReceiver, filter, RECEIVER_EXPORTED);
         // registerReceiver(stepUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED, Context.RECEIVER_TAKE_PERSISTABLE_UPDATES, null);
     }
 
@@ -195,7 +199,8 @@ public class StepCounterActivity extends AppCompatActivity {
 
     private void updateUI() {
         loadData();
-        Log.d("Mylogs", "Current steps: " + (totalSteps - previewsTotalSteps));
+        Log.d("Mylogs", "total steps: " + totalSteps);
+        Log.d("Mylogs", "prev steps: " + previewsTotalSteps);
 
         int currentSteps = totalSteps - previewsTotalSteps;
         steps.setText(String.valueOf(currentSteps));

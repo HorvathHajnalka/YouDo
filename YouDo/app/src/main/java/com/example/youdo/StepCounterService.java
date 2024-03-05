@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,10 +30,12 @@ public class StepCounterService extends Service implements SensorEventListener {
     private static boolean isServiceRunningInForeground = false;
     Context context;
 
+
     @SuppressLint("ForegroundServiceType")
     @Override
     public void onCreate() {
         super.onCreate();
+
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
@@ -40,6 +43,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             mSensorManager.registerListener(this, mStepSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
         loadInitialStepCount();
+
 
         if (!isServiceRunningInForeground) {
             createNotificationChannel();
@@ -91,6 +95,13 @@ public class StepCounterService extends Service implements SensorEventListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         StepCounterActivity.updateServiceState(this, true);
+
+        Log.d("Mylogs", "BroadCast receiver started in StepCounterService onStart");
+        Intent updateIntent = new Intent("com.example.youdo.STEP_UPDATE");
+        updateIntent.putExtra("steps", 0); // Kezdeti érték, ami lehet 0 vagy a korábban mentett érték
+        sendBroadcast(updateIntent);
+
+
         // Ellenőrizd, hogy van-e 'resetSteps' extra az intentben, és ha igen, kezeld.
         if (intent.getBooleanExtra("resetSteps", false)) {
             // Itt lenne a reset logika
