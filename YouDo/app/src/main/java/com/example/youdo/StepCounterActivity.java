@@ -38,15 +38,22 @@ public class StepCounterActivity extends AppCompatActivity {
                 int stepsCount = intent.getIntExtra("steps", 0);
                 totalSteps = stepsCount; // Frissítjük a totalSteps értékét
 
-                // Napi lépések
-                int currentSteps = totalSteps - previewsTotalSteps;
-                Log.d("StepCounterActivity", "BroadCast receiver current steps: " + currentSteps);
+                // Mivel UI frissítést kell végezni, győződjünk meg róla, hogy a fő szálon vagyunk
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Napi lépések
+                        int currentSteps = totalSteps - previewsTotalSteps;
+                        Log.d("StepCounterActivity", "BroadCast receiver current steps: " + currentSteps);
 
-                steps.setText(String.valueOf(currentSteps));
-                progressBar.setProgress(currentSteps);
+                        steps.setText(String.valueOf(currentSteps));
+                        progressBar.setProgress(currentSteps);
+                    }
+                });
             }
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +114,7 @@ public class StepCounterActivity extends AppCompatActivity {
             previewsTotalSteps = totalSteps;
             steps.setText("0");
             progressBar.setProgress(0);
-            savedData();
+            saveData();
             resetStepCountInService();
             return true;
         });
@@ -125,15 +132,8 @@ public class StepCounterActivity extends AppCompatActivity {
     }
 
 
-    private void savedData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("previewsTotalSteps", previewsTotalSteps);
-        editor.apply();
-    }
-
     private void loadData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         totalSteps = sharedPreferences.getInt("totalSteps", 0); // Betöltjük a teljes lépésszámot is
         previewsTotalSteps = sharedPreferences.getInt("previewsTotalSteps", 0);
     }
@@ -168,7 +168,7 @@ public class StepCounterActivity extends AppCompatActivity {
     }
 
     public static void updateServiceState(Context context, boolean isRunning) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("ServicePrefs", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("ServiceRunning", isRunning);
         editor.apply();
@@ -176,7 +176,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
 
     private boolean isServiceRunning() {
-        SharedPreferences sharedPreferences = getSharedPreferences("ServicePrefs", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("ServiceRunning", false);
     }
 
@@ -191,7 +191,7 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
     private void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("myPref", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("totalSteps", totalSteps); // Elmentjük a teljes lépésszámot is
         editor.putInt("previewsTotalSteps", previewsTotalSteps);

@@ -26,6 +26,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     public static final String CHANNEL_ID = "step_counter_service_channel";
     public static final int NOTIFICATION_ID = 1;
     private static boolean isServiceRunningInForeground = false;
+    Context context;
 
     @SuppressLint("ForegroundServiceType")
     @Override
@@ -49,7 +50,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     }
 
     private void loadInitialStepCount() {
-        SharedPreferences sharedPreferences = getSharedPreferences("myPref", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);
         mInitialStepCount = sharedPreferences.getInt("initialStepCount", 0);
     }
 
@@ -87,18 +88,36 @@ public class StepCounterService extends Service implements SensorEventListener {
     @SuppressLint("ForegroundServiceType")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         StepCounterActivity.updateServiceState(this, true);
         // Ellenőrizd, hogy van-e 'resetSteps' extra az intentben, és ha igen, kezeld.
         if (intent.getBooleanExtra("resetSteps", false)) {
             // Itt lenne a reset logika
             mInitialStepCount = -1;
+            saveInitialStepCount(mInitialStepCount); // Mentés az új kezdőértékkel
         } else {
-            createNotificationChannel();
-            startForeground(1, getNotification());
+            if (shouldResetStepCounter()) {
+                // Amennyiben az alkalmazás/szerviz újraindult, reseteld az mInitialStepCount értéket
+                mInitialStepCount = -1;
+                saveInitialStepCount(mInitialStepCount);
+            }
         }
         Log.d("StepCounterService", "Service started.");
         return START_STICKY;
     }
+
+    private boolean shouldResetStepCounter() {
+        // Használja a Service kontextusát közvetlenül
+        SharedPreferences prefs = this.getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
+        boolean hasServiceRestarted = prefs.getBoolean("ServiceRestarted", false);
+        if (hasServiceRestarted) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("ServiceRestarted", false);
+            editor.apply();
+        }
+        return hasServiceRestarted;
+    }
+
     private Notification getNotification() {
         Intent notificationIntent = new Intent(this, StepCounterActivity.class);
         PendingIntent pendingIntent;
@@ -136,7 +155,7 @@ public class StepCounterService extends Service implements SensorEventListener {
 
 
     private void saveInitialStepCount(int initialStepCount) {
-        SharedPreferences sharedPreferences = getSharedPreferences("myPref", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("initialStepCount", initialStepCount);
         editor.apply();
@@ -153,9 +172,4 @@ public class StepCounterService extends Service implements SensorEventListener {
         Log.d("StepCounterService", "Foreground notification built.");
         return builder.build();
     }
-
-
-
-
-
 }
