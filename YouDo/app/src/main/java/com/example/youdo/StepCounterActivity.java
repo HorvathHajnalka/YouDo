@@ -25,6 +25,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class StepCounterActivity extends AppCompatActivity {
 
     private int totalSteps;
@@ -34,6 +38,7 @@ public class StepCounterActivity extends AppCompatActivity {
     int userId;
     private ActivityResultLauncher<String> notificationPermissionLauncher;
     private static final int REQUEST_CODE = 100;
+    private dbStepCounter db;
 
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -66,11 +71,14 @@ public class StepCounterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_counter);
 
+        db = new dbStepCounter(this);
+
         progressBar = findViewById(R.id.progressBar);
         steps = findViewById(R.id.steps);
 
         resetSteps();
-        loadData();
+        // loadData();
+        loadDataFromDatabase();
 
         Log.d("Mylogs", "Az alkalmazás létrehozva: onCreate()");
 
@@ -121,7 +129,8 @@ public class StepCounterActivity extends AppCompatActivity {
         super.onResume();
         Log.d("Mylogs", "Az alkalmazás folytatódik: onResume()");
 
-        loadData(); // Először betöltjük az adatokat
+        // loadData(); // Először betöltjük az adatokat
+        loadDataFromDatabase();
         resetSteps();
         updateUI(); // Az updateUI() már tartalmazza a loadData() hívást, így redundáns volt itt meghívni
 
@@ -153,7 +162,7 @@ public class StepCounterActivity extends AppCompatActivity {
             previewsTotalSteps = totalSteps;
             steps.setText("0");
             progressBar.setProgress(0);
-            saveData();
+            saveStepsToDatabase();
             resetStepCountInService();
             return true;
         });
@@ -170,12 +179,18 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
-
+    /*
     private void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         totalSteps = sharedPreferences.getInt("totalSteps", 0); // Betöltjük a teljes lépésszámot is
         previewsTotalSteps = sharedPreferences.getInt("previewsTotalSteps", 0);
+    }*/
+    private void loadDataFromDatabase() {
+        String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        totalSteps = db.getStepsByDate(db.getDeviceId(), todayAsString); // Feltételezve, hogy a deviceId "device1"
+        // Itt nincs szükség a previewsTotalSteps változóra, mivel az adatbázis kezeli az összesítést
     }
+
 
 
 
@@ -184,7 +199,7 @@ public class StepCounterActivity extends AppCompatActivity {
         super.onDestroy();
         // StepCounterActivity.updateServiceState(this, true);
         // stopService(new Intent(this, StepCounterService.class));
-        saveData();
+        saveStepsToDatabase();
         Log.d("Mylogs", "A szolgáltatás leállítva: onDestroy()");
     }
     @Override
@@ -198,7 +213,7 @@ public class StepCounterActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        loadData();
+        loadDataFromDatabase();
         Log.d("Mylogs", "total steps: " + totalSteps);
         Log.d("Mylogs", "prev steps: " + previewsTotalSteps);
 
@@ -230,12 +245,21 @@ public class StepCounterActivity extends AppCompatActivity {
             }
         }
     }
+
+    /*
     private void saveData() {
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("totalSteps", totalSteps); // Elmentjük a teljes lépésszámot is
         editor.putInt("previewsTotalSteps", previewsTotalSteps);
         editor.apply();
+    }*/
+
+    private void saveStepsToDatabase() {
+        String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        db.addSteps(db.getDeviceId(), todayAsString, totalSteps); // Feltételezve, hogy a deviceId "device1"
     }
+
+
 
 }

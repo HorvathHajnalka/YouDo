@@ -21,6 +21,10 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class StepCounterService extends Service implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mStepSensor;
@@ -29,12 +33,15 @@ public class StepCounterService extends Service implements SensorEventListener {
     public static final int NOTIFICATION_ID = 1;
     private static boolean isServiceRunningInForeground = false;
     Context context;
+    private dbStepCounter dbStepCounter;
 
 
     @SuppressLint("ForegroundServiceType")
     @Override
     public void onCreate() {
         super.onCreate();
+
+        dbStepCounter = new dbStepCounter(getApplicationContext());
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mStepSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -66,6 +73,7 @@ public class StepCounterService extends Service implements SensorEventListener {
         mSensorManager.unregisterListener(this);
     }
 
+    /*
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -80,7 +88,30 @@ public class StepCounterService extends Service implements SensorEventListener {
             intent.putExtra("steps", currentStepCount);
             sendBroadcast(intent);
         }
+    }*/
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            if (mInitialStepCount == -1) {
+                mInitialStepCount = (int) event.values[0];
+                saveInitialStepCount(mInitialStepCount);
+            }
+            int totalStepsSinceReboot = (int) event.values[0];
+            int currentStepCount = totalStepsSinceReboot - mInitialStepCount;
+
+            // Frissítse az adatbázist az új lépésszámmal
+            String deviceId = dbStepCounter.getDeviceId(); // Esetleg szükség lehet a deviceId kezelésére
+            String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            dbStepCounter.addSteps(deviceId, todayDate, currentStepCount);
+
+            // Küldjön szándékot a UI frissítésére
+            Intent intent = new Intent("com.example.youdo.STEP_UPDATE");
+            intent.putExtra("steps", currentStepCount);
+            sendBroadcast(intent);
+        }
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) { }
