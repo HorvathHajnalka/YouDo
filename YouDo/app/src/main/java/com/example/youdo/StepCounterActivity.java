@@ -39,7 +39,10 @@ public class StepCounterActivity extends AppCompatActivity {
     private ActivityResultLauncher<String> notificationPermissionLauncher;
     private static final int REQUEST_CODE = 100;
     private dbStepCounter db;
+    String todayAsString;
+    String deviceId;
 
+    /*
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -57,13 +60,49 @@ public class StepCounterActivity extends AppCompatActivity {
                         int currentSteps = totalSteps - previewsTotalSteps;
                         Log.d("StepCounterActivity", "BroadCast receiver current steps: " + currentSteps);
 
+                        db.addSteps(db.getDeviceId(), todayAsString,currentSteps);
+
                         steps.setText(String.valueOf(currentSteps));
                         progressBar.setProgress(currentSteps);
                     }
                 });
             }
         }
+    };*/
+
+    private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("Mylogs", "BroadCast receiver started");
+            if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
+                // Lépések száma
+                int stepsCount = intent.getIntExtra("steps", 0);
+
+                // Mivel UI frissítést kell végezni, győződjünk meg róla, hogy a fő szálon vagyunk
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+                        // A meglévő lépésszám lekérése az adatbázisból
+                        int existingSteps = db.getStepsByDate(db.getDeviceId(), todayAsString);
+
+                        // Új lépésszám kiszámítása
+                        int newTotalSteps = existingSteps + (stepsCount - totalSteps);
+                        totalSteps = stepsCount; // Frissítjük a totalSteps értékét az új összes lépésre
+
+                        // Adatbázis frissítése az új lépésszámmal
+                        db.addSteps(db.getDeviceId(), todayAsString, newTotalSteps);
+
+                        // UI frissítése az új teljes lépésszámmal
+                        steps.setText(String.valueOf(newTotalSteps));
+                        progressBar.setProgress(newTotalSteps);
+                    }
+                });
+            }
+        }
     };
+
 
 
     @Override
@@ -73,10 +112,14 @@ public class StepCounterActivity extends AppCompatActivity {
 
         db = new dbStepCounter(this);
 
+        deviceId = dbStepCounter.getDeviceId();
+        todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+
         progressBar = findViewById(R.id.progressBar);
         steps = findViewById(R.id.steps);
 
-        resetSteps();
+        // resetSteps();
         // loadData();
         loadDataFromDatabase();
 
@@ -131,7 +174,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
         // loadData(); // Először betöltjük az adatokat
         loadDataFromDatabase();
-        resetSteps();
+        // resetSteps();
         updateUI(); // Az updateUI() már tartalmazza a loadData() hívást, így redundáns volt itt meghívni
 
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
@@ -256,7 +299,7 @@ public class StepCounterActivity extends AppCompatActivity {
     }*/
 
     private void saveStepsToDatabase() {
-        String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
         db.addSteps(db.getDeviceId(), todayAsString, totalSteps); // Feltételezve, hogy a deviceId "device1"
     }
 

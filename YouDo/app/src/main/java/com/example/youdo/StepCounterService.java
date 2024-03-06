@@ -34,12 +34,17 @@ public class StepCounterService extends Service implements SensorEventListener {
     private static boolean isServiceRunningInForeground = false;
     Context context;
     private dbStepCounter dbStepCounter;
+    String deviceId;
+    String todayDate;
 
 
     @SuppressLint("ForegroundServiceType")
     @Override
     public void onCreate() {
         super.onCreate();
+
+        deviceId = com.example.youdo.dbStepCounter.getDeviceId();
+        todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         dbStepCounter = new dbStepCounter(getApplicationContext());
 
@@ -60,10 +65,25 @@ public class StepCounterService extends Service implements SensorEventListener {
             isServiceRunningInForeground = true;
         }
     }
-
+/*
     private void loadInitialStepCount() {
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);
         mInitialStepCount = sharedPreferences.getInt("initialStepCount", 0);
+    }*/
+
+    private void loadInitialStepCount() {
+        // Az aktuális dátum formázása
+        String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Az eszköz azonosítójának lekérése
+        String deviceId = dbStepCounter.getDeviceId();
+
+        // Az adatbázisból való lépésszám lekérése az adott napra
+        int storedStepsForToday = dbStepCounter.getStepsByDate(deviceId, todayAsString);
+
+        // A kezdeti lépésszám beállítása az adatbázisban tárolt értékre
+        // Ez az érték azt jelenti, hogy mennyi lépést tettünk meg aznap, mielőtt a szolgáltatás elindult volna
+        mInitialStepCount = storedStepsForToday;
     }
 
     @Override
@@ -89,7 +109,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             sendBroadcast(intent);
         }
     }*/
-
+/*
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -110,7 +130,33 @@ public class StepCounterService extends Service implements SensorEventListener {
             intent.putExtra("steps", currentStepCount);
             sendBroadcast(intent);
         }
+    }*/
+
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            if (mInitialStepCount == -1) {
+                // Itt az első érték beállítása történik, ami a szenzor által érzékelt összes lépés
+                mInitialStepCount = (int) event.values[0];
+                saveInitialStepCount(mInitialStepCount);
+            }
+
+            int totalStepsSinceReboot = (int) event.values[0];
+            int currentStepCount = totalStepsSinceReboot - mInitialStepCount;
+
+            // Frissítse az adatbázist az új lépésszámmal
+            // Feltételezve, hogy a deviceId és a mai dátum megszerzése korábban megfelelően történik
+
+
+            // Itt a lényeg, hogy az addSteps függvényt használjuk a lépésszám frissítésére
+            dbStepCounter.addSteps(deviceId, todayDate, currentStepCount);
+
+            // Küldjön szándékot a UI frissítésére
+            Intent intent = new Intent("com.example.youdo.STEP_UPDATE");
+            intent.putExtra("steps", currentStepCount);
+            sendBroadcast(intent);
+        }
     }
+
 
 
     @Override
@@ -121,10 +167,35 @@ public class StepCounterService extends Service implements SensorEventListener {
         return null;
     }
 
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        StepCounterActivity.updateServiceState(this, true);
+
+        Log.d("Mylogs", "BroadCast receiver started in StepCounterService onStart");
+        Intent updateIntent = new Intent("com.example.youdo.STEP_UPDATE");
+        // Az adatbázisból kell lekérni az aktuális lépésszámot, és azt kell broadcastolni
+        int currentSteps = dbStepCounter.getStepsByDate(deviceId,todayDate); // Feltételezve, hogy van ilyen függvényed
+        updateIntent.putExtra("steps", currentSteps);
+        sendBroadcast(updateIntent);
+
+        /*
+
+        if (intent.getBooleanExtra("resetSteps", false)) {
+            resetStepsInDatabase(); // Feltételezve, hogy implementálva van ez a függvény az adatbázis-kezelő osztályban
+        } else {
+            if (shouldResetStepCounter()) {
+                resetStepsInDatabase(); // Itt is, reseteljük az adatbázisban lévő lépéseket
+            }
+        }*/
+        Log.d("StepCounterService", "Service started.");
+        return START_STICKY;
+    }
+
+
+    /*
     @SuppressLint("ForegroundServiceType")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         StepCounterActivity.updateServiceState(this, true);
 
         Log.d("Mylogs", "BroadCast receiver started in StepCounterService onStart");
@@ -147,7 +218,7 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         Log.d("StepCounterService", "Service started.");
         return START_STICKY;
-    }
+    }*/
 
     private boolean shouldResetStepCounter() {
         // Használja a Service kontextusát közvetlenül

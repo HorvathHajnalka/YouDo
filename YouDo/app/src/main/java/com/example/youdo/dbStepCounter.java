@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class dbStepCounter {
 
-    private dbConnect dbHelper;
+    private static dbConnect dbHelper;
 
     public dbStepCounter(Context context) {
         dbHelper = new dbConnect(context);
@@ -23,12 +23,23 @@ public class dbStepCounter {
     public void addSteps(String deviceId, String date, int steps) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        String selection = dbConnect.deviceId + " = ? AND " + dbConnect.date + " = ?";
+        String[] selectionArgs = {deviceId, date};
+        Cursor cursor = db.query(dbConnect.stepsTable, null, selection, selectionArgs, null, null, null);
+
         ContentValues values = new ContentValues();
         values.put(dbConnect.deviceId, deviceId);
         values.put(dbConnect.date, date);
         values.put(dbConnect.steps, steps);
 
-        db.insert(dbConnect.stepsTable, null, values);
+        if (cursor.moveToFirst()) {
+            // Ha már létezik rekord, akkor frissítjük a lépésszámot
+            db.update(dbConnect.stepsTable, values, selection, selectionArgs);
+        } else {
+            // Ha még nem létezik rekord, akkor újat hozunk létre
+            db.insert(dbConnect.stepsTable, null, values);
+        }
+        cursor.close();
         db.close();
     }
 
@@ -58,7 +69,7 @@ public class dbStepCounter {
         return db.rawQuery("SELECT * FROM " + dbConnect.stepsTable, null);
     }
 
-    public String getDeviceId() {
+    public static String getDeviceId() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(dbConnect.devicesTable, new String[]{"deviceId"}, null, null, null, null, null);
 
