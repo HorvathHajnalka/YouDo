@@ -32,6 +32,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
     ToDo todo;
     int todoId = -1; // has to be updated
     int userId = -1; // has to be updated
+    String curr_date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +47,11 @@ public class ToDoDetailActivity extends AppCompatActivity {
         detailDate = findViewById(R.id.detailDate);
 
 
-
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("todoId") && intent.hasExtra("userId")) {
             todoId = intent.getIntExtra("todoId", -1); // -1 if we don't know the "todoId"
             userId = intent.getIntExtra("userId", -1); // -1 if we don't know the "userId"
+            curr_date = intent.getStringExtra("curr_date");
         }
 
         dbConnectToDo = new dbConnectToDo(this);
@@ -60,11 +61,29 @@ public class ToDoDetailActivity extends AppCompatActivity {
             detailTitle.setText(todo.getName());
             detailDesc.setText(todo.getDescription());
             detailDate.setText("Date: " + todo.getDate());
+            if (todo.isDone()) doneTodoBtn.setText("ToDo is Not Done!");
 
         } else {
             Toast.makeText(this, "ToDo not found", Toast.LENGTH_SHORT).show();
             finish(); // last activity
         }
+
+        doneTodoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!todo.isDone()) todo.setDone(true);
+                else todo.setDone(false);
+
+
+                dbConnectToDo.updateToDo(todo);
+
+                Intent i = new Intent(ToDoDetailActivity.this, ToDoMainActivity.class);
+                i.putExtra("userId", userId);
+                i.putExtra("curr_date", curr_date);
+                startActivity(i);
+
+            }
+        });
 
         editTodoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +91,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent(ToDoDetailActivity.this, UploadToDoActivity.class);
                 intent.putExtra("userId", userId);
                 intent.putExtra("todoId", todoId);
+                intent.putExtra("curr_date", curr_date);
                 startActivity(intent);
             }
         });
@@ -94,6 +114,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
                 Intent i = new Intent(ToDoDetailActivity.this, ToDoMainActivity.class);
                 i.putExtra("userId", userId);
+                i.putExtra("curr_date", curr_date);
                 startActivity(i);
             }
         });

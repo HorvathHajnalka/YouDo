@@ -23,6 +23,19 @@
         android:textSize="20dp"
         android:textStyle="bold" />
 
+
+    <ImageView
+        android:id="@+id/todoDatePickerBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/date_picker" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todoRecyclerView"
         android:layout_width="match_parent"

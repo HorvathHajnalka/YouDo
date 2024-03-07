@@ -4,20 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.IBinder;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
+import android.os.IBinder;
 import android.util.Log;
-
 
 import androidx.core.app.NotificationCompat;
 
@@ -36,7 +33,6 @@ public class StepCounterService extends Service implements SensorEventListener {
     private dbStepCounter dbStepCounter;
     String deviceId;
     String todayDate;
-
 
     @SuppressLint("ForegroundServiceType")
     @Override
@@ -65,11 +61,6 @@ public class StepCounterService extends Service implements SensorEventListener {
             isServiceRunningInForeground = true;
         }
     }
-/*
-    private void loadInitialStepCount() {
-        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);
-        mInitialStepCount = sharedPreferences.getInt("initialStepCount", 0);
-    }*/
 
     private void loadInitialStepCount() {
         // Az aktuális dátum formázása
@@ -92,45 +83,6 @@ public class StepCounterService extends Service implements SensorEventListener {
         StepCounterActivity.updateServiceState(this, false);
         mSensorManager.unregisterListener(this);
     }
-
-    /*
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            if (mInitialStepCount == -1) {
-                mInitialStepCount = (int) event.values[0];
-                saveInitialStepCount(mInitialStepCount);
-            }
-            int totalStepsSinceReboot = (int) event.values[0];
-            int currentStepCount = totalStepsSinceReboot - mInitialStepCount;
-
-            Intent intent = new Intent("com.example.youdo.STEP_UPDATE");
-            intent.putExtra("steps", currentStepCount);
-            sendBroadcast(intent);
-        }
-    }*/
-/*
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            if (mInitialStepCount == -1) {
-                mInitialStepCount = (int) event.values[0];
-                saveInitialStepCount(mInitialStepCount);
-            }
-            int totalStepsSinceReboot = (int) event.values[0];
-            int currentStepCount = totalStepsSinceReboot - mInitialStepCount;
-
-            // Frissítse az adatbázist az új lépésszámmal
-            String deviceId = dbStepCounter.getDeviceId(); // Esetleg szükség lehet a deviceId kezelésére
-            String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-            dbStepCounter.addSteps(deviceId, todayDate, currentStepCount);
-
-            // Küldjön szándékot a UI frissítésére
-            Intent intent = new Intent("com.example.youdo.STEP_UPDATE");
-            intent.putExtra("steps", currentStepCount);
-            sendBroadcast(intent);
-        }
-    }*/
 
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -157,8 +109,6 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
     }
 
-
-
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
@@ -176,49 +126,9 @@ public class StepCounterService extends Service implements SensorEventListener {
         int currentSteps = dbStepCounter.getStepsByDate(deviceId,todayDate); // Feltételezve, hogy van ilyen függvényed
         updateIntent.putExtra("steps", currentSteps);
         sendBroadcast(updateIntent);
-
-        /*
-
-        if (intent.getBooleanExtra("resetSteps", false)) {
-            resetStepsInDatabase(); // Feltételezve, hogy implementálva van ez a függvény az adatbázis-kezelő osztályban
-        } else {
-            if (shouldResetStepCounter()) {
-                resetStepsInDatabase(); // Itt is, reseteljük az adatbázisban lévő lépéseket
-            }
-        }*/
         Log.d("StepCounterService", "Service started.");
         return START_STICKY;
     }
-
-
-    /*
-    @SuppressLint("ForegroundServiceType")
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        //SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        StepCounterActivity.updateServiceState(this, true);
-
-        Log.d("Mylogs", "BroadCast receiver started in StepCounterService onStart");
-        Intent updateIntent = new Intent("com.example.youdo.STEP_UPDATE");
-        updateIntent.putExtra("steps", 0); // Kezdeti érték, ami lehet 0 vagy a korábban mentett érték
-        sendBroadcast(updateIntent);
-
-
-        // Ellenőrizd, hogy van-e 'resetSteps' extra az intentben, és ha igen, kezeld.
-        if (intent.getBooleanExtra("resetSteps", false)) {
-            // Itt lenne a reset logika
-            mInitialStepCount = -1;
-            saveInitialStepCount(mInitialStepCount); // Mentés az új kezdőértékkel
-        } else {
-            if (shouldResetStepCounter()) {
-                // Amennyiben az alkalmazás/szerviz újraindult, reseteld az mInitialStepCount értéket
-                mInitialStepCount = -1;
-                saveInitialStepCount(mInitialStepCount);
-            }
-        }
-        Log.d("StepCounterService", "Service started.");
-        return START_STICKY;
-    }*/
 
     private boolean shouldResetStepCounter() {
         // Használja a Service kontextusát közvetlenül
@@ -231,7 +141,6 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         return hasServiceRestarted;
     }
-
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -246,7 +155,6 @@ public class StepCounterService extends Service implements SensorEventListener {
 
         }
     }
-
 
     private void saveInitialStepCount(int initialStepCount) {
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);

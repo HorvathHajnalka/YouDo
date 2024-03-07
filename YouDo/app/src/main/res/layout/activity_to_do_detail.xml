@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ToDoDetailActivity"
-    android:background="@color/dark_grey">
+    android:background="@drawable/background">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         app:cardCornerRadius="30dp"
-        app:cardBackgroundColor="@color/black"
+        app:cardBackgroundColor="@color/blue_extra_dark"
         app:cardElevation="20dp">
 
         <LinearLayout
@@ -35,7 +35,8 @@
                 android:textSize="24sp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="12dp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -61,7 +62,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="12dp"
                 android:textColor="@color/white"
-                android:textStyle="bold"/>
+            />
 
 
 
@@ -81,7 +82,7 @@
                     android:layout_gravity="center"
                     android:background="@drawable/blue_border"
                     android:text="Edit ToDo"
-                    android:textColor="@color/dark_purple"
+                    android:textColor="@color/light_grey"
                     android:textSize="18dp"
                     android:layout_weight="1"
                     app:backgroundTint="@null" />
@@ -94,7 +95,7 @@
                     android:layout_margin="20dp"
                     android:background="@drawable/blue_border"
                     android:text="Delete ToDo"
-                    android:textColor="@color/dark_purple"
+                    android:textColor="@color/light_grey"
                     android:textSize="18dp"
                     android:layout_weight="1"
                     app:backgroundTint="@null" />

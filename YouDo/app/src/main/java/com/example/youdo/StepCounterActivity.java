@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,40 +34,11 @@ public class StepCounterActivity extends AppCompatActivity {
     private int previewsTotalSteps;
     private ProgressBar progressBar;
     private TextView steps;
-    int userId;
     private ActivityResultLauncher<String> notificationPermissionLauncher;
     private static final int REQUEST_CODE = 100;
     private dbStepCounter db;
     String todayAsString;
     String deviceId;
-
-    /*
-    private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("Mylogs", "BroadCast receiver started");
-            if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
-                // Lépések száma
-                int stepsCount = intent.getIntExtra("steps", 0);
-                totalSteps = stepsCount; // Frissítjük a totalSteps értékét
-
-                // Mivel UI frissítést kell végezni, győződjünk meg róla, hogy a fő szálon vagyunk
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Napi lépések
-                        int currentSteps = totalSteps - previewsTotalSteps;
-                        Log.d("StepCounterActivity", "BroadCast receiver current steps: " + currentSteps);
-
-                        db.addSteps(db.getDeviceId(), todayAsString,currentSteps);
-
-                        steps.setText(String.valueOf(currentSteps));
-                        progressBar.setProgress(currentSteps);
-                    }
-                });
-            }
-        }
-    };*/
 
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -103,7 +73,6 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,12 +83,9 @@ public class StepCounterActivity extends AppCompatActivity {
         deviceId = dbStepCounter.getDeviceId();
         todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-
         progressBar = findViewById(R.id.progressBar);
         steps = findViewById(R.id.steps);
 
-        // resetSteps();
-        // loadData();
         loadDataFromDatabase();
 
         Log.d("Mylogs", "Az alkalmazás létrehozva: onCreate()");
@@ -127,7 +93,6 @@ public class StepCounterActivity extends AppCompatActivity {
         updateUI();
 
         Log.d("Mylogs", "Broadcastreceiver activityben: onCreate()");
-
 
         progressBar.setMax(7500);
 
@@ -221,26 +186,15 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    private void loadData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        totalSteps = sharedPreferences.getInt("totalSteps", 0); // Betöltjük a teljes lépésszámot is
-        previewsTotalSteps = sharedPreferences.getInt("previewsTotalSteps", 0);
-    }*/
     private void loadDataFromDatabase() {
         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         totalSteps = db.getStepsByDate(db.getDeviceId(), todayAsString); // Feltételezve, hogy a deviceId "device1"
         // Itt nincs szükség a previewsTotalSteps változóra, mivel az adatbázis kezeli az összesítést
     }
 
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // StepCounterActivity.updateServiceState(this, true);
-        // stopService(new Intent(this, StepCounterService.class));
         saveStepsToDatabase();
         Log.d("Mylogs", "A szolgáltatás leállítva: onDestroy()");
     }
@@ -271,7 +225,6 @@ public class StepCounterActivity extends AppCompatActivity {
         editor.apply();
     }
 
-
     private boolean isServiceRunning() {
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("ServiceRunning", false);
@@ -288,20 +241,8 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    private void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("totalSteps", totalSteps); // Elmentjük a teljes lépésszámot is
-        editor.putInt("previewsTotalSteps", previewsTotalSteps);
-        editor.apply();
-    }*/
-
     private void saveStepsToDatabase() {
 
         db.addSteps(db.getDeviceId(), todayAsString, totalSteps); // Feltételezve, hogy a deviceId "device1"
     }
-
-
-
 }

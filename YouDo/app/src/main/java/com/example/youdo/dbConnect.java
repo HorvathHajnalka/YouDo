@@ -28,7 +28,7 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String googleTodoId = "googleTodoId";
     public static String todoName = "todoName";
     public static String todoDesc = "todoDesc";
-    public static String todoState = "todoState"; // Boolean?
+    public static String todoDone = "todoDone"; // Boolean?
     public static String todoDate = "todoDate"; // Date?
     public static String todoTime = "todoTime"; // Time?
     // ?
@@ -46,7 +46,7 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String stepsTable = "steps";
     public static String stepId = "stepId";
     public static String deviceId = "deviceId"; //
-    public static String date = "date"; // yyy-mm-dd
+    public static String date = "date"; // yyyy-mm-dd
     public static String steps = "steps"; // stepcount on a given dayd
 
     // devices
@@ -71,7 +71,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
         // to do table
         String makeTodoQuery = "CREATE TABLE " + todoTable + "(" + todoId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + googleTodoId + " TEXT, " + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoState + " TEXT, " + todoDate + " TEXT, "
+                + googleTodoId + " TEXT, " + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoDone + " TEXT, " + todoDate + " TEXT, "
                 + todoTime + " TEXT, " + todoTypeId + " INTEGER, " + todoUserId + " INTEGER, "
                 + "FOREIGN KEY(" + todoTypeId + ") REFERENCES " + typeTable + "(" + typeId + "), "
                 + "FOREIGN KEY(" + todoUserId + ") REFERENCES " + userTable + "(" + userId + "))";

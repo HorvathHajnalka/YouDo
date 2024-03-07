@@ -10,7 +10,7 @@ public class ToDo {
     private String description;
     private int typeId;
     private int userId;
-    private String state;
+    private boolean done;
 
     // functions
 
@@ -58,12 +58,6 @@ public class ToDo {
     public void setUserId(int userId) {
         this.userId = userId;
     }
-    public String getState() {
-        return state;
-    }
-    public void setState(String state) {
-        this.state = state;
-    }
 
     public String getGoogleTodoId() {
         return googleTodoId;
@@ -71,5 +65,13 @@ public class ToDo {
 
     public void setGoogleTodoId(String googleTodoId) {
         this.googleTodoId = googleTodoId;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 }
