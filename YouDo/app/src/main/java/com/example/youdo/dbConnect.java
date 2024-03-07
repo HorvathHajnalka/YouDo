@@ -11,7 +11,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 6;
+    private static int dbVersion = 7;
 
 
     // users
@@ -54,6 +54,9 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String devicesTable = "devices";
     public static String registrationDate = "registrationDate";
 
+    // userDeviceLink
+    public static String userDeviceLink = "userDeviceLink";
+
     public dbConnect(@Nullable Context context) {
         super(context, dbName, null, dbVersion);
     }
@@ -84,11 +87,20 @@ public class dbConnect extends SQLiteOpenHelper {
                 + deviceId + " TEXT, " + date + " TEXT, " + steps + " INTEGER)";
         db.execSQL(makeStepsQuery);
 
-        // devices
+        // devices table
         String makeDeviceTableQuery = "CREATE TABLE " + devicesTable + "(" +
                 deviceId + " TEXT PRIMARY KEY, " +
                 registrationDate + " TEXT)";
         db.execSQL(makeDeviceTableQuery);
+
+        // userDeviceLink table
+        String makeUserDeviceLinkTableQuery = "CREATE TABLE " + userDeviceLink + "(" +
+                "userId INTEGER, " +
+                "deviceId TEXT, " +
+                "PRIMARY KEY (userId, deviceId), " +
+                "FOREIGN KEY (userId) REFERENCES " + userTable + "(" + userId + "), " +
+                "FOREIGN KEY (deviceId) REFERENCES " + devicesTable + "(" + deviceId + "))";
+        db.execSQL(makeUserDeviceLinkTableQuery);
 
     }
 
@@ -98,6 +110,7 @@ public class dbConnect extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+ todoTable);
         db.execSQL("DROP TABLE IF EXISTS "+ typeTable);
         db.execSQL("DROP TABLE IF EXISTS "+ stepsTable);
+        db.execSQL("DROP TABLE IF EXISTS "+ userDeviceLink);
         onCreate(db);
     }
 }
