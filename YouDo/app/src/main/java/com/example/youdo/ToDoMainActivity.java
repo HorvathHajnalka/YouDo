@@ -91,7 +91,7 @@ public class ToDoMainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (curr_date != String.valueOf("-1") && curr_date != null && ! curr_date.equals(getTodaysDate())) loadToDosForDate(curr_date);
+        if (!curr_date.equals("-1") && curr_date != null && ! curr_date.equals(getTodaysDate())) loadToDosForDate(curr_date);
         else loadToDosForDate(getTodaysDate());
     }
     private void initDatePicker() {
@@ -127,9 +127,10 @@ public class ToDoMainActivity extends AppCompatActivity {
         todoList = dbConnectToDo.getToDosByUserAndDate(userId, date);
         ToDoAdapter adapter = new ToDoAdapter(todoList, this, curr_date);
         recyclerView.setAdapter(adapter);
-        if (curr_date != String.valueOf("-1") && curr_date != null && ! curr_date.equals(getTodaysDate())) {
+        if (! curr_date.equals("-1") && curr_date != null && ! curr_date.equals(getTodaysDate())) {
                 todoText.setText(curr_date);
         }else{
+            curr_date = getTodaysDate();
             todoText.setText("ToDos for today");
         }
         adapter.notifyDataSetChanged();
