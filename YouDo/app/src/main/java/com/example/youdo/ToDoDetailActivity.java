@@ -1,6 +1,7 @@
 package com.example.youdo;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -59,7 +60,12 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
         if (todo != null) {
             detailTitle.setText(todo.getName());
-            detailDesc.setText(todo.getDescription());
+            if(! todo.getDescription().equals("")) detailDesc.setText(todo.getDescription());
+            else {
+                detailDesc.setText("");
+                detailDesc.setHeight(1);
+                detailDesc.setBackgroundColor(ContextCompat.getColor(ToDoDetailActivity.this, R.color.blue_extra_dark));
+            }
             detailDate.setText("Date: " + todo.getDate());
             if (todo.isDone()) doneTodoBtn.setText("ToDo is Not Done!");
 
