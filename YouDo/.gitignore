@@ -13,6 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
-keystores/
-app/google-services.json
+# new
+YouDo/keystores/
+YouDo/app/google-services.json
 YouDo/app/Constants.kt
+# from
