@@ -94,5 +94,27 @@ public class dbStepCounter {
             return deviceId;
         }
     }
+    public void addOrUpdateSteps(String deviceId, String date, int steps) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        String selection = dbConnect.deviceId + " = ? AND " + dbConnect.date + " = ?";
+        String[] selectionArgs = {deviceId, date};
+        Cursor cursor = db.query(dbConnect.stepsTable, null, selection, selectionArgs, null, null, null);
+
+        ContentValues values = new ContentValues();
+        values.put(dbConnect.deviceId, deviceId);
+        values.put(dbConnect.date, date);
+        values.put(dbConnect.steps, steps);
+
+        if (cursor.moveToFirst()) {
+            // Ha már létezik rekord, és a frissítés manuális, akkor frissítjük a lépésszámot
+            db.update(dbConnect.stepsTable, values, selection, selectionArgs);
+        } else {
+            // Ha még nem létezik rekord, akkor újat hozunk létre
+            db.insert(dbConnect.stepsTable, null, values);
+        }
+        cursor.close();
+        db.close();
+    }
 
 }

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        tools:context=".WeeklyStatsActivity">
+
+        <TextView
+            android:id="@+id/stepCounterTitle"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:background="@drawable/background_top"
+            android:gravity="center"
+            android:text="Weekly Steps"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/weekday1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/stepCounterTitle"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/dark_purple"
+        android:bottomLeftRadius="10dp"
+
+        android:bottomRightRadius="10dp"
+        android:padding="12dp"
+        android:text="2024.01.01.:"
+        android:textAlignment="viewStart"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+        />
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/weekday2"
+        android:layout_below="@+id/weekday1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_margin="8dp"
+        android:padding="12dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+
+        android:textColor="@color/white"
+        android:text="weekday2"
+        android:backgroundTint="@color/dark_purple"
+        android:textAlignment="viewStart"
+        >
+    </Button>
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/weekday3"
+        android:layout_below="@+id/weekday2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_margin="8dp"
+        android:padding="12dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+
+        android:textColor="@color/white"
+        android:text="weekday3"
+        android:backgroundTint="@color/dark_purple"
+        android:textAlignment="viewStart"
+        >
+    </Button>
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/weekday4"
+        android:layout_below="@+id/weekday3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_margin="8dp"
+        android:padding="12dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+
+        android:textColor="@color/white"
+        android:text="weekday4"
+        android:backgroundTint="@color/dark_purple"
+        android:textAlignment="viewStart"
+        >
+    </Button>
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/weekday5"
+        android:layout_below="@+id/weekday4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_margin="8dp"
+        android:padding="12dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+
+        android:textColor="@color/white"
+        android:text="weekday5"
+        android:backgroundTint="@color/dark_purple"
+        android:textAlignment="viewStart"
+        >
+    </Button>
+    <Button xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/weekday6"
+        android:layout_below="@+id/weekday5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_margin="8dp"
+        android:padding="12dp"
+
+        android:bottomRightRadius="10dp"
+        android:bottomLeftRadius="10dp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp"
+
+        android:textColor="@color/white"
+        android:text="weekday6"
+        android:backgroundTint="@color/dark_purple"
+        android:textAlignment="viewStart"
+        >
+    </Button>
+
+    <Button
+        android:id="@+id/weekday7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/weekday6"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/dark_purple"
+        android:bottomLeftRadius="10dp"
+
+        android:bottomRightRadius="10dp"
+        android:padding="12dp"
+        android:text="weekday7"
+        android:textAlignment="viewStart"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:topLeftRadius="10dp"
+        android:topRightRadius="10dp" />
+
+</RelativeLayout>
+

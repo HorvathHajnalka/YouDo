@@ -17,16 +17,34 @@
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
         android:background="@drawable/background_top"
-        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingLeft="60dp"
         android:text="Step Counter"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="23dp"
         android:textStyle="bold" />
+    <TextView
+        android:id="@+id/dateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/stepCounterTitle"
+        android:paddingTop="15dp"
+        android:paddingRight="60dp"
+        android:text="date"
+        android:layout_centerHorizontal="true"
+        android:textSize="23dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        />
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:id="@+id/layout_id">
+
+
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -63,6 +81,25 @@
             android:textColor="@color/light_grey"
             android:textSize="20dp" />
     </RelativeLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/weeklyStatsBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_id"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="40dp"
+        android:layout_weight="1"
+        android:background="@drawable/blue_border"
+        android:text="Step History"
+        android:textColor="@color/light_grey"
+        android:textSize="18dp"
+        app:backgroundTint="@null" />
+
 
 
 </RelativeLayout>

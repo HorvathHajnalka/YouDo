@@ -2,6 +2,7 @@ package com.example.youdo;
 
 import static android.Manifest.permission.ACTIVITY_RECOGNITION;
 
+import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +27,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -34,11 +40,16 @@ public class StepCounterActivity extends AppCompatActivity {
     private int previewsTotalSteps;
     private ProgressBar progressBar;
     private TextView steps;
+    TextView dateText;
     private ActivityResultLauncher<String> notificationPermissionLauncher;
     private static final int REQUEST_CODE = 100;
     private dbStepCounter db;
     String todayAsString;
     String deviceId;
+    MaterialButton weeklyStatsBtn;
+    private DatePickerDialog datePickerDialog;
+    String curr_date;
+    String todaysDate;
 
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -76,6 +87,7 @@ public class StepCounterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_step_counter);
 
         db = new dbStepCounter(this);
@@ -85,6 +97,9 @@ public class StepCounterActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         steps = findViewById(R.id.steps);
+        dateText = findViewById(R.id.dateText);
+        weeklyStatsBtn = findViewById(R.id.weeklyStatsBtn);
+
 
         loadDataFromDatabase();
 
@@ -95,6 +110,11 @@ public class StepCounterActivity extends AppCompatActivity {
         Log.d("Mylogs", "Broadcastreceiver activityben: onCreate()");
 
         progressBar.setMax(7500);
+
+        todaysDate = getTodaysDate();
+        curr_date = todaysDate;
+
+        dateText.setText(curr_date);
 
         if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{ACTIVITY_RECOGNITION}, 1);
@@ -114,7 +134,52 @@ public class StepCounterActivity extends AppCompatActivity {
             }
         });
         checkAndRequestNotificationPermission();
+
+        // manually add some data for testing purposes
+
+        db.addOrUpdateSteps(deviceId, "2024-03-12", 6815);
+        db.addOrUpdateSteps(deviceId, "2024-03-11", 5542);
+        db.addOrUpdateSteps(deviceId, "2024-03-10", 2014);
+        db.addOrUpdateSteps(deviceId, "2024-03-09", 8507);
+        db.addOrUpdateSteps(deviceId, "2024-03-08", 7499);
+        db.addOrUpdateSteps(deviceId, "2024-03-07", 54);
+        db.addOrUpdateSteps(deviceId, "2024-03-06", 13);
+
+        initDatePicker();
+        weeklyStatsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                datePickerDialog.show();
+            }
+        });
+
+
     }
+
+    private void initDatePicker() {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                month = month + 1;
+                String formattedMonth = (month < 10 ? "0" : "") + month;
+                String formattedDayOfMonth = (dayOfMonth < 10 ? "0" : "") + dayOfMonth;
+                String strDate = year + "-" + formattedMonth + "-" + formattedDayOfMonth;
+                curr_date = strDate;
+                Log.e("myLog", "main date "+curr_date);
+                dateText.setText(curr_date);
+                loadStepsForDate(strDate);
+            }
+        };
+
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+    }
+
 
     private void checkAndRequestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -140,6 +205,8 @@ public class StepCounterActivity extends AppCompatActivity {
         loadDataFromDatabase();
         // resetSteps();
         updateUI(); // Az updateUI() már tartalmazza a loadData() hívást, így redundáns volt itt meghívni
+
+        dateText.setText(curr_date);
 
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
         // filter.addFlags(Intent.FLAG_RECEIVER_NOT_EXPORTED);
@@ -188,7 +255,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
     private void loadDataFromDatabase() {
         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        totalSteps = db.getStepsByDate(db.getDeviceId(), todayAsString); // Feltételezve, hogy a deviceId "device1"
+        totalSteps = db.getStepsByDate(db.getDeviceId(), todayAsString);
         // Itt nincs szükség a previewsTotalSteps változóra, mivel az adatbázis kezeli az összesítést
     }
 
@@ -243,6 +310,33 @@ public class StepCounterActivity extends AppCompatActivity {
 
     private void saveStepsToDatabase() {
 
-        db.addSteps(db.getDeviceId(), todayAsString, totalSteps); // Feltételezve, hogy a deviceId "device1"
+        db.addSteps(db.getDeviceId(), todayAsString, totalSteps);
     }
+
+    private static String getTodaysDate() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(calendar.getTime());
+    }
+
+    private void loadStepsForDate(String date) {
+        // A date paramétert használva lekérjük az adott dátumhoz tartozó lépések számát
+        int stepsForDate = db.getStepsByDate(deviceId, date);
+
+        // Frissítjük a UI elemeit az újonnan betöltött adatokkal
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Beállítjuk a lépések szöveges megjelenítését a lekért lépésszámmal
+                steps.setText(String.valueOf(stepsForDate));
+
+                // Beállítjuk a progress bar értékét. Feltételezve, hogy a progressBar maximuma megfelelően van beállítva.
+                progressBar.setProgress(stepsForDate);
+            }
+        });
+
+        // Naplózás, ha szükséges
+        Log.d("loadStepsForDate", "Lépések betöltve a dátumra: " + date + ", Lépések száma: " + stepsForDate);
+    }
+
 }
