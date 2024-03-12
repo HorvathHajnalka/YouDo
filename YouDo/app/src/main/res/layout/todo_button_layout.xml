@@ -14,7 +14,7 @@
 
     android:textColor="@color/white"
     android:text="Todo example"
-    android:backgroundTint="@color/dark_purple"
+    android:backgroundTint="#5849ff"
     android:textAlignment="viewStart"
     >
 

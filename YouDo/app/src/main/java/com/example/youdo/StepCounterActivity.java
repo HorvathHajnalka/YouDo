@@ -114,7 +114,7 @@ public class StepCounterActivity extends AppCompatActivity {
         todaysDate = getTodaysDate();
         curr_date = todaysDate;
 
-        dateText.setText(curr_date);
+        dateText.setText("Step Counts on "+ curr_date);
 
         if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{ACTIVITY_RECOGNITION}, 1);
@@ -166,7 +166,7 @@ public class StepCounterActivity extends AppCompatActivity {
                 String strDate = year + "-" + formattedMonth + "-" + formattedDayOfMonth;
                 curr_date = strDate;
                 Log.e("myLog", "main date "+curr_date);
-                dateText.setText(curr_date);
+                dateText.setText("Step Counts on "+ curr_date);
                 loadStepsForDate(strDate);
             }
         };
@@ -206,7 +206,7 @@ public class StepCounterActivity extends AppCompatActivity {
         // resetSteps();
         updateUI(); // Az updateUI() már tartalmazza a loadData() hívást, így redundáns volt itt meghívni
 
-        dateText.setText(curr_date);
+        dateText.setText("Step Counts on "+ curr_date);
 
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
         // filter.addFlags(Intent.FLAG_RECEIVER_NOT_EXPORTED);
