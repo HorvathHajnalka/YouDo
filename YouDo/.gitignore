@@ -18,3 +18,7 @@ YouDo/keystores/
 YouDo/app/google-services.json
 YouDo/app/Constants.kt
 # from
+YouDo/app/src/main/res/values/strings.xml
+YouDo/app/src/main/assets/youdo-415515-555ce73bccc4.json
+YouDo/app/release/app-release.apk
+
