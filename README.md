@@ -1,6 +1,6 @@
 # YouDo Android Task Manager
 
-Hello! Thanks for checking out YouDo, my very first full-stack programme. It started as a hobby project, but as I added features, it grew into something I'm really proud of and I have many ideas for making YouDo even better. It's a simple yet powerful app I created to help manage daily tasks. My goal was to make something that's not just easy to use but also packs in enough features to actually be useful in keeping up with day-to-day activities.
+Hello!😊 Thanks for checking out YouDo, my very first full-stack programme. It started as a hobby project, but as I added features, it grew into something I'm really proud of and I have many ideas for making YouDo even better. It's a simple yet powerful app I created to help manage daily tasks. My goal was to make something that's not just easy to use but also packs in enough features to actually be useful in keeping up with day-to-day activities.
 ## Features
 
 YouDo is packed with features to help you manage your day better:
@@ -50,4 +50,4 @@ To use YouDo in your development environment, follow these steps:
 
 As mentioned earlier, YouDo is a personal development project, and as such, is not open to direct contributions. However, your feedback and suggestions are highly valued. If you have ideas on how to improve the app or encounter any issues, please feel free to open an issue in the repository.
 
-Thank you for your interest in YouDo!
+Thank you for your interest in YouDo!😊
