@@ -13,13 +13,13 @@
 .externalNativeBuild
 .cxx
 local.properties
-# new
+
 YouDo/keystores/
 YouDo/app/Constants.kt
-# from
+
 YouDo/app/src/main/assets/youdo-415515-555ce73bccc4.json
 YouDo/app/release/app-release.apk
 
-# again
+
 YouDo/app/google-services.json
 YouDo/app/src/main/res/values/strings.xml
