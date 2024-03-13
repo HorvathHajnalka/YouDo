@@ -6,7 +6,7 @@ Hello!😊 Thanks for checking out YouDo, my very first full-stack programme. It
 YouDo is packed with features to help you manage your day better:
 
 - **Authentication:** Includes features for Registration, Login, and Google Sign In. 
-- **Google APIs (Calendar Integration):** You can upload, edit, and delete your tasks directly on your Google Calendar via our integration.
+- **Google APIs (Calendar Integration):** You can upload, edit, and delete your tasks directly on your Google Calendar via this app.
 - **Step Counter (Sensor Usage):** Stay healthy while being productive. Using your phone's sensors, step counter works in the background (even when the app is closed), monitored through a persistent notification for easy access.
 - **Date-Based Filtering:** Easily sort and view your tasks/steps based on deadlines and dates, allowing for efficient time management.
 - **User Interface:** Intuitive and user-friendly interface for seamless navigation and task management.
