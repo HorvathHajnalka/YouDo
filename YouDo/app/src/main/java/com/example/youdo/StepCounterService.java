@@ -101,7 +101,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             // Feltételezve, hogy a deviceId és a mai dátum megszerzése korábban megfelelően történik
 
 
-            // Itt a lényeg, hogy az addSteps függvényt használjuk a lépésszám frissítésére
+            // az addSteps függvényt használjuk a lépésszám frissítésére
             dbStepCounter.addSteps(deviceId, todayDate, currentStepCount);
 
             // Küldjön szándékot a UI frissítésére
@@ -143,26 +143,26 @@ public class StepCounterService extends Service implements SensorEventListener {
         }
         return hasServiceRestarted;
     }
+    private void saveInitialStepCount(int initialStepCount) {
+        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("initialStepCount", initialStepCount);
+        editor.apply();
+    }
+
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Step Counter Notification Channel",
-                    NotificationManager.IMPORTANCE_HIGH); // Módosítsd ezt a sort
+                    NotificationManager.IMPORTANCE_HIGH);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(serviceChannel);
             Log.d("StepCounterService", "Notification channel created.");
 
         }
-    }
-
-    private void saveInitialStepCount(int initialStepCount) {
-        SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("initialStepCount", initialStepCount);
-        editor.apply();
     }
 
     private Notification buildForegroundNotification() {

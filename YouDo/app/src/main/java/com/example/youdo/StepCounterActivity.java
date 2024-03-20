@@ -137,13 +137,14 @@ public class StepCounterActivity extends AppCompatActivity {
 
         // manually add some data for testing purposes
 
-        db.addOrUpdateSteps(deviceId, "2024-03-12", 6815);
-        db.addOrUpdateSteps(deviceId, "2024-03-11", 5542);
-        db.addOrUpdateSteps(deviceId, "2024-03-10", 2014);
-        db.addOrUpdateSteps(deviceId, "2024-03-09", 8507);
-        db.addOrUpdateSteps(deviceId, "2024-03-08", 7499);
-        db.addOrUpdateSteps(deviceId, "2024-03-07", 54);
-        db.addOrUpdateSteps(deviceId, "2024-03-06", 13);
+        /*
+        db.addOrUpdateSteps(deviceId, "2024-03-18", 6815);
+        db.addOrUpdateSteps(deviceId, "2024-03-17", 5542);
+        db.addOrUpdateSteps(deviceId, "2024-03-16", 2014);
+        db.addOrUpdateSteps(deviceId, "2024-03-15", 8507);
+        db.addOrUpdateSteps(deviceId, "2024-03-14", 7499);
+        db.addOrUpdateSteps(deviceId, "2024-03-13", 54);
+        db.addOrUpdateSteps(deviceId, "2024-03-12", 13);*/
 
         initDatePicker();
         weeklyStatsBtn.setOnClickListener(new View.OnClickListener() {
