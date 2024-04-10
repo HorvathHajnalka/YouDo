@@ -15,11 +15,12 @@ public class dbStepCounter {
 
     private static dbConnect dbHelper;
 
+    // Constructor to initialize the dbHelper with the application context
     public dbStepCounter(Context context) {
         dbHelper = new dbConnect(context);
     }
 
-    // Lépések hozzáadása az adatbázishoz
+    // Adds steps to the database for a specific device and date
     public void addSteps(String deviceId, String date, int steps) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -33,17 +34,17 @@ public class dbStepCounter {
         values.put(dbConnect.steps, steps);
 
         if (cursor.moveToFirst()) {
-            // Ha már létezik rekord, akkor frissítjük a lépésszámot
+            // If a record already exists, update the steps count
             db.update(dbConnect.stepsTable, values, selection, selectionArgs);
         } else {
-            // Ha még nem létezik rekord, akkor újat hozunk létre
+            // If the record does not exist, create a new one
             db.insert(dbConnect.stepsTable, null, values);
         }
         cursor.close();
         db.close();
     }
 
-    // Lekéri az adott nap lépésszámát
+    // Retrieves the step count for a given device and date
     @SuppressLint("Range")
     public int getStepsByDate(String deviceId, String date) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -63,17 +64,19 @@ public class dbStepCounter {
         return totalSteps;
     }
 
-    // Az összes lépés lekérése
+    // Retrieves all step records from the database
     public Cursor getAllSteps() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + dbConnect.stepsTable, null);
     }
 
+    // Generates or retrieves the unique device ID
     public static String getDeviceId() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(dbConnect.devicesTable, new String[]{"deviceId"}, null, null, null, null, null);
 
         if (cursor.moveToFirst()) {
+            // If device ID already exists, return it
             String deviceId = cursor.getString(0);
             cursor.close();
             db.close();
@@ -82,7 +85,7 @@ public class dbStepCounter {
             cursor.close();
             db.close();
 
-            // Eszköz ID generálása és mentése
+            // Generate and save a new device ID if it doesn't exist
             String deviceId = UUID.randomUUID().toString();
             SQLiteDatabase writeDb = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
@@ -94,6 +97,8 @@ public class dbStepCounter {
             return deviceId;
         }
     }
+
+    // Adds or updates step count for a given device and date
     public void addOrUpdateSteps(String deviceId, String date, int steps) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -107,14 +112,13 @@ public class dbStepCounter {
         values.put(dbConnect.steps, steps);
 
         if (cursor.moveToFirst()) {
-            // Ha már létezik rekord, és a frissítés manuális, akkor frissítjük a lépésszámot
+            // Update the step count if the record already exists
             db.update(dbConnect.stepsTable, values, selection, selectionArgs);
         } else {
-            // Ha még nem létezik rekord, akkor újat hozunk létre
+            // Create a new record if it doesn't exist
             db.insert(dbConnect.stepsTable, null, values);
         }
         cursor.close();
         db.close();
     }
-
 }

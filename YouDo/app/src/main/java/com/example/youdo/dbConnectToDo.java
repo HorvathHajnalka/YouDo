@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
+// Manages database operations for To-Do items.
 public class dbConnectToDo {
     private dbConnect dbHelper;
 
@@ -19,6 +21,7 @@ public class dbConnectToDo {
     }
 
 
+    // Adds a new To-Do item to the database.
     public int addToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -39,6 +42,7 @@ public class dbConnectToDo {
         return id;
     }
 
+    // Updates an existing To-Do item in the database.
     public boolean updateToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -58,6 +62,7 @@ public class dbConnectToDo {
     }
 
 
+    // Deletes a To-Do item from the database by its ID.
     public boolean deleteToDoById(int todoId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int endResult = db.delete(dbConnect.todoTable, dbConnect.todoId + " =?", new String[]{String.valueOf(todoId)});
@@ -65,6 +70,7 @@ public class dbConnectToDo {
         return endResult > 0;
     }
 
+    // Checks if a To-Do item exists in the database based on its Google ID.
     public boolean getToDoByGoogleId(String googleId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -83,8 +89,7 @@ public class dbConnectToDo {
         return exists;
     }
 
-
-
+    // Retrieves all To-Do items for a specific user.
     public List<ToDo> getAllToDoPerUser(int uId) {
         List<ToDo> todoList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -148,7 +153,7 @@ public class dbConnectToDo {
         return todoList;
     }
 
-
+    // Retrieves a single To-Do item by its ID.
     public ToDo getTodoById(int todoId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -192,11 +197,12 @@ public class dbConnectToDo {
         return todo;
     }
 
+    // Retrieves To-Do items for a user on a specific date.
     public List<ToDo> getToDosByUserAndDate(int userId, String date) {
         List<ToDo> filteredToDoList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        // A kiválasztandó oszlopok
+
         String[] projection = {
                 dbConnect.todoId,
                 dbConnect.googleTodoId,
@@ -209,11 +215,11 @@ public class dbConnectToDo {
                 dbConnect.todoDone
         };
 
-        // A keresési feltételek
+
         String selection = dbConnect.todoUserId + " = ? AND " + dbConnect.todoDate + " = ?";
         String[] selectionArgs = {String.valueOf(userId), date};
 
-        // A lekérdezés végrehajtása
+
         Cursor cursor = db.query(
                 dbConnect.todoTable,
                 projection,
@@ -224,7 +230,7 @@ public class dbConnectToDo {
                 null
         );
 
-        // Az eredmények feldolgozása
+
         if (cursor.moveToFirst()) {
             do {
                 ToDo todo = new ToDo();
@@ -242,7 +248,7 @@ public class dbConnectToDo {
             } while (cursor.moveToNext());
         }
 
-        // Erőforrások felszabadítása
+
         if (cursor != null) {
             cursor.close();
         }

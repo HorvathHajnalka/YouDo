@@ -60,6 +60,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         // typePickerBtn = findViewById(R.id.typePickerBtn);
 
 
+        // Get extras passed through the intent that started this activity.
         extras = getIntent().getExtras();
         if (extras != null) {
             userId = extras.getInt("userId", -1);
@@ -68,6 +69,7 @@ public class UploadToDoActivity extends AppCompatActivity {
             curr_date = extras.getString("curr_date", "-1");
         }
 
+        // Check if we're editing an existing To-Do
         if (editTodoId != -1) {
             editTodo = db.getTodoById(editTodoId);
             mainTitle.setText("Edit ToDo");
@@ -129,6 +131,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                     return;
                 }
 
+                // Checking if the user is signed in with Google
                 GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(UploadToDoActivity.this);
 
                 if (editTodoId == -1) {
@@ -149,15 +152,18 @@ public class UploadToDoActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
+        // Month in Java's Calendar class is zero-based so it needs to be incremented by one to get the correct display value.
         month = month + 1;
 
         return makeDateString(day, month, year);
     }
 
+    // Initialize the DatePicker dialog.
     private void initDatePicker() {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                // Month in Java's Calendar class is zero-based so it needs to be incremented by one for display.
                 month = month + 1;
                 String date = makeDateString(dayOfMonth, month, year);
                 datePickerBtn.setText(date);
@@ -170,13 +176,17 @@ public class UploadToDoActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
+        // Creating the DatePickerDialog instance with the current date as the default selection.
         datePickerDialog = new DatePickerDialog(this, R.style.DatePickerDialogTheme, dateSetListener, year, month, day);
+        // Setting the minimum date to the current date, preventing selection of past dates.
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
 
 
     }
 
+    // This method formats the date string by converting the month integer to a string abbreviation and appending it with the day and year.
     private String makeDateString(int dayOfMonth, int month, int year) {
+
 
         return year + "/" + getMonthFormat(month) + "/" + dayOfMonth + "  ";
     }
@@ -195,6 +205,8 @@ public class UploadToDoActivity extends AppCompatActivity {
         else if (month == 11) return "Nov";
         else return "Dec";
     }
+
+    // Retrieves the selected date from the DatePicker and sets it as the start time in a Calendar instance.
     private Calendar getStartTime() {
         DatePicker datePicker = datePickerDialog.getDatePicker();
         Calendar startTime = Calendar.getInstance();
@@ -202,11 +214,13 @@ public class UploadToDoActivity extends AppCompatActivity {
         return startTime;
     }
 
+    // Formats a Calendar instance to a string using the specified date format.
     private String getFormattedDate(Calendar calendar) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(calendar.getTime());
     }
 
+    // Creates a new To-Do item with the provided details and adds it to the database. Optionally, it can integrate with Google Calendar.
     private void createNewToDo(String name, String desc, String date, GoogleSignInAccount account) {
         ToDo newToDo = new ToDo();
         newToDo.setName(name);
@@ -215,18 +229,22 @@ public class UploadToDoActivity extends AppCompatActivity {
         newToDo.setDate(date);
         newToDo.setDone(false);
 
+        // Adding the new To-Do to the database and retrieving its unique ID
         int todoId = db.addToDo(newToDo);
         newToDo.setTodoId(todoId);
         Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
 
+        // Optionally handling Google Calendar integration
         handleGoogleCalendarEvent(account, newToDo, true);
     }
 
+    // Updates an existing To-Do item with new details.
     private void updateExistingToDo(String name, String desc, String date, GoogleSignInAccount account) {
         editTodo.setName(name);
         editTodo.setDescription(desc);
         editTodo.setDate(date);
 
+        // Attempting to update the To-Do item in the database
         boolean updated = db.updateToDo(editTodo);
         if (updated) {
             Toast.makeText(UploadToDoActivity.this, "ToDo has been updated successfully!", Toast.LENGTH_SHORT).show();
@@ -234,19 +252,23 @@ public class UploadToDoActivity extends AppCompatActivity {
             Toast.makeText(UploadToDoActivity.this, "ToDo update failed!", Toast.LENGTH_SHORT).show();
         }
 
+        // Handling potential updates to the associated Google Calendar event
         handleGoogleCalendarEvent(account, editTodo, false);
     }
 
+    // Manages the Google Calendar event associated with a To-Do item
     private void handleGoogleCalendarEvent(GoogleSignInAccount account, ToDo todo, boolean isNew) {
+        //  return if not signed in to Google
         if (account == null) return;
 
-
+        // Initialize the GoogleCalendarService with the current account
         googleCalendarService = new GoogleCalendarService(UploadToDoActivity.this, account);
         if (isNew) {
-            // Create and add new event
+            // Creating a new event in Google Calendar for the new To-Do item
             googleCalendarService.createAndAddEventToGoogleCalendar( todo,account, todo.getName(), todo.getDescription(), todo.getDate(),  new EventCallback() {
                 @Override
                 public void onEventAdded(String eventId) {
+                    // Updating the To-Do item with the Google Calendar event ID
                     todo.setGoogleTodoId(eventId);
                     db.updateToDo(todo);
                     Log.d("GoogleCalendarEvent", "Event added successfully. ID: " + eventId);
@@ -258,7 +280,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Update existing event
+            // Updating an existing Google Calendar event for the To-Do item
             CompletableFuture.runAsync(() -> {
                 try {
                     googleCalendarService.updateEvent(account, todo.getGoogleTodoId(), todo.getName(), todo.getDescription(), todo.getDate());
@@ -266,12 +288,13 @@ public class UploadToDoActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }).thenRun(() -> {
-
+                // This could be used to perform actions after the event update is completed
             });
             Toast.makeText(UploadToDoActivity.this, "ToDo has been updated in Google Calendar!", Toast.LENGTH_SHORT).show();
         }
     }
 
+    // Navigates back to the main To-Do activity, passing along any necessary data.
     private void navigateToMainToDoActivity() {
         Intent intent = new Intent(UploadToDoActivity.this, ToDoMainActivity.class);
         intent.putExtra("userId", userId);

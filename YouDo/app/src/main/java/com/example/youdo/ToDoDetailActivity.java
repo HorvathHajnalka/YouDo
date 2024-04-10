@@ -58,6 +58,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
         dbConnectToDo = new dbConnectToDo(this);
         todo = dbConnectToDo.getTodoById(todoId);
 
+        // send UI the to-do details if to-do exists
         if (todo != null) {
             detailTitle.setText(todo.getName());
             if(! todo.getDescription().equals("")) detailDesc.setText(todo.getDescription());
@@ -71,7 +72,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
         } else {
             Toast.makeText(this, "ToDo not found", Toast.LENGTH_SHORT).show();
-            finish(); // last activity
+            finish(); // Closing the activity if the to-do is not found
         }
 
         doneTodoBtn.setOnClickListener(new View.OnClickListener() {
@@ -105,9 +106,11 @@ public class ToDoDetailActivity extends AppCompatActivity {
         delTodoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Deleting the to-do by its id from the database
                 dbConnectToDo.deleteToDoById(todoId);
                 Toast.makeText(ToDoDetailActivity.this, "ToDo has been deleted!", Toast.LENGTH_SHORT).show();
 
+                // Attempting to remove the corresponding event from Google Calendar if linked
                 GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(ToDoDetailActivity.this);
 
                 String googleEventId = todo.getGoogleTodoId();
@@ -132,6 +135,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
+                    // Setting up the Google Calendar API credentials
                     GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                             ToDoDetailActivity.this, Collections.singleton(CalendarScopes.CALENDAR));
 
@@ -145,7 +149,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
                             .setApplicationName("YouDo")
                             .build();
 
-                    // delete event
+                    // Deleting the event from Google Calendar
                     service.events().delete("primary", eventId).execute();
                 } catch (Exception e) {
                     Log.e("deleteEvent", "Error deleting event from Google Calendar", e);
@@ -155,6 +159,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                // Notifying the user about the deletion from Google Calendar
                 super.onPostExecute(aVoid);
                 Toast.makeText(ToDoDetailActivity.this, "Event deleted from Google Calendar", Toast.LENGTH_SHORT).show();
             }

@@ -17,6 +17,13 @@ import com.example.youdo.ToDo;
 
 import java.util.List;
 
+/*
+  Adapter class for managing a list of To-Do items in a RecyclerView.
+  Each To-Do item is represented by a button. This adapter is responsible
+  for binding To-Do data to views, handling layout inflation, and setting
+  up click listeners to navigate to detail views for each To-Do item.
+ */
+
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     private List<ToDo> todoList;
@@ -29,6 +36,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         this.curr_date = curr_date;
     }
 
+    // Inflate the layout for each item in the RecyclerView (each To-Do item will use todo_button_layout)
     @NonNull
     @Override
     public ToDoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,11 +45,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
+    // Bind data to the views in the ViewHolder (set up the To-Do item in the list at the given position)
     @Override
     public void onBindViewHolder(@NonNull ToDoAdapter.ViewHolder holder, int position) {
         final ToDo todo = todoList.get(position);
         holder.todoButton.setText(todo.getName());
         if (todo.isDone()) {
+            // If the To-Do is marked as done, change the background color of the button to dark grey
             int darkGrey = ContextCompat.getColor(context, R.color.grey_00);
             holder.todoButton.setBackgroundColor(darkGrey);
         }
@@ -61,11 +71,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         });
     }
 
+    // Return the total number of items in the todoList
     @Override
     public int getItemCount() {
         return todoList.size();
     }
 
+    // Button representing a single To-Do item
     public static class ViewHolder extends RecyclerView.ViewHolder {
         Button todoButton;
 

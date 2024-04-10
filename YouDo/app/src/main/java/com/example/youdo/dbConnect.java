@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+// building the database
 public class dbConnect extends SQLiteOpenHelper {
     // db parameters
 
@@ -29,8 +30,8 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String todoName = "todoName";
     public static String todoDesc = "todoDesc";
     public static String todoDone = "todoDone"; // Boolean?
-    public static String todoDate = "todoDate"; // Date?
-    public static String todoTime = "todoTime"; // Time?
+    public static String todoDate = "todoDate";
+    public static String todoTime = "todoTime";
     // ?
     public static String todoTypeId = "todoTypeId"; // foreign key
     public static String todoUserId = "todoUserId"; // foreign key
@@ -47,7 +48,7 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String stepId = "stepId";
     public static String deviceId = "deviceId"; //
     public static String date = "date"; // yyyy-mm-dd
-    public static String steps = "steps"; // stepcount on a given dayd
+    public static String steps = "steps"; // stepcount on a given days
 
     // devices
 

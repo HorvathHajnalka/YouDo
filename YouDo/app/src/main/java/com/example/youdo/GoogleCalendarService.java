@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Date;
 
+// initializes the Google Calendar Service with the user's Google account.
 public class GoogleCalendarService {
     private static final String TAG = "GoogleCalendarService";
     private com.google.api.services.calendar.Calendar service;
@@ -46,7 +47,7 @@ public class GoogleCalendarService {
                 .build();
     }
 
-
+    //  Creates an event in the user's Google Calendar and adds it to the local database.
     public void createAndAddEventToGoogleCalendar(ToDo newtodo, GoogleSignInAccount account, String title, String description, String dateStr, EventCallback callback) {
 
         String googleAccountId = account.getId();
@@ -80,29 +81,33 @@ public class GoogleCalendarService {
                 .build();
 
 
+        // Call addEventToGoogleCalendar method to start the process of adding an event.
         addEventToGoogleCalendar(newtodo, service, title, description, startTime, endTime, new EventCallback(){
             @Override
             public void onEventAdded(String eventId) {
-
-
+                //  handle the event when it's successfully added.
                 callback.onEventAdded(eventId);
             }
 
             @Override
             public void onError() {
-
+                // handle errors.
                 callback.onError();
             }
         });
     }
 
+    // add an event to Google Calendar using an AsyncTask to perform network operations on a separate thread.
+
     private void addEventToGoogleCalendar(ToDo newtodo, com.google.api.services.calendar.Calendar service,
                                           String title, String description,
                                           ZonedDateTime startTime, ZonedDateTime endTime,
                                           EventCallback callback) {
+        // Execute the AddEventTask AsyncTask.
         new GoogleCalendarService.AddEventTask(newtodo, service, title, description, startTime, endTime, callback).execute();
     }
 
+    // AsyncTask to handle the creation of an event in Google Calendar.
 
     private class AddEventTask extends AsyncTask<Void, Void, String> {
         ToDo newtodo;
@@ -113,6 +118,7 @@ public class GoogleCalendarService {
         private ZonedDateTime endTime;
         private EventCallback callback;
 
+        // Constructor to initialize the AsyncTask with event details and service objects.
         public AddEventTask(ToDo newtodo, com.google.api.services.calendar.Calendar service,
                             String title, String description,
                             ZonedDateTime startTime, ZonedDateTime endTime,
@@ -130,19 +136,24 @@ public class GoogleCalendarService {
         @Override
         protected String doInBackground(Void... params) {
             try {
+                // Create and configure a new Event object with the provided details.
                 Event event = new Event()
                         .setSummary(title)
                         .setDescription(description);
 
+                // Convert start and end times to DateTime objects.
                 DateTime start = new DateTime(Date.from(startTime.toInstant()));
                 DateTime end = new DateTime(Date.from(endTime.toInstant()));
 
+                // Set the start and end times of the event.
                 event.setStart(new EventDateTime().setDateTime(start));
                 event.setEnd(new EventDateTime().setDateTime(end));
 
+                // Insert the event into the primary calendar and return the event ID.
                 Event createdEvent = service.events().insert("primary", event).execute();
                 return createdEvent.getId();
             } catch (IOException e) {
+                // Handle exceptions and return null if an error occurs.
                 e.printStackTrace();
                 return null;
             }
@@ -150,8 +161,13 @@ public class GoogleCalendarService {
 
         @Override
         protected void onPostExecute(String eventId) {
+            // Method executed on the UI thread after the background computation finishes.
             super.onPostExecute(eventId);
+
             if (eventId != null) {
+
+                // If the event was successfully added, display a toast message and update the local database.
+
                 Toast.makeText(context, "Event added to your Google Calendar", Toast.LENGTH_LONG).show();
                 newtodo.setGoogleTodoId(eventId);
                 db.updateToDo(newtodo);
@@ -162,6 +178,9 @@ public class GoogleCalendarService {
                 // Toast.makeText(UploadToDoActivity.this, "Event updated"+ newtodo.getTodoId(), Toast.LENGTH_LONG).show();
 
             } else {
+
+                // If the event was not added, display a toast message indicating failure.
+
                 Toast.makeText(context, "Failed to add even to your Google Calendar", Toast.LENGTH_LONG).show();
             }
         }
@@ -169,7 +188,7 @@ public class GoogleCalendarService {
 
 
 
-    // update event
+    // Updates an existing event in Google Calendar.
     public void updateEvent(GoogleSignInAccount account, String eventId, String strToDoName, String strToDoDesc, String strDate) {
         // Use GoogleAccountCredential for authentication
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(

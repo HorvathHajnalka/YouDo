@@ -51,31 +51,39 @@ public class StepCounterActivity extends AppCompatActivity {
     String curr_date;
     String todaysDate;
 
+    /*
+    Define a BroadcastReceiver to handle incoming intents (broadcasts)
+
+    It first retrieves the current step count from the intent,
+    checks the existing steps from the database for today's date,
+    calculates the new total steps,
+    and updates both the database and the UI accordingly.
+     */
     private BroadcastReceiver stepUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("Mylogs", "BroadCast receiver started");
             if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
-                // Lépések száma
+                // Number of steps
                 int stepsCount = intent.getIntExtra("steps", 0);
 
-                // Mivel UI frissítést kell végezni, győződjünk meg róla, hogy a fő szálon vagyunk
+                // Since we need to update the UI, make sure we're on the main thread
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-                        // A meglévő lépésszám lekérése az adatbázisból
+                        // Getting the existing step count from the database
                         int existingSteps = db.getStepsByDate(db.getDeviceId(), todayAsString);
 
-                        // Új lépésszám kiszámítása
+                        // Calculating the new total step count
                         int newTotalSteps = existingSteps + (stepsCount - totalSteps);
-                        totalSteps = stepsCount; // Frissítjük a totalSteps értékét az új összes lépésre
+                        totalSteps = stepsCount; // Updating the totalSteps value with the new total steps
 
-                        // Adatbázis frissítése az új lépésszámmal
+                        // Updating the database with the new step count
                         db.addSteps(db.getDeviceId(), todayAsString, newTotalSteps);
 
-                        // UI frissítése az új teljes lépésszámmal
+                        // Updating the UI with the new total step count
                         steps.setText(String.valueOf(newTotalSteps));
                         progressBar.setProgress(newTotalSteps);
                     }
@@ -103,11 +111,11 @@ public class StepCounterActivity extends AppCompatActivity {
 
         loadDataFromDatabase();
 
-        Log.d("Mylogs", "Az alkalmazás létrehozva: onCreate()");
+        Log.d("Mylogs", "The app created: onCreate()");
 
         updateUI();
 
-        Log.d("Mylogs", "Broadcastreceiver activityben: onCreate()");
+        Log.d("Mylogs", "Broadcastreceiver in activity: onCreate()");
 
         progressBar.setMax(7500);
 
@@ -116,21 +124,24 @@ public class StepCounterActivity extends AppCompatActivity {
 
         dateText.setText("Step Counts on "+ curr_date);
 
+        // Check for activity recognition permission and request if not granted
         if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{ACTIVITY_RECOGNITION}, 1);
         } else {
+            // If permission already granted, initiate step counter service
             initiateStepCounterService();
         }
 
+        // Initialize a permission launcher for notification permission
         notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
-                // Az engedély megadva, kezdd el az értesítések küldését
-                Log.d("NotificationPermission", "Értesítési engedély megadva.");
+                // Permission granted, start sending notifications
+                Log.d("NotificationPermission", "Notification permission granted.");
             } else {
-                // Az engedély megtagadva, kezelje ennek megfelelően
+                // Permission denied, handle accordingly
                 Toast.makeText(this, "Enable notifications for counting steps in the background.", Toast.LENGTH_SHORT).show();
 
-                Log.d("NotificationPermission", "Értesítési engedély megtagadva.");
+                Log.d("NotificationPermission", "Notification permission denied.");
             }
         });
         checkAndRequestNotificationPermission();
@@ -146,6 +157,8 @@ public class StepCounterActivity extends AppCompatActivity {
         db.addOrUpdateSteps(deviceId, "2024-03-13", 54);
         db.addOrUpdateSteps(deviceId, "2024-03-12", 13);*/
 
+
+
         initDatePicker();
         weeklyStatsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,6 +170,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
     }
 
+    // Initialize the date picker for selecting dates
     private void initDatePicker() {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -177,59 +191,63 @@ public class StepCounterActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
+        // Initialize the DatePickerDialog with the current date and the created listener
         datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis()); // Restrict future dates
     }
 
 
+    // check if notifications are permitted
     private void checkAndRequestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-                // Értesítések nincsenek engedélyezve, irányítsuk a felhasználót az alkalmazás értesítési beállításaihoz
+                // Notifications are not enabled, guide the user to the app's notification settings
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                // Android O és felette
+                // For Android O and above
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
-                startActivity(intent);
+                startActivity(intent); // Start the settings activity
             }
         }
-        // Itt folytathatod a többi, értesítésekkel kapcsolatos logikád implementálását
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("Mylogs", "Az alkalmazás folytatódik: onResume()");
+        Log.d("Mylogs", "The app is resuming: onResume()");
 
-        // loadData(); // Először betöltjük az adatokat
+        // First, load the data
         loadDataFromDatabase();
-        // resetSteps();
-        updateUI(); // Az updateUI() már tartalmazza a loadData() hívást, így redundáns volt itt meghívni
+        // Update the UI; updateUI() already includes a call to loadData(), so it was redundant to call it here
 
-        dateText.setText("Step Counts on "+ curr_date);
+        dateText.setText("Step Counts on " + curr_date);
 
+        // Set up a filter to listen for our custom step update action
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
-        // filter.addFlags(Intent.FLAG_RECEIVER_NOT_EXPORTED);
         filter.addAction("ACTION_NOTIFICATION_CLEARED");
+        // Register the broadcast receiver with our filter
         registerReceiver(stepUpdateReceiver, filter, RECEIVER_EXPORTED);
-        // registerReceiver(stepUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED, Context.RECEIVER_TAKE_PERSISTABLE_UPDATES, null);
+        // Note: RECEIVER_EXPORTED is a flag that specifies the receiver is allowed to receive messages from sources outside its application
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        // Unregister the broadcast receiver when the activity is not in the foreground
         unregisterReceiver(stepUpdateReceiver);
-        Log.d("Mylogs", "Az alkalmazás valószínűleg háttérbe került: onPause()");
-
+        Log.d("Mylogs", "The app is likely going into the background: onPause()");
     }
+
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("Mylogs", "Az alkalmazás valószínűleg háttérbe került: onStop()");
+        Log.d("Mylogs", "The app is likely going into the background: onStop()");
     }
 
 
+
+    // Reset the step count when a long press is detected
     private void resetSteps() {
         steps.setOnClickListener(v -> Toast.makeText(StepCounterActivity.this,"Long press to reset steps", Toast.LENGTH_SHORT).show());
 
@@ -244,6 +262,7 @@ public class StepCounterActivity extends AppCompatActivity {
     }
 
 
+    // reset stepcounts in service
     private void resetStepCountInService() {
         Intent resetIntent = new Intent(this, StepCounterService.class);
         resetIntent.putExtra("resetSteps", true);
@@ -254,18 +273,21 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
+
     private void loadDataFromDatabase() {
         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         totalSteps = db.getStepsByDate(db.getDeviceId(), todayAsString);
-        // Itt nincs szükség a previewsTotalSteps változóra, mivel az adatbázis kezeli az összesítést
     }
 
+    // Called when the activity is being destroyed
     @Override
     protected void onDestroy() {
         super.onDestroy();
         saveStepsToDatabase();
-        Log.d("Mylogs", "A szolgáltatás leállítva: onDestroy()");
+        Log.d("Mylogs", "Service stopped: onDestroy()");
     }
+
+    // Handles the result from requesting permissions, specifically activity recognition for step counting.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -276,6 +298,7 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
+    // Updates the user interface based on the current step count fetched from the database.
     private void updateUI() {
         loadDataFromDatabase();
         Log.d("Mylogs", "total steps: " + totalSteps);
@@ -286,6 +309,7 @@ public class StepCounterActivity extends AppCompatActivity {
         progressBar.setProgress(currentSteps);
     }
 
+    // Updates the shared preferences to reflect the current running state of the step counter service.
     public static void updateServiceState(Context context, boolean isRunning) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -293,11 +317,13 @@ public class StepCounterActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    // Checks if the step counter service is currently running, based on shared preferences.
     private boolean isServiceRunning() {
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("ServiceRunning", false);
     }
 
+    // Initiates the step counter service if it's not already running.
     private void initiateStepCounterService() {
         if (!isServiceRunning()) {
             Intent serviceIntent = new Intent(this, StepCounterService.class);
@@ -309,11 +335,13 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
+    // Saves the current step count to the database for today's date.
     private void saveStepsToDatabase() {
 
         db.addSteps(db.getDeviceId(), todayAsString, totalSteps);
     }
 
+    // Returns today's date in the format "yyyy-MM-dd".
     private static String getTodaysDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
