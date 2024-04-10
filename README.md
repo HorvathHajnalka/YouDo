@@ -14,7 +14,7 @@ YouDo is packed with features to help you manage your day better:
 - **Cross-Platform Compatibility:** Tested and fully functional on Android 13 and 14, providing smooth user experience across devices.
 
 ## App Demonstrations
-To see YouDo in action, you can find images and videos showcasing the app's operation in the demonstrations folder. This resource offers a closer look at the interface and functionality, helping you understand how YouDo can fit into your daily routine.
+To see YouDo in action, you can find images and videos showcasing the app's operation in the demonstrations folder. This resource offers a closer look at the interface and functionality.
   
 ## Security Note
 
