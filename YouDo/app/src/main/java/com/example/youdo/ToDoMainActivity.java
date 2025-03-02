@@ -14,16 +14,36 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import androidx.credentials.CredentialManager;
 public class ToDoMainActivity extends AppCompatActivity {
 
+    // Initialize variables
+    GoogleSignInClient googleSignInClient;
+    FirebaseAuth firebaseAuth;
     FloatingActionButton addTodoBtn;
     FloatingActionButton stepCounterBtn;
+    ImageView logoutBtn;
     ImageView todoDatePickerBtn;
     RecyclerView recyclerView;
     List<ToDo> todoList;
@@ -50,9 +70,18 @@ public class ToDoMainActivity extends AppCompatActivity {
         // Link UI elements with their IDs
         addTodoBtn = findViewById(R.id.addToDobtn);
         stepCounterBtn = findViewById(R.id.stepCounterbtn);
+        logoutBtn = findViewById(R.id.logoutBtn);
         recyclerView = findViewById(R.id.todoRecyclerView);
         todoDatePickerBtn = findViewById(R.id.todoDatePickerBtn);
         todoText = findViewById(R.id.todoText);
+
+        // Initialize Firebase Auth
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        // Initialize Firebase user
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+
+        googleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build());
 
         // Receive userId and curr_date from previous activity if provided
         Intent intent = getIntent();
@@ -63,8 +92,6 @@ public class ToDoMainActivity extends AppCompatActivity {
 
         // Initialize database connection
         dbConnectToDo = new dbConnectToDo(this);
-
-
 
         addTodoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,8 +110,6 @@ public class ToDoMainActivity extends AppCompatActivity {
             }
         });
 
-
-
         stepCounterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,7 +118,34 @@ public class ToDoMainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        logoutBtn.setOnClickListener(view ->  logout());
+
     }
+    private void logout() {
+        // Firebase log out
+        firebaseAuth.signOut();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+
+        // Google log out
+        if (account != null) {
+            googleSignInClient.signOut().addOnCompleteListener(this, task -> {
+                Toast.makeText(ToDoMainActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+                navigateToLogin();
+            });
+        } else {
+            Toast.makeText(ToDoMainActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+            navigateToLogin();
+        }
+    }
+    private void navigateToLogin() {
+        Intent intent = new Intent(ToDoMainActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     protected void onResume() {
         // Load To-Do items for selected date

@@ -1,4 +1,5 @@
 package com.example.youdo;
+import android.util.Log;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +22,26 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.api.services.calendar.CalendarScopes;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 
 
@@ -29,6 +50,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     EditText userNameLogIn, passwordLogIn;
     MaterialButton loginbtn, googlebtn;
     dbConnectUser db = new dbConnectUser(this);
+    GoogleSignInClient googleSignInClient;
+    FirebaseAuth firebaseAuth;
 
     private static final int RC_SIGN_IN = 100;
     private GoogleSignInClient mGoogleSignInClient;
@@ -45,25 +68,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         loginbtn = findViewById(R.id.loginbtn);
         googlebtn = findViewById(R.id.googlebtn);
         newaccountbtn = findViewById(R.id.newaccount);
-
-        // Configure Google Sign-In to request the user data required by your app
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .requestProfile()
-                .requestScopes(new Scope(CalendarScopes.CALENDAR)) // enable apis
-                .build();
-
-
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        // Check for existing Google Sign In account
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
-            // User is already signed in. Sign them out.
-            signOut(mGoogleSignInClient);
-        }
 
         // switch to registerpage
         newaccountbtn.setOnClickListener(new View.OnClickListener() {
@@ -100,12 +104,31 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        googlebtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
+        // Initialize sign in options the client-id is copied form google-services.json file
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("377347138306-nj0is4059uuvhd44ms8rfinja9ika5e3.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        // Initialize sign in client
+        googleSignInClient = GoogleSignIn.getClient(LoginActivity.this, googleSignInOptions);
+
+        googlebtn.setOnClickListener((View.OnClickListener) view -> {
+            // Initialize sign in intent
+            Intent intent = googleSignInClient.getSignInIntent();
+            // Start activity for result
+            startActivityForResult(intent, 100);
         });
+
+        // Initialize firebase auth
+        firebaseAuth = FirebaseAuth.getInstance();
+        // Initialize firebase user
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        // Check condition
+        if (firebaseUser != null) {
+            // When user already sign in redirect to profile activity
+            startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
 
     // Sign out method
@@ -129,58 +152,52 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Check if the result is from the Google Sign-In intent
-        if (requestCode == RC_SIGN_IN) {
-            // Get the task from the Google Sign-In intent
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-
-            // Check if the sign-in was successful
-            if (resultCode == RESULT_OK && task.isSuccessful()) {
-                GoogleSignInAccount account = null;
+        // Check condition
+        if (requestCode == 100) {
+            // When request code is equal to 100 initialize task
+            Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn.getSignedInAccountFromIntent(data);
+            // check condition
+            if (signInAccountTask.isSuccessful()) {
+                // When google sign in successful initialize string
+                String s = "Google sign in successful";
+                // Display Toast
+                displayToast(s);
+                // Initialize sign in account
                 try {
-                    // Attempt to retrieve the GoogleSignInAccount from the task
-                    account = task.getResult(ApiException.class);
+                    // Initialize sign in account
+                    GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
+                    // Check condition
+                    if (googleSignInAccount != null) {
+                        // When sign in account is not equal to null initialize auth credential
+                        AuthCredential authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
+                        // Check credential
+                        firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                // Check condition
+                                if (task.isSuccessful()) {
+                                    // When task is successful redirect to profile activity display Toast
+                                    startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                                    displayToast("Firebase authentication successful");
+                                } else {
+                                    // When task is unsuccessful display Toast
+                                    displayToast("Authentication Failed :" + task.getException().getMessage());
+                                }
+                            }
+                        });
+                    }
                 } catch (ApiException e) {
-                    // If GoogleSignInAccount cannot be retrieved, throw an exception
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
-                if (account != null) {
-                    // If an account was successfully retrieved, get the account ID
-                    String googleAccountId = account.getId();
-                    // Handle the successful sign-in result
-                    handleSignInResult(task, googleAccountId);
-                }
-            } else {
-                // Sign in failed
-                Toast.makeText(this, "Google Sign In failed", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // Handle sign-in success
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask, String googleAccountId) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            // Signed in successfully
-            if (account != null) {
-                Toast.makeText(this, "Successfully signed in as " + account.getEmail(), Toast.LENGTH_SHORT).show();
-
-                // Navigate to main activity
-                Intent intent = new Intent(LoginActivity.this, ToDoMainActivity.class);
-                intent.putExtra("userId", googleAccountId);
-                startActivity(intent);
-                finish();
-                // createAndAddEventToGoogleCalendar(account);
-            }
-        } catch (ApiException e) {
-            // Handle sign in failure
-            Toast.makeText(this, "Google Sign In failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+    private void displayToast(String s) {
+        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
     }
-
 
     // Handle failed connection to Google Play Services
     @Override
