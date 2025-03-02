@@ -81,13 +81,17 @@ public class ToDoMainActivity extends AppCompatActivity {
         // Initialize Firebase user
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
+        // get google user
         googleSignInClient = GoogleSignIn.getClient(this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build());
 
-        // Receive userId and curr_date from previous activity if provided
+        if (firebaseUser != null) {
+            userId = firebaseUser.getUid().hashCode();
+        }
         Intent intent = getIntent();
+        // Receive userId and curr_date from previous activity if provided
         if (intent != null && intent.hasExtra("userId")) {
-            userId = intent.getIntExtra("userId", -1); // -1 if we don't know the "userId"
-            curr_date = getIntent().getExtras().getString("curr_date", "-1");
+                userId = intent.getIntExtra("userId", -1);
+                curr_date = getIntent().getExtras().getString("curr_date", "-1");
         }
 
         // Initialize database connection

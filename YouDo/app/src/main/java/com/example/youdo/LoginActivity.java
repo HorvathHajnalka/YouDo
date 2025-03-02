@@ -130,7 +130,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
-
+/*
     // Sign out method
     private void signOut(GoogleSignInClient mGoogleSignInClient) {
         mGoogleSignInClient.signOut()
@@ -149,7 +149,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         });
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
