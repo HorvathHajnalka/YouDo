@@ -1,16 +1,12 @@
 package com.example.youdo;
-import android.util.Log;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -18,32 +14,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.api.services.calendar.CalendarScopes;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-
-
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     TextView newaccountbtn;
@@ -130,26 +109,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
-/*
-    // Sign out method
-    private void signOut(GoogleSignInClient mGoogleSignInClient) {
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> {
-                    // Handle sign out (update UI, navigate to login screen, etc.)
-                    // Toast.makeText(this, "Successfully signed out", Toast.LENGTH_SHORT).show();
-                    // Here you can update your UI or navigate back to your login screen, etc.
-                });
-    }
-
-    // Initiate sign in
-    private void signIn() {
-        // Reset the user's sign-in state before attempting to sign in
-        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
-            // Start sign in intent
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
-        });
-    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -180,7 +139,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                 if (task.isSuccessful()) {
                                     // When task is successful redirect to profile activity display Toast
                                     startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                                    displayToast("Firebase authentication successful");
                                 } else {
                                     // When task is unsuccessful display Toast
                                     displayToast("Authentication Failed :" + task.getException().getMessage());

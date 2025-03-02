@@ -14,6 +14,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -152,9 +153,16 @@ public class GoogleCalendarService {
                 // Insert the event into the primary calendar and return the event ID.
                 Event createdEvent = service.events().insert("primary", event).execute();
                 return createdEvent.getId();
+            } catch (GoogleJsonResponseException e) {
+                Log.e("GoogleCalendar", "Google API error: " + e.getDetails().getMessage(), e);
+                return null;
             } catch (IOException e) {
                 // Handle exceptions and return null if an error occurs.
                 e.printStackTrace();
+                Log.e("GoogleCalendar", "Network error while creating event: " + e.getMessage(), e);
+                return null;
+            } catch (Exception e) {
+                Log.e("GoogleCalendar", "Unexpected error: " + e.getMessage(), e);
                 return null;
             }
         }

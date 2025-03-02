@@ -1,8 +1,6 @@
 package com.example.youdo;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,30 +10,16 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import androidx.credentials.CredentialManager;
 public class ToDoMainActivity extends AppCompatActivity {
 
     // Initialize variables
@@ -135,7 +119,7 @@ public class ToDoMainActivity extends AppCompatActivity {
         // Google log out
         if (account != null) {
             googleSignInClient.signOut().addOnCompleteListener(this, task -> {
-                Toast.makeText(ToDoMainActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ToDoMainActivity.this, "Successfully logged out from google account", Toast.LENGTH_SHORT).show();
                 navigateToLogin();
             });
         } else {

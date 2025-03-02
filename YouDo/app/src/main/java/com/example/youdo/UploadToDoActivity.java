@@ -14,7 +14,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.ParseException;
@@ -22,11 +24,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
+import com.google.android.gms.common.api.Scope;
 
 
 public class UploadToDoActivity extends AppCompatActivity {
-
-
+    private static final int REQUEST_CODE_PERMISSIONS = 1001;
+    GoogleSignInClient googleSignInClient;
     EditText uploadName, uploadDesc;
     Button datePickerBtn, typePickerBtn;
     MaterialButton addNewTypeBtn, saveBtn;
@@ -133,6 +136,7 @@ public class UploadToDoActivity extends AppCompatActivity {
 
                 // Checking if the user is signed in with Google
                 GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(UploadToDoActivity.this);
+                googleSignInClient = GoogleSignIn.getClient(UploadToDoActivity.this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build());
 
                 if (editTodoId == -1) {
                     createNewToDo(strToDoName, strToDoDesc, strDate, account);
@@ -259,7 +263,20 @@ public class UploadToDoActivity extends AppCompatActivity {
     // Manages the Google Calendar event associated with a To-Do item
     private void handleGoogleCalendarEvent(GoogleSignInAccount account, ToDo todo, boolean isNew) {
         //  return if not signed in to Google
-        if (account == null) return;
+        if (account == null) {
+            Log.e("GoogleCalendarEvent", "GoogleSignInAccount is null, skipping event sync.");
+            return;
+        }
+        if (!account.getGrantedScopes().contains(new Scope("https://www.googleapis.com/auth/calendar"))) {
+            Toast.makeText(UploadToDoActivity.this, "No Google Calendar Permission!", Toast.LENGTH_SHORT).show();
+            GoogleSignIn.requestPermissions(
+                    this,
+                    REQUEST_CODE_PERMISSIONS,
+                    account,
+                    new Scope("https://www.googleapis.com/auth/calendar")
+            );
+        }
+
 
         // Initialize the GoogleCalendarService with the current account
         googleCalendarService = new GoogleCalendarService(UploadToDoActivity.this, account);
