@@ -5,13 +5,11 @@ public class Type {
     private int typeId;
     private String name;
     private String colour;
+    private int userId;
 
     // functions
 
-    public Type(String name, String colour) {
-        this.name = name;
-        this.colour = colour;
-    }
+    public Type() {}
     public int getTypeId() {
         return typeId;
     }
@@ -29,5 +27,15 @@ public class Type {
     }
     public void setColour(String colour) {
         this.colour = colour;
+    }
+    public int getUserId() {
+        return userId;
+    }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    @Override
+    public String toString() {
+        return name; // used in Spinner
     }
 }

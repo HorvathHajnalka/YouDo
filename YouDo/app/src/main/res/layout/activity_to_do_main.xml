@@ -36,12 +36,26 @@
         android:layout_marginBottom="30dp"
         android:src="@drawable/date_picker" />
 
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/seestatsbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="65dp"
+        android:background="@color/blue_extra_dark"
+        android:text="See your statistics"
+        android:textColor="@color/light_grey"
+        android:textSize="18dp"
+        app:backgroundTint="@null"
+        android:layout_alignParentRight="true"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/todoRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/todoText"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="54dp"
         android:nestedScrollingEnabled="true"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

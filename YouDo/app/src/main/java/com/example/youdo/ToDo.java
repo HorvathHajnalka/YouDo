@@ -15,8 +15,7 @@ public class ToDo {
 
     // functions
 
-    public ToDo() {
-    }
+    public ToDo() {}
     public int getTodoId() {
         return todoId;
     }

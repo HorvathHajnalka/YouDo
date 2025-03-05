@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import android.app.AlertDialog;
@@ -42,6 +43,8 @@ public class UploadToDoActivity extends AppCompatActivity {
     MaterialButton addNewTypeBtn, saveBtn, setTargetMinBtn;
     TextView targetTimeText;
     int targetMinutes;
+    int typeId = -1;
+    String typeName;
     private DatePickerDialog datePickerDialog;
     TextView mainTitle;
 
@@ -51,6 +54,7 @@ public class UploadToDoActivity extends AppCompatActivity {
     int editTodoId;
     Bundle extras;
     dbConnectToDo db = new dbConnectToDo(this);
+    dbConnectToDoType dbType = new dbConnectToDoType(this);
     GoogleCalendarService googleCalendarService;
     ToDo editTodo;
 
@@ -90,6 +94,10 @@ public class UploadToDoActivity extends AppCompatActivity {
             mainTitle.setText("Edit ToDo");
             uploadName.setText(editTodo.getName());
             uploadDesc.setText(editTodo.getDescription());
+            typeId = editTodo.getTypeId();
+            if(typeId!= -1) {
+                typePickerBtn.setText(dbType.getToDoTypeById(typeId).getName());
+            }
             targetMinutes = editTodo.getTargetMinutes();
             if(targetMinutes != 0) {
                 targetTimeText.setText(": " + editTodo.getTargetMinutes() + " min.");
@@ -176,7 +184,6 @@ public class UploadToDoActivity extends AppCompatActivity {
                             dialog.cancel();
                         }
                     });
-
                     builder.show();
                 }
             });
@@ -200,10 +207,45 @@ public class UploadToDoActivity extends AppCompatActivity {
         typePickerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                List<Type> typeList = dbType.getAllToDoTypesForUser(userId);
+                // Spinner
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle("Choose a type for todo");
 
+                final Spinner typeSpinner = new Spinner(v.getContext());
+                ArrayAdapter<Type> adapter = new ArrayAdapter<>(v.getContext(),
+                        android.R.layout.simple_spinner_dropdown_item, typeList);
+                typeSpinner.setAdapter(adapter);
+
+                // Layout
+                LinearLayout layout = new LinearLayout(v.getContext());
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setPadding(50, 40, 50, 10);
+                layout.addView(typeSpinner);
+                builder.setView(layout);
+
+                // OK
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Type selectedType = (Type) typeSpinner.getSelectedItem();
+                        typePickerBtn.setText(selectedType.getName());
+                        typeId = selectedType.getTypeId();
+                    }
+                });
+
+                // Cancel
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                // Dialog
+                builder.show();
             }
         });
-
         saveBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String strToDoName = uploadName.getText().toString();
@@ -221,9 +263,9 @@ public class UploadToDoActivity extends AppCompatActivity {
                 googleSignInClient = GoogleSignIn.getClient(UploadToDoActivity.this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build());
 
                 if (editTodoId == -1) {
-                    createNewToDo(strToDoName, strToDoDesc, strDate, targetMinutes, account);
+                    createNewToDo(strToDoName, strToDoDesc, strDate, targetMinutes, typeId, account);
                 } else {
-                    updateExistingToDo(strToDoName, strToDoDesc, strDate, targetMinutes, account);
+                    updateExistingToDo(strToDoName, strToDoDesc, strDate, targetMinutes, typeId, account);
                 }
 
                 navigateToMainToDoActivity();
@@ -306,7 +348,7 @@ public class UploadToDoActivity extends AppCompatActivity {
     }
 
     // Creates a new To-Do item with the provided details and adds it to the database. Optionally, it can integrate with Google Calendar.
-    private void createNewToDo(String name, String desc, String date, int targetMinutes, GoogleSignInAccount account) {
+    private void createNewToDo(String name, String desc, String date, int targetMinutes, int typeId, GoogleSignInAccount account) {
         ToDo newToDo = new ToDo();
         newToDo.setName(name);
         newToDo.setDescription(desc);
@@ -314,6 +356,9 @@ public class UploadToDoActivity extends AppCompatActivity {
         newToDo.setDate(date);
         newToDo.setTargetMinutes(targetMinutes);
         newToDo.setDone(false);
+        if(typeId != -1){
+            newToDo.setTypeId(typeId);
+        }
 
         // Adding the new To-Do to the database and retrieving its unique ID
         int todoId = db.addToDo(newToDo);
@@ -325,11 +370,14 @@ public class UploadToDoActivity extends AppCompatActivity {
     }
 
     // Updates an existing To-Do item with new details.
-    private void updateExistingToDo(String name, String desc, String date, int targetMinutes, GoogleSignInAccount account) {
+    private void updateExistingToDo(String name, String desc, String date, int targetMinutes, int typeId, GoogleSignInAccount account) {
         editTodo.setName(name);
         editTodo.setDescription(desc);
         editTodo.setDate(date);
         editTodo.setTargetMinutes(targetMinutes);
+        if(typeId != -1){
+            editTodo.setTypeId(typeId);
+        }
 
         // Attempting to update the To-Do item in the database
         boolean updated = db.updateToDo(editTodo);

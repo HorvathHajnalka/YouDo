@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -19,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,6 +36,7 @@ public class ToDoMainActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     FloatingActionButton addTodoBtn;
     FloatingActionButton stepCounterBtn;
+    MaterialButton seestatsbtn;
     ImageView logoutBtn;
     ImageView todoDatePickerBtn;
     RecyclerView recyclerView;
@@ -61,9 +65,16 @@ public class ToDoMainActivity extends AppCompatActivity {
         addTodoBtn = findViewById(R.id.addToDobtn);
         stepCounterBtn = findViewById(R.id.stepCounterbtn);
         logoutBtn = findViewById(R.id.logoutBtn);
+        MaterialButton seestatsbtn = findViewById(R.id.seestatsbtn);
         recyclerView = findViewById(R.id.todoRecyclerView);
         todoDatePickerBtn = findViewById(R.id.todoDatePickerBtn);
         todoText = findViewById(R.id.todoText);
+
+        // underline text
+        String text = "See your statistics";
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(new UnderlineSpan(), 0, text.length(), 0);
+        seestatsbtn.setText(spannableString);
 
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();

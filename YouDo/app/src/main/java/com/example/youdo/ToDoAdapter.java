@@ -2,6 +2,7 @@ package com.example.youdo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,11 +31,12 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     private List<ToDo> todoList;
     private Context context;
     String curr_date;
-
+    dbConnectToDoType db;
     public ToDoAdapter(List<ToDo> todoList, Context context,String curr_date) {
         this.todoList = todoList;
         this.context = context;
         this.curr_date = curr_date;
+        this.db = new dbConnectToDoType(context);
     }
 
     // Inflate the layout for each item in the RecyclerView (each To-Do item will use todo_button_layout)
@@ -57,6 +59,10 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             holder.todoButton.setBackgroundColor(darkGrey);
             holder.todoButton.setPaintFlags(holder.todoButton.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
+            if(todo != null && todo.getTypeId() != 0) {
+                Type type = db.getToDoTypeById(todo.getTypeId());
+                holder.todoButton.setBackgroundColor(Color.parseColor(type.getColour()));
+            }
             holder.todoButton.setPaintFlags(holder.todoButton.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
 

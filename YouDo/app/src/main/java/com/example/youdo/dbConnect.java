@@ -12,7 +12,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 10;
+    private static int dbVersion = 15;
 
 
     // users
@@ -42,6 +42,7 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String typeId = "typeId";
     public static String typeName = "typeName";
     public static String typeColour = "typeColour";
+    public static String typeUserId = "typeUserId"; // foreign key
 
 
     // steps
@@ -81,7 +82,8 @@ public class dbConnect extends SQLiteOpenHelper {
 
         // type table
         String makeTypeQuery = "CREATE TABLE " + typeTable + "(" + typeId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + typeName + " TEXT, "+ typeColour + " TEXT)";
+                + typeName + " TEXT, "+ typeColour + " TEXT, " + typeUserId + " INTEGER, "
+                + "FOREIGN KEY(" + typeUserId + ") REFERENCES " + userTable + "(" + userId + "))";
         db.execSQL(makeTypeQuery);
 
         // steps table
@@ -104,6 +106,8 @@ public class dbConnect extends SQLiteOpenHelper {
                 "FOREIGN KEY (deviceId) REFERENCES " + devicesTable + "(" + deviceId + "))";
         db.execSQL(makeUserDeviceLinkTableQuery);
 
+        insertDefaultTypes(db);
+
     }
 
     @Override
@@ -115,5 +119,17 @@ public class dbConnect extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+ stepsTable);
         db.execSQL("DROP TABLE IF EXISTS "+ devicesTable);
         onCreate(db);
+    }
+
+    private void insertDefaultTypes(SQLiteDatabase db) {
+        String insertQuery = "INSERT INTO " + typeTable + " (" + typeName + ", " + typeColour + ") VALUES "
+                + "('-', '#5849ff'), " // basic to do color
+                + "('Sport', '#02C8EA'), "
+                + "('Study', '#FF0065'), "
+                + "('Self-Improvement', '#B900FF'), "
+                + "('Work', '#0015FF'), "
+                + "('Hobby', '#47D701');";
+
+        db.execSQL(insertQuery);
     }
 }
