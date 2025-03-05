@@ -24,11 +24,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
-import com.google.android.gms.common.api.Scope;
 
 
 public class UploadToDoActivity extends AppCompatActivity {
-    private static final int REQUEST_CODE_PERMISSIONS = 1001;
     GoogleSignInClient googleSignInClient;
     EditText uploadName, uploadDesc;
     Button datePickerBtn, typePickerBtn;
@@ -147,7 +145,6 @@ public class UploadToDoActivity extends AppCompatActivity {
                 navigateToMainToDoActivity();
             }
         });
-
     }
 
     private String getTodaysDate() {
@@ -267,22 +264,12 @@ public class UploadToDoActivity extends AppCompatActivity {
             Log.e("GoogleCalendarEvent", "GoogleSignInAccount is null, skipping event sync.");
             return;
         }
-        if (!account.getGrantedScopes().contains(new Scope("https://www.googleapis.com/auth/calendar"))) {
-            Toast.makeText(UploadToDoActivity.this, "No Google Calendar Permission!", Toast.LENGTH_SHORT).show();
-            GoogleSignIn.requestPermissions(
-                    this,
-                    REQUEST_CODE_PERMISSIONS,
-                    account,
-                    new Scope("https://www.googleapis.com/auth/calendar")
-            );
-        }
-
 
         // Initialize the GoogleCalendarService with the current account
-        googleCalendarService = new GoogleCalendarService(UploadToDoActivity.this, account);
+        googleCalendarService = new GoogleCalendarService(this, account);
         if (isNew) {
             // Creating a new event in Google Calendar for the new To-Do item
-            googleCalendarService.createAndAddEventToGoogleCalendar( todo,account, todo.getName(), todo.getDescription(), todo.getDate(),  new EventCallback() {
+            googleCalendarService.createAndAddEventToGoogleCalendar(todo, account, todo.getName(), todo.getDescription(), todo.getDate(), new EventCallback() {
                 @Override
                 public void onEventAdded(String eventId) {
                     // Updating the To-Do item with the Google Calendar event ID
@@ -318,6 +305,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         intent.putExtra("curr_date", curr_date);
         startActivity(intent);
     }
+
 }
 
 

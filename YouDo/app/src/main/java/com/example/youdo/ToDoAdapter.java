@@ -2,6 +2,7 @@ package com.example.youdo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +55,9 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             // If the To-Do is marked as done, change the background color of the button to dark grey
             int darkGrey = ContextCompat.getColor(context, R.color.grey_00);
             holder.todoButton.setBackgroundColor(darkGrey);
+            holder.todoButton.setPaintFlags(holder.todoButton.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            holder.todoButton.setPaintFlags(holder.todoButton.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
 
         holder.todoButton.setOnClickListener(new View.OnClickListener() {
