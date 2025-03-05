@@ -57,6 +57,37 @@
                 android:textColorHint="@color/white"
                 android:background="@drawable/rounded_edittext"/>
 
+        <LinearLayout
+            android:id="@+id/LinearLayout04"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="15dp"
+            >
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/setTargetMinBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:background="@color/blue_extra_dark"
+                android:padding="1dp"
+                android:text="+ Set Target Time"
+                android:textColor="@color/light_grey"
+                android:textSize="18dp"
+                app:backgroundTint="@null"
+                app:cornerRadius="10dp" />
+            <TextView
+                android:id="@+id/targetTimeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp" />
+        </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/LinearLayout02"
                 android:layout_height="wrap_content"
@@ -90,7 +121,6 @@
 
                         />
             </LinearLayout>
-            <!--
                         <LinearLayout
                             android:id="@+id/LinearLayout03"
                             android:layout_height="wrap_content"
@@ -141,7 +171,8 @@
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="right"
                 android:layout_margin="10dp"
-                />-->
+                />
+
             <com.google.android.material.button.MaterialButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -154,9 +185,6 @@
                 android:textColor="@color/dark_purple"
                 android:layout_margin="20dp"
                 />
-
-
-
 
         </LinearLayout>
 

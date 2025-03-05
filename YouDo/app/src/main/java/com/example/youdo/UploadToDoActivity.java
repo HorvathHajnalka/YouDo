@@ -25,12 +25,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.InputType;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 public class UploadToDoActivity extends AppCompatActivity {
     GoogleSignInClient googleSignInClient;
     EditText uploadName, uploadDesc;
     Button datePickerBtn, typePickerBtn;
-    MaterialButton addNewTypeBtn, saveBtn;
+    MaterialButton addNewTypeBtn, saveBtn, setTargetMinBtn;
+    TextView targetTimeText;
+    int targetMinutes;
     private DatePickerDialog datePickerDialog;
     TextView mainTitle;
 
@@ -54,11 +65,14 @@ public class UploadToDoActivity extends AppCompatActivity {
 
         uploadName = findViewById(R.id.addToDoName);
         uploadDesc = findViewById(R.id.addToDoDesc);
+        setTargetMinBtn = findViewById(R.id.setTargetMinBtn);
+        TextView targetTimeText = findViewById(R.id.targetTimeText);
         mainTitle = findViewById(R.id.mainTitle);
-        // addNewTypeBtn = findViewById(R.id.newtypebtn);
+        addNewTypeBtn = findViewById(R.id.newtypebtn);
         saveBtn = findViewById(R.id.saveTodoBtn);
         datePickerBtn = findViewById(R.id.datePickerBtn);
-        // typePickerBtn = findViewById(R.id.typePickerBtn);
+        typePickerBtn = findViewById(R.id.typePickerBtn);
+        targetMinutes = 0;
 
 
         // Get extras passed through the intent that started this activity.
@@ -76,6 +90,10 @@ public class UploadToDoActivity extends AppCompatActivity {
             mainTitle.setText("Edit ToDo");
             uploadName.setText(editTodo.getName());
             uploadDesc.setText(editTodo.getDescription());
+            targetMinutes = editTodo.getTargetMinutes();
+            if(targetMinutes != 0) {
+                targetTimeText.setText(": " + editTodo.getTargetMinutes() + " min.");
+            }
 
             // convert from yyyy-mm-dd to yyyy/mm/dd
 
@@ -98,27 +116,93 @@ public class UploadToDoActivity extends AppCompatActivity {
             datePickerBtn.setText(getTodaysDate());
         }
 
+        setTargetMinBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle("Set a target time");
+
+                    // Layout
+                    LinearLayout layout = new LinearLayout(v.getContext());
+                    layout.setOrientation(LinearLayout.VERTICAL);
+                    layout.setPadding(50, 40, 50, 10);
+
+                    final EditText input = new EditText(v.getContext());
+                    input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    input.setHint("Give a number");
+                    layout.addView(input);
+
+                    // Spinner (Hour/Minute)
+                    final Spinner spinner = new Spinner(v.getContext());
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(v.getContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            new String[]{"Minutes", "Hours"});
+                    spinner.setAdapter(adapter);
+                    layout.addView(spinner);
+                    // set layout for dialog
+                    builder.setView(layout);
+
+                    // OK
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String value = input.getText().toString();
+                            String type = spinner.getSelectedItem().toString();
+
+                            if (!value.isEmpty()) {
+                                int number = Integer.parseInt(value);
+                                int maxLimit = type.equals("Hours") ? 24 : 1440; // hour max 24, minute max 1440
+
+                                if (number >= 0 && number <= maxLimit) {
+                                    if( type.equals("Hours")) {
+                                        targetMinutes = number * 60;
+                                    }else{
+                                        targetMinutes = number;
+                                    }
+                                    targetTimeText.setText(": " + targetMinutes + " min.");
+                                } else {
+                                    Toast.makeText(v.getContext(),
+                                            "Invalid number! Limit for " + type + ": 0 - " + maxLimit,
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    });
+
+                    // Cancel
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                }
+            });
+
+
+
         datePickerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 datePickerDialog.show();
             }
         });
-        /*
+
         addNewTypeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(UploadToDoActivity.this, NewTypeActivity.class));
             }
-        });*/
+        });
 
-        /*
         typePickerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
-        });*/
+        });
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -137,9 +221,9 @@ public class UploadToDoActivity extends AppCompatActivity {
                 googleSignInClient = GoogleSignIn.getClient(UploadToDoActivity.this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build());
 
                 if (editTodoId == -1) {
-                    createNewToDo(strToDoName, strToDoDesc, strDate, account);
+                    createNewToDo(strToDoName, strToDoDesc, strDate, targetMinutes, account);
                 } else {
-                    updateExistingToDo(strToDoName, strToDoDesc, strDate, account);
+                    updateExistingToDo(strToDoName, strToDoDesc, strDate, targetMinutes, account);
                 }
 
                 navigateToMainToDoActivity();
@@ -222,12 +306,13 @@ public class UploadToDoActivity extends AppCompatActivity {
     }
 
     // Creates a new To-Do item with the provided details and adds it to the database. Optionally, it can integrate with Google Calendar.
-    private void createNewToDo(String name, String desc, String date, GoogleSignInAccount account) {
+    private void createNewToDo(String name, String desc, String date, int targetMinutes, GoogleSignInAccount account) {
         ToDo newToDo = new ToDo();
         newToDo.setName(name);
         newToDo.setDescription(desc);
         newToDo.setUserId(userId);
         newToDo.setDate(date);
+        newToDo.setTargetMinutes(targetMinutes);
         newToDo.setDone(false);
 
         // Adding the new To-Do to the database and retrieving its unique ID
@@ -240,10 +325,11 @@ public class UploadToDoActivity extends AppCompatActivity {
     }
 
     // Updates an existing To-Do item with new details.
-    private void updateExistingToDo(String name, String desc, String date, GoogleSignInAccount account) {
+    private void updateExistingToDo(String name, String desc, String date, int targetMinutes, GoogleSignInAccount account) {
         editTodo.setName(name);
         editTodo.setDescription(desc);
         editTodo.setDate(date);
+        editTodo.setTargetMinutes(targetMinutes);
 
         // Attempting to update the To-Do item in the database
         boolean updated = db.updateToDo(editTodo);

@@ -12,7 +12,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 7;
+    private static int dbVersion = 10;
 
 
     // users
@@ -31,7 +31,8 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String todoDesc = "todoDesc";
     public static String todoDone = "todoDone"; // Boolean?
     public static String todoDate = "todoDate";
-    public static String todoTime = "todoTime";
+    public static String todoTargetMinutes = "todoTargetMinutes";
+    public static String todoAchievedMinutes = "todoAchievedMinutes";
     // ?
     public static String todoTypeId = "todoTypeId"; // foreign key
     public static String todoUserId = "todoUserId"; // foreign key
@@ -73,7 +74,7 @@ public class dbConnect extends SQLiteOpenHelper {
         // to do table
         String makeTodoQuery = "CREATE TABLE " + todoTable + "(" + todoId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + googleTodoId + " TEXT, " + todoName + " TEXT, "+ todoDesc + " TEXT, "+ todoDone + " TEXT, " + todoDate + " TEXT, "
-                + todoTime + " TEXT, " + todoTypeId + " INTEGER, " + todoUserId + " INTEGER, "
+                + todoTargetMinutes + " INTEGER, " + todoAchievedMinutes + " INTEGER, " + todoTypeId + " INTEGER, " + todoUserId + " INTEGER, "
                 + "FOREIGN KEY(" + todoTypeId + ") REFERENCES " + typeTable + "(" + typeId + "), "
                 + "FOREIGN KEY(" + todoUserId + ") REFERENCES " + userTable + "(" + userId + "))";
         db.execSQL(makeTodoQuery);
@@ -107,11 +108,12 @@ public class dbConnect extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS "+ userDeviceLink);
         db.execSQL("DROP TABLE IF EXISTS "+ userTable);
         db.execSQL("DROP TABLE IF EXISTS "+ todoTable);
         db.execSQL("DROP TABLE IF EXISTS "+ typeTable);
         db.execSQL("DROP TABLE IF EXISTS "+ stepsTable);
-        db.execSQL("DROP TABLE IF EXISTS "+ userDeviceLink);
+        db.execSQL("DROP TABLE IF EXISTS "+ devicesTable);
         onCreate(db);
     }
 }

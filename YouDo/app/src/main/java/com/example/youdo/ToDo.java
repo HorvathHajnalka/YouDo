@@ -6,7 +6,8 @@ public class ToDo {
     private String googleTodoId;
     private String name;
     private String date;
-    private String time;
+    private int targetMinutes;
+    private int achievedMinutes;
     private String description;
     private int typeId;
     private int userId;
@@ -34,12 +35,10 @@ public class ToDo {
     public void setDate(String date) {
         this.date = date;
     }
-    public String getTime() {
-        return time;
-    }
-    public void setTime(String time) {
-        this.time = time;
-    }
+    public int getTargetMinutes() { return targetMinutes; }
+    public void setTargetMinutes(int targetMinutes) { this.targetMinutes = targetMinutes; }
+    public int getAchievedMinutes() { return achievedMinutes; }
+    public void setAchievedMinutes(int targetMinutes) { this.achievedMinutes = targetMinutes; }
     public String getDescription() {
         return description;
     }

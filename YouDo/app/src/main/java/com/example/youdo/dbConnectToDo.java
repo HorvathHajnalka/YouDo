@@ -31,7 +31,8 @@ public class dbConnectToDo {
         values.put(dbConnect.todoDesc, todo.getDescription());
         values.put(dbConnect.todoDone, String.valueOf(todo.isDone()));
         values.put(dbConnect.todoDate, todo.getDate());
-        values.put(dbConnect.todoTime, todo.getTime());
+        values.put(dbConnect.todoTargetMinutes, todo.getTargetMinutes());
+        values.put(dbConnect.todoAchievedMinutes, todo.getAchievedMinutes());
         values.put(dbConnect.todoTypeId, todo.getTypeId());
         values.put(dbConnect.todoUserId, todo.getUserId());
 
@@ -52,7 +53,8 @@ public class dbConnectToDo {
         values.put(dbConnect.todoDesc, todo.getDescription());
         values.put(dbConnect.todoDone, String.valueOf(todo.isDone()));
         values.put(dbConnect.todoDate, todo.getDate());
-        values.put(dbConnect.todoTime, todo.getTime());
+        values.put(dbConnect.todoTargetMinutes, todo.getTargetMinutes());
+        values.put(dbConnect.todoAchievedMinutes, todo.getAchievedMinutes());
         values.put(dbConnect.todoTypeId, todo.getTypeId());
         values.put(dbConnect.todoUserId, todo.getUserId());
 
@@ -100,7 +102,8 @@ public class dbConnectToDo {
                 dbConnect.todoName,
                 dbConnect.todoDesc,
                 dbConnect.todoDate,
-                dbConnect.todoTime,
+                dbConnect.todoTargetMinutes,
+                dbConnect.todoAchievedMinutes,
                 dbConnect.todoTypeId,
                 dbConnect.todoUserId,
                 dbConnect.todoDone
@@ -125,7 +128,8 @@ public class dbConnectToDo {
                 int nameIndex = cursor.getColumnIndex(dbConnect.todoName);
                 int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
                 int dateIndex = cursor.getColumnIndex(dbConnect.todoDate);
-                int timeIndex = cursor.getColumnIndex(dbConnect.todoTime);
+                int targetMinutesIndex = cursor.getColumnIndex(dbConnect.todoTargetMinutes);
+                int achievedMinutesIndex = cursor.getColumnIndex(dbConnect.todoAchievedMinutes);
                 int typeIdIndex = cursor.getColumnIndex(dbConnect.todoTypeId);
                 int userIdIndex = cursor.getColumnIndex(dbConnect.todoUserId);
                 int stateIndex = cursor.getColumnIndex(dbConnect.todoDone);
@@ -135,7 +139,8 @@ public class dbConnectToDo {
                 if (nameIndex != -1) todo.setName(cursor.getString(nameIndex));
                 if (descIndex != -1) todo.setDescription(cursor.getString(descIndex));
                 if (dateIndex != -1) todo.setDate(cursor.getString(dateIndex));
-                if (timeIndex != -1) todo.setTime(cursor.getString(timeIndex));
+                if (targetMinutesIndex != -1) todo.setTargetMinutes(cursor.getInt(targetMinutesIndex));
+                if (achievedMinutesIndex != -1) todo.setAchievedMinutes(cursor.getInt(achievedMinutesIndex));
                 if (typeIdIndex != -1) todo.setTypeId(cursor.getInt(typeIdIndex));
                 if (userIdIndex != -1) todo.setUserId(cursor.getInt(userIdIndex));
                 if (stateIndex != -1 && Objects.equals(cursor.getString(stateIndex), "true")) todo.setDone(true);
@@ -161,7 +166,7 @@ public class dbConnectToDo {
         String[] selectionArgs = {String.valueOf(todoId)};
 
         Cursor cursor = db.query(dbConnect.todoTable,
-                new String[]{dbConnect.todoId,dbConnect.googleTodoId, dbConnect.todoName, dbConnect.todoDesc, dbConnect.todoDone, dbConnect.todoDate, dbConnect.todoTime, dbConnect.todoTypeId, dbConnect.todoUserId},
+                new String[]{dbConnect.todoId,dbConnect.googleTodoId, dbConnect.todoName, dbConnect.todoDesc, dbConnect.todoDone, dbConnect.todoDate, dbConnect.todoTargetMinutes, dbConnect.todoAchievedMinutes, dbConnect.todoTypeId, dbConnect.todoUserId},
                 selection, selectionArgs, null, null, null);
 
         ToDo todo = null;
@@ -173,7 +178,8 @@ public class dbConnectToDo {
             int descIndex = cursor.getColumnIndex(dbConnect.todoDesc);
             int stateIndex = cursor.getColumnIndex(dbConnect.todoDone);
             int dateIndex = cursor.getColumnIndex(dbConnect.todoDate);
-            int timeIndex = cursor.getColumnIndex(dbConnect.todoTime);
+            int targetMinutesIndex = cursor.getColumnIndex(dbConnect.todoTargetMinutes);
+            int achievedMinutesIndex = cursor.getColumnIndex(dbConnect.todoAchievedMinutes);
             int typeIdIndex = cursor.getColumnIndex(dbConnect.todoTypeId);
             int userIdIndex = cursor.getColumnIndex(dbConnect.todoUserId);
 
@@ -184,7 +190,8 @@ public class dbConnectToDo {
             if (stateIndex != -1 && Objects.equals(cursor.getString(stateIndex), "true")) todo.setDone(true);
             if (stateIndex != -1 && Objects.equals(cursor.getString(stateIndex), "false")) todo.setDone(false);
             if (dateIndex != -1) todo.setDate(cursor.getString(dateIndex));
-            if (timeIndex != -1) todo.setTime(cursor.getString(timeIndex));
+            if (targetMinutesIndex != -1) todo.setTargetMinutes(cursor.getInt(targetMinutesIndex));
+            if (achievedMinutesIndex != -1) todo.setAchievedMinutes(cursor.getInt(achievedMinutesIndex));
             if (typeIdIndex != -1) todo.setTypeId(cursor.getInt(typeIdIndex));
             if (userIdIndex != -1) todo.setUserId(cursor.getInt(userIdIndex));
         }
@@ -209,7 +216,8 @@ public class dbConnectToDo {
                 dbConnect.todoName,
                 dbConnect.todoDesc,
                 dbConnect.todoDate,
-                dbConnect.todoTime,
+                dbConnect.todoTargetMinutes,
+                dbConnect.todoAchievedMinutes,
                 dbConnect.todoTypeId,
                 dbConnect.todoUserId,
                 dbConnect.todoDone
@@ -239,7 +247,8 @@ public class dbConnectToDo {
                 todo.setName(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoName)));
                 todo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoDesc)));
                 todo.setDate(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoDate)));
-                todo.setTime(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoTime)));
+                todo.setTargetMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoTargetMinutes)));
+                todo.setAchievedMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoAchievedMinutes)));
                 todo.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoTypeId)));
                 todo.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoUserId)));
                 todo.setDone("true".equals(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoDone))));
