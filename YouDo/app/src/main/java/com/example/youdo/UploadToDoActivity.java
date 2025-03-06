@@ -2,6 +2,7 @@ package com.example.youdo;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -36,15 +37,14 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import yuku.ambilwarna.AmbilWarnaDialog;
 public class UploadToDoActivity extends AppCompatActivity {
     GoogleSignInClient googleSignInClient;
     EditText uploadName, uploadDesc;
     Button datePickerBtn, typePickerBtn;
-    MaterialButton addNewTypeBtn, saveBtn, setTargetMinBtn;
-    TextView targetTimeText;
+    MaterialButton addNewTypeBtn, saveBtn, setTargetMinBtn, delTypeBtn;
     int targetMinutes;
     int typeId = -1;
-    String typeName;
     private DatePickerDialog datePickerDialog;
     TextView mainTitle;
 
@@ -73,6 +73,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         TextView targetTimeText = findViewById(R.id.targetTimeText);
         mainTitle = findViewById(R.id.mainTitle);
         addNewTypeBtn = findViewById(R.id.newtypebtn);
+        delTypeBtn = findViewById(R.id.deltypebtn);
         saveBtn = findViewById(R.id.saveTodoBtn);
         datePickerBtn = findViewById(R.id.datePickerBtn);
         typePickerBtn = findViewById(R.id.typePickerBtn);
@@ -95,8 +96,9 @@ public class UploadToDoActivity extends AppCompatActivity {
             uploadName.setText(editTodo.getName());
             uploadDesc.setText(editTodo.getDescription());
             typeId = editTodo.getTypeId();
-            if(typeId!= -1) {
-                typePickerBtn.setText(dbType.getToDoTypeById(typeId).getName());
+            Type selectedType = dbType.getToDoTypeById(typeId);
+            if (selectedType != null) {
+                typePickerBtn.setText(selectedType.getName());
             }
             targetMinutes = editTodo.getTargetMinutes();
             if(targetMinutes != 0) {
@@ -200,7 +202,87 @@ public class UploadToDoActivity extends AppCompatActivity {
         addNewTypeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(UploadToDoActivity.this, NewTypeActivity.class));
+                AlertDialog.Builder builder = new AlertDialog.Builder(UploadToDoActivity.this);
+                builder.setTitle("Add New Type");
+
+                // Creating a custom layout
+                LinearLayout layout = new LinearLayout(UploadToDoActivity.this);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                layout.setPadding(50, 40, 50, 10);
+
+                // EditText for type name
+                final EditText typeNameInput = new EditText(UploadToDoActivity.this);
+                typeNameInput.setHint("Type Name");
+                layout.addView(typeNameInput);
+
+                // Button to open color picker
+                final Button colorPickerBtn = new Button(UploadToDoActivity.this);
+                colorPickerBtn.setText("Pick a Color");
+                layout.addView(colorPickerBtn);
+
+                // TextView to display selected color
+                final TextView colorPreview = new TextView(UploadToDoActivity.this);
+                colorPreview.setText("Selected Color");
+                colorPreview.setPadding(10, 20, 10, 20);
+                colorPreview.setTextColor(Color.parseColor("#ffffff"));
+                layout.addView(colorPreview);
+
+                builder.setView(layout);
+
+                // Color picker event handler
+                final int[] selectedColor = {Color.BLACK}; // Default color
+                colorPickerBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new AmbilWarnaDialog(UploadToDoActivity.this, selectedColor[0], new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                            @Override
+                            public void onOk(AmbilWarnaDialog dialog, int color) {
+                                selectedColor[0] = color;
+                                colorPreview.setBackgroundColor(color);
+                            }
+
+                            @Override
+                            public void onCancel(AmbilWarnaDialog dialog) {
+                                // Do nothing on cancel
+                            }
+                        }).show();
+                    }
+                });
+
+                // Adding buttons to the dialog
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String typeName = typeNameInput.getText().toString().trim();
+                        if (!typeName.isEmpty()) {
+                            Type newType = new Type();
+                            newType.setName(typeName);
+                            newType.setColour("#" + Integer.toHexString(selectedColor[0]));
+                            newType.setUserId(userId);
+                            typeId = dbType.addToDoType(newType);
+                            typePickerBtn.setText(newType.getName());
+                            // Toast.makeText(UploadToDoActivity.this, "Type: " + typeName + ", Color: #" + Integer.toHexString(selectedColor[0]), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(UploadToDoActivity.this, "Please enter a name!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+
+        delTypeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
             }
         });
 
