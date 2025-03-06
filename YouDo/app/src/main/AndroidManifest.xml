@@ -29,7 +29,7 @@
         android:theme="@style/Theme.YouDo"
         tools:targetApi="34">
         <activity
-            android:name=".WeeklyStatsActivity"
+            android:name=".MyStatsActivity"
             android:exported="false" />
         <activity
             android:name=".StepCounterActivity"

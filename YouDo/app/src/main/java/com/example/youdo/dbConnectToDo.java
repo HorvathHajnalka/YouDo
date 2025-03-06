@@ -7,8 +7,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -264,6 +267,40 @@ public class dbConnectToDo {
         db.close();
 
         return filteredToDoList;
+    }
+
+    public List<ToDo> getToDosBeforeTodayForUser(int userId) {
+        List<ToDo> todoList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT * FROM " + dbConnect.todoTable +
+                    " WHERE " + dbConnect.todoUserId + " = ? " +
+                    " AND " + dbConnect.todoDone + " = ? " +
+                    " AND " + dbConnect.todoDate + " <= date('now')";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), "true"});
+
+        if (cursor.moveToFirst()) {
+                do {
+                    ToDo todo = new ToDo();
+                    todo.setTodoId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoId)));
+                    todo.setGoogleTodoId(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.googleTodoId)));
+                    todo.setName(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoName)));
+                    todo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoDesc)));
+                    todo.setDate(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoDate)));
+                    todo.setTargetMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoTargetMinutes)));
+                    todo.setAchievedMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoAchievedMinutes)));
+                    todo.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoTypeId)));
+                    todo.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.todoUserId)));
+                    todo.setDone("true".equals(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.todoDone))));
+
+                    todoList.add(todo);
+                } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return todoList;
     }
 
 

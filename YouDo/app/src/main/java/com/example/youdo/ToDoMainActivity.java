@@ -76,6 +76,15 @@ public class ToDoMainActivity extends AppCompatActivity {
         spannableString.setSpan(new UnderlineSpan(), 0, text.length(), 0);
         seestatsbtn.setText(spannableString);
 
+        seestatsbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ToDoMainActivity.this, MyStatsActivity.class);
+                i.putExtra("userId", userId);
+                startActivity(i);
+            }
+        });
+
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
 
