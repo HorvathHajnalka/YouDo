@@ -21,7 +21,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_gravity="center_horizontal"
             android:padding="20dp"
 
             android:background="@drawable/blue_border">
@@ -60,10 +59,44 @@
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="12dp"
                 android:textColor="@color/white"
             />
 
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/targetTimeText"
+                    android:text="Target Time: "
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:padding="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="5dp"
+                    />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/achievedTimeText"
+                    android:text="Achieved Time: "
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:padding="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="5dp"
+                    />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/typeText"
+                android:text="Activity Type: "
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:padding="1dp"
+                android:layout_weight="1"
+                android:layout_marginTop="5dp"
+                />
 
 
             <LinearLayout
