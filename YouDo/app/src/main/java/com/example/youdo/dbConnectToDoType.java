@@ -99,4 +99,47 @@ public class dbConnectToDoType {
         db.close();
         return typeList;
     }
+
+    public boolean hasToDosAssigned(int typeId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Count the number of ToDos assigned to the given typeId
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + dbConnect.todoTable + " WHERE " + dbConnect.todoTypeId + " = ?",
+                new String[]{String.valueOf(typeId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int count = cursor.getInt(0); // Get the count from the result
+            cursor.close();
+            return count > 0; // Return true if there are any ToDos associated with this typeId
+        }
+
+        return false; // Return false if no ToDos are found
+    }
+
+
+    public List<Type> getAllUserToDoTypesForUser(int userId) {
+        List<Type> typeList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = "SELECT * FROM " + dbConnect.typeTable + " WHERE " + dbConnect.typeUserId + " = ? ";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Type type = new Type();
+                type.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.typeId)));
+                type.setName(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeName)));
+                type.setColour(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeColour)));
+                int userIdIndex = cursor.getColumnIndex(dbConnect.typeUserId);
+                if (userIdIndex != -1 && !cursor.isNull(userIdIndex)) {
+                    type.setUserId(cursor.getInt(userIdIndex));
+                }
+                typeList.add(type);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return typeList;
+    }
 }

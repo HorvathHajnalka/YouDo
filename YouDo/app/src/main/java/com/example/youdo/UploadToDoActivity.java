@@ -283,6 +283,54 @@ public class UploadToDoActivity extends AppCompatActivity {
         delTypeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Create an AlertDialog to ask the user which type to delete
+                AlertDialog.Builder builder = new AlertDialog.Builder(UploadToDoActivity.this);
+                builder.setTitle("Delete Type");
+
+                // Create a dropdown (Spinner) to select the type to delete
+                final Spinner typeSpinner = new Spinner(UploadToDoActivity.this);
+
+                // Get the list of types from the database
+                List<Type> typeList = dbType.getAllUserToDoTypesForUser(userId);
+
+
+                // Create an ArrayAdapter for the Spinner
+                ArrayAdapter<Type> adapter = new ArrayAdapter<>(UploadToDoActivity.this, android.R.layout.simple_spinner_dropdown_item, typeList);
+                typeSpinner.setAdapter(adapter);
+
+                builder.setView(typeSpinner);
+
+                // Add buttons
+                builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Get the selected type from the Spinner
+                        Type selectedType = (Type) typeSpinner.getSelectedItem();
+
+                        if (selectedType != null) {
+                            // Check if the type has any associated ToDo items
+                            boolean hasAssociatedTodos = dbType.hasToDosAssigned(selectedType.getTypeId());
+                            if (hasAssociatedTodos) {
+                                Toast.makeText(UploadToDoActivity.this, "This type cannot be deleted because it has associated ToDos.", Toast.LENGTH_SHORT).show();
+                            }else {
+                                // Call the delete method on the database
+                                dbType.deleteToDoTypeById(selectedType.getTypeId());
+                                Toast.makeText(UploadToDoActivity.this, "Type '" + selectedType + "' has been deleted.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(UploadToDoActivity.this, "Type not found.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
 
@@ -438,7 +486,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         newToDo.setDate(date);
         newToDo.setTargetMinutes(targetMinutes);
         newToDo.setDone(false);
-        if(typeId != -1){
+        if(typeId != -1 && dbType.getToDoTypeById(typeId) != null){
             newToDo.setTypeId(typeId);
         }
 
@@ -457,7 +505,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         editTodo.setDescription(desc);
         editTodo.setDate(date);
         editTodo.setTargetMinutes(targetMinutes);
-        if(typeId != -1){
+        if(typeId != -1 && dbType.getToDoTypeById(typeId) != null){
             editTodo.setTypeId(typeId);
         }
 
