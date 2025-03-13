@@ -1,20 +1,16 @@
-package com.example.youdo;
+package com.example.youdo.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import android.os.Bundle;
 
+import com.example.youdo.R;
 
-public class MainActivity extends AppCompatActivity {
+public class NewTypeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-
-
+        setContentView(R.layout.activity_new_type);
     }
 }
-

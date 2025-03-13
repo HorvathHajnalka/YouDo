@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:icon="@mipmap/my_icon"
     android:background="@color/blue_extra_dark"
-    tools:context=".ToDoMainActivity">
+    tools:context=".Activities.ToDoMainActivity">
 
     <TextView
         android:id="@+id/todoText"

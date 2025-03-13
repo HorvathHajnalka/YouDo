@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Database;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;

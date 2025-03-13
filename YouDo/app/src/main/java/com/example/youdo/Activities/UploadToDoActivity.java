@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Activities;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -14,6 +14,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.youdo.Database.dbConnectToDo;
+import com.example.youdo.Database.dbConnectToDoType;
+import com.example.youdo.HelperServices.StepCounterHelper.EventCallback;
+import com.example.youdo.HelperServices.GoogleCalendarService;
+import com.example.youdo.Models.ToDo;
+import com.example.youdo.Models.Type;
+import com.example.youdo.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -30,12 +37,9 @@ import java.util.concurrent.CompletableFuture;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.InputType;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 public class UploadToDoActivity extends AppCompatActivity {

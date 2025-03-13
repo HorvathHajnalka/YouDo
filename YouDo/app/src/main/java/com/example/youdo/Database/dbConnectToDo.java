@@ -1,17 +1,14 @@
-package com.example.youdo;
+package com.example.youdo.Database;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
+import com.example.youdo.Models.ToDo;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 
@@ -274,10 +271,9 @@ public class dbConnectToDo {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + dbConnect.todoTable +
                     " WHERE " + dbConnect.todoUserId + " = ? " +
-                    " AND " + dbConnect.todoDone + " = ? " +
                     " AND " + dbConnect.todoDate + " <= date('now')";
 
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), "true"});
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
         if (cursor.moveToFirst()) {
                 do {

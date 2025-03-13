@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Activities;
 
 import static android.Manifest.permission.ACTIVITY_RECOGNITION;
 
@@ -27,6 +27,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.youdo.Database.dbStepCounter;
+import com.example.youdo.R;
+import com.example.youdo.HelperServices.StepCounterHelper.StepCounterService;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.SimpleDateFormat;

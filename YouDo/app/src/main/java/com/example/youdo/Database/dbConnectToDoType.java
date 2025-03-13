@@ -1,9 +1,12 @@
-package com.example.youdo;
+package com.example.youdo.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.youdo.Models.Type;
+
 import java.util.ArrayList;
 import java.util.List;
 

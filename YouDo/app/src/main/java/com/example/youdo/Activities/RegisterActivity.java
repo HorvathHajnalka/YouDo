@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.youdo.Database.dbConnectUser;
+import com.example.youdo.Models.User;
+import com.example.youdo.R;
 import com.google.android.material.button.MaterialButton;
 
 public class RegisterActivity extends AppCompatActivity {

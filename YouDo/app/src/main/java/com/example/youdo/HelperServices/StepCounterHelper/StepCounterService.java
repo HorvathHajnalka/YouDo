@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.HelperServices.StepCounterHelper;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -18,7 +18,9 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import com.google.android.material.button.MaterialButton;
+import com.example.youdo.Activities.StepCounterActivity;
+import com.example.youdo.Database.dbStepCounter;
+import com.example.youdo.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,7 +43,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
 
-        deviceId = com.example.youdo.dbStepCounter.getDeviceId();
+        deviceId = com.example.youdo.Database.dbStepCounter.getDeviceId();
         todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         dbStepCounter = new dbStepCounter(getApplicationContext());

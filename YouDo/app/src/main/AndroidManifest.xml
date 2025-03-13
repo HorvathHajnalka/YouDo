@@ -29,25 +29,25 @@
         android:theme="@style/Theme.YouDo"
         tools:targetApi="34">
         <activity
-            android:name=".MyStatsActivity"
+            android:name=".Activities.MyStatsActivity"
             android:exported="false" />
         <activity
-            android:name=".StepCounterActivity"
+            android:name=".Activities.StepCounterActivity"
             android:exported="true"></activity>
         <activity
-            android:name=".ToDoDetailActivity"
+            android:name=".Activities.ToDoDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".NewTypeActivity"
+            android:name=".Activities.NewTypeActivity"
             android:exported="false" />
         <activity
-            android:name=".UploadToDoActivity"
+            android:name=".Activities.UploadToDoActivity"
             android:exported="false" />
         <activity
-            android:name=".ToDoMainActivity"
+            android:name=".Activities.ToDoMainActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,20 +56,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Activities.RegisterActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
 
         <service
-            android:name=".StepCounterService"
+            android:name=".HelperServices.StepCounterHelper.StepCounterService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync"></service>
 
         <receiver
-            android:name=".BootCompletedReceiver"
+            android:name=".HelperServices.StepCounterHelper.BootCompletedReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

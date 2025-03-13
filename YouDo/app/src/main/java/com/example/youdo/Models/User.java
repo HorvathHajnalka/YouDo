@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Models;
 
 
 public class User {

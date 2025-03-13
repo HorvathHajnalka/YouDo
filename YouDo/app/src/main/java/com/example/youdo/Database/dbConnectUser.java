@@ -1,12 +1,12 @@
-package com.example.youdo;
-
-import static android.app.DownloadManager.COLUMN_ID;
+package com.example.youdo.Database;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.youdo.Models.User;
 
 // Handles database operations for user
 public class dbConnectUser {

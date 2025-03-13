@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Activities;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -13,6 +13,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.youdo.Database.dbConnectToDo;
+import com.example.youdo.Database.dbConnectToDoType;
+import com.example.youdo.Models.ToDo;
+import com.example.youdo.Models.Type;
+import com.example.youdo.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.button.MaterialButton;
@@ -22,15 +28,13 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import java.util.Collections;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class ToDoDetailActivity extends AppCompatActivity {
 
     TextView detailTitle, detailDesc, detailDate, targetTimeText, achievedTimeText, typeText;
     MaterialButton editTodoBtn, delTodoBtn, doneTodoBtn;
-    dbConnectToDo dbConnectToDo;
-    dbConnectToDoType dbConnectToDoType;
+    com.example.youdo.Database.dbConnectToDo dbConnectToDo;
+    com.example.youdo.Database.dbConnectToDoType dbConnectToDoType;
     ToDo todo;
     int todoId = -1; // has to be updated
     int userId = -1; // has to be updated

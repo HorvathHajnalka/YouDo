@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.HelperServices.StepCounterHelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

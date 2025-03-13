@@ -1,10 +1,13 @@
-package com.example.youdo;
+package com.example.youdo.HelperServices;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.youdo.Database.dbConnectToDo;
+import com.example.youdo.HelperServices.StepCounterHelper.EventCallback;
+import com.example.youdo.Models.ToDo;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;

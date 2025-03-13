@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context=".MyStatsActivity">
+    tools:context=".Activities.MyStatsActivity">
     <TextView
         android:id="@+id/stepCounterTitle"
         android:layout_width="match_parent"
@@ -43,11 +43,74 @@
         android:textStyle="bold"
         android:gravity="center" />
 
-    <ScrollView
-        android:layout_below="@id/completionPercentage"
+    <TextView
+        android:id="@+id/motivationalText"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="180dp"
+        android:gravity="center"
+        android:paddingBottom="20dp"
+        android:text=""
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="italic" />
+    <LinearLayout
+        android:id="@+id/legendContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="220dp"
         android:padding="16dp">
+
+        <!-- Target Jelmagyarázat -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginEnd="16dp">
+
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="#FF007A" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Target Time"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="#04E4DB" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Achieved Time"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="506dp"
+        android:layout_below="@id/completionPercentage"
+        android:layout_marginTop="110dp"
+        android:padding="20dp">
 
         <LinearLayout
             android:id="@+id/chartContainer"

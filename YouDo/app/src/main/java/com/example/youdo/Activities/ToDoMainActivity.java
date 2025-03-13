@@ -1,4 +1,4 @@
-package com.example.youdo;
+package com.example.youdo.Activities;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +16,11 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.youdo.Database.dbConnectToDo;
+import com.example.youdo.Models.ToDo;
+import com.example.youdo.R;
+import com.example.youdo.HelperServices.ToDoAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -41,7 +46,7 @@ public class ToDoMainActivity extends AppCompatActivity {
     ImageView todoDatePickerBtn;
     RecyclerView recyclerView;
     List<ToDo> todoList;
-    dbConnectToDo dbConnectToDo;
+    com.example.youdo.Database.dbConnectToDo dbConnectToDo;
     int userId = -1; // has to be updated
     private DatePickerDialog datePickerDialog;
     String curr_date;
