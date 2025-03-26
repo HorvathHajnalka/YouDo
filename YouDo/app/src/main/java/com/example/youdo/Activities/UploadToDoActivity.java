@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -231,6 +232,11 @@ public class UploadToDoActivity extends AppCompatActivity {
                 colorPreview.setTextColor(Color.parseColor("#ffffff"));
                 layout.addView(colorPreview);
 
+                // Checkbox for reward condition
+                final CheckBox rewardCheckBox = new CheckBox(UploadToDoActivity.this);
+                rewardCheckBox.setText("Reward if completed in less time");
+                layout.addView(rewardCheckBox);
+
                 builder.setView(layout);
 
                 // Color picker event handler
@@ -263,6 +269,9 @@ public class UploadToDoActivity extends AppCompatActivity {
                             newType.setName(typeName);
                             newType.setColour("#" + Integer.toHexString(selectedColor[0]));
                             newType.setUserId(userId);
+                            newType.setSumTargetMinutes(0);
+                            newType.setSumAchievedMinutes(0);
+                            newType.setRewardOverAchievement(!rewardCheckBox.isChecked());
                             typeId = dbType.addToDoType(newType);
                             typePickerBtn.setText(newType.getName());
                             // Toast.makeText(UploadToDoActivity.this, "Type: " + typeName + ", Color: #" + Integer.toHexString(selectedColor[0]), Toast.LENGTH_SHORT).show();
@@ -492,6 +501,8 @@ public class UploadToDoActivity extends AppCompatActivity {
         newToDo.setDone(false);
         if(typeId != -1 && dbType.getToDoTypeById(typeId) != null){
             newToDo.setTypeId(typeId);
+            Type todoType = dbType.getToDoTypeById(typeId);
+            todoType.setSumTargetMinutes(todoType.getSumTargetMinutes() + targetMinutes);
         }
 
         // Adding the new To-Do to the database and retrieving its unique ID

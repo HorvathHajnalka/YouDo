@@ -48,11 +48,12 @@ public class StepCounterActivity extends AppCompatActivity {
     private static final int REQUEST_CODE = 100;
     private dbStepCounter db;
     String todayAsString;
-    String deviceId;
+    String userId;
     MaterialButton weeklyStatsBtn;
     private DatePickerDialog datePickerDialog;
     String curr_date;
     String todaysDate;
+    Bundle extras;
 
     /*
     Define a BroadcastReceiver to handle incoming intents (broadcasts)
@@ -69,6 +70,7 @@ public class StepCounterActivity extends AppCompatActivity {
             if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
                 // Number of steps
                 int stepsCount = intent.getIntExtra("steps", 0);
+                userId = Integer.toString(intent.getIntExtra("userId", 0));
 
                 // Since we need to update the UI, make sure we're on the main thread
                 runOnUiThread(new Runnable() {
@@ -77,14 +79,14 @@ public class StepCounterActivity extends AppCompatActivity {
                         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
                         // Getting the existing step count from the database
-                        int existingSteps = db.getStepsByDate(db.getDeviceId(), todayAsString);
+                        int existingSteps = db.getStepsByDate(userId, todayAsString);
 
                         // Calculating the new total step count
                         int newTotalSteps = existingSteps + (stepsCount - totalSteps);
                         totalSteps = stepsCount; // Updating the totalSteps value with the new total steps
 
                         // Updating the database with the new step count
-                        db.addSteps(db.getDeviceId(), todayAsString, newTotalSteps);
+                        db.addSteps(userId, todayAsString, newTotalSteps);
 
                         // Updating the UI with the new total step count
                         steps.setText(String.valueOf(newTotalSteps));
@@ -103,7 +105,6 @@ public class StepCounterActivity extends AppCompatActivity {
 
         db = new dbStepCounter(this);
 
-        deviceId = dbStepCounter.getDeviceId();
         todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         progressBar = findViewById(R.id.progressBar);
@@ -111,6 +112,10 @@ public class StepCounterActivity extends AppCompatActivity {
         dateText = findViewById(R.id.dateText);
         weeklyStatsBtn = findViewById(R.id.weeklyStatsBtn);
 
+        extras = getIntent().getExtras();
+        if (extras != null) {
+            userId = Integer.toString(extras.getInt("userId", -1));
+        }
 
         loadDataFromDatabase();
 
@@ -151,14 +156,14 @@ public class StepCounterActivity extends AppCompatActivity {
 
         // manually add some data for testing purposes
 
-        /*
-        db.addOrUpdateSteps(deviceId, "2024-03-18", 6815);
-        db.addOrUpdateSteps(deviceId, "2024-03-17", 5542);
-        db.addOrUpdateSteps(deviceId, "2024-03-16", 2014);
-        db.addOrUpdateSteps(deviceId, "2024-03-15", 8507);
-        db.addOrUpdateSteps(deviceId, "2024-03-14", 7499);
-        db.addOrUpdateSteps(deviceId, "2024-03-13", 54);
-        db.addOrUpdateSteps(deviceId, "2024-03-12", 13);*/
+
+        db.addOrUpdateSteps(userId, "2025-03-26", 6815);
+        db.addOrUpdateSteps(userId, "2025-03-25", 5542);
+        db.addOrUpdateSteps(userId, "2025-03-24", 2014);
+        db.addOrUpdateSteps(userId, "2025-03-23", 8507);
+        db.addOrUpdateSteps(userId, "2025-03-22", 7499);
+        db.addOrUpdateSteps(userId, "2025-03-21", 54);
+        db.addOrUpdateSteps(userId, "2025-03-20", 13);
 
 
 
@@ -279,7 +284,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
     private void loadDataFromDatabase() {
         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        totalSteps = db.getStepsByDate(db.getDeviceId(), todayAsString);
+        totalSteps = db.getStepsByDate(userId, todayAsString);
     }
 
     // Called when the activity is being destroyed
@@ -330,6 +335,7 @@ public class StepCounterActivity extends AppCompatActivity {
     private void initiateStepCounterService() {
         if (!isServiceRunning()) {
             Intent serviceIntent = new Intent(this, StepCounterService.class);
+            serviceIntent.putExtra("userId", userId);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(serviceIntent);
             } else {
@@ -341,7 +347,7 @@ public class StepCounterActivity extends AppCompatActivity {
     // Saves the current step count to the database for today's date.
     private void saveStepsToDatabase() {
 
-        db.addSteps(db.getDeviceId(), todayAsString, totalSteps);
+        db.addSteps(userId, todayAsString, totalSteps);
     }
 
     // Returns today's date in the format "yyyy-MM-dd".
@@ -353,7 +359,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
     private void loadStepsForDate(String date) {
         // A date paramétert használva lekérjük az adott dátumhoz tartozó lépések számát
-        int stepsForDate = db.getStepsByDate(deviceId, date);
+        int stepsForDate = db.getStepsByDate(userId, date);
 
         // Frissítjük a UI elemeit az újonnan betöltött adatokkal
         runOnUiThread(new Runnable() {
@@ -367,7 +373,7 @@ public class StepCounterActivity extends AppCompatActivity {
             }
         });
 
-        // Naplózás, ha szükséges
+        // Naplózás
         Log.d("loadStepsForDate", "Lépések betöltve a dátumra: " + date + ", Lépések száma: " + stepsForDate);
     }
 

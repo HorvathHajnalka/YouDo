@@ -12,7 +12,7 @@ public class dbConnect extends SQLiteOpenHelper {
 
     // database
     private static String dbName = "youDo_DB";
-    private static int dbVersion = 15;
+    private static int dbVersion = 22;
 
 
     // users
@@ -29,11 +29,10 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String googleTodoId = "googleTodoId";
     public static String todoName = "todoName";
     public static String todoDesc = "todoDesc";
-    public static String todoDone = "todoDone"; // Boolean?
+    public static String todoDone = "todoDone";
     public static String todoDate = "todoDate";
     public static String todoTargetMinutes = "todoTargetMinutes";
     public static String todoAchievedMinutes = "todoAchievedMinutes";
-    // ?
     public static String todoTypeId = "todoTypeId"; // foreign key
     public static String todoUserId = "todoUserId"; // foreign key
 
@@ -43,22 +42,18 @@ public class dbConnect extends SQLiteOpenHelper {
     public static String typeName = "typeName";
     public static String typeColour = "typeColour";
     public static String typeUserId = "typeUserId"; // foreign key
+    public static String sumTargetMinutes = "sumTargetMinutes";
+    public static String sumAchievedMinutes = "sumAchievedMinutes";
+    public static String rewardOverAchievement = "rewardOverAchievement";
 
 
     // steps
     public static String stepsTable = "steps";
     public static String stepId = "stepId";
-    public static String deviceId = "deviceId"; //
+
     public static String date = "date"; // yyyy-mm-dd
     public static String steps = "steps"; // stepcount on a given days
-
-    // devices
-
-    public static String devicesTable = "devices";
-    public static String registrationDate = "registrationDate";
-
-    // userDeviceLink
-    public static String userDeviceLink = "userDeviceLink";
+    public static String stepUserId = "stepUserId";
 
     public dbConnect(@Nullable Context context) {
         super(context, dbName, null, dbVersion);
@@ -81,30 +76,18 @@ public class dbConnect extends SQLiteOpenHelper {
         db.execSQL(makeTodoQuery);
 
         // type table
-        String makeTypeQuery = "CREATE TABLE " + typeTable + "(" + typeId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + typeName + " TEXT, "+ typeColour + " TEXT, " + typeUserId + " INTEGER, "
+        String makeTypeQuery = "CREATE TABLE " + typeTable + "("
+                + typeId + " INTEGER PRIMARY KEY AUTOINCREMENT, " + typeName + " TEXT, " + typeColour + " TEXT, "
+                + sumTargetMinutes + " INTEGER DEFAULT 0, " + sumAchievedMinutes + " INTEGER DEFAULT 0, "
+                + rewardOverAchievement + " BOOLEAN, " + typeUserId + " INTEGER, "
                 + "FOREIGN KEY(" + typeUserId + ") REFERENCES " + userTable + "(" + userId + "))";
         db.execSQL(makeTypeQuery);
 
+
         // steps table
         String makeStepsQuery = "CREATE TABLE " + stepsTable + "(" + stepId + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + deviceId + " TEXT, " + date + " TEXT, " + steps + " INTEGER)";
+                + date + " TEXT, " + steps + " INTEGER, " + stepUserId + " INTEGER, "+ "FOREIGN KEY(" + stepUserId + ") REFERENCES " + userTable + "(" + userId + "))";
         db.execSQL(makeStepsQuery);
-
-        // devices table
-        String makeDeviceTableQuery = "CREATE TABLE " + devicesTable + "(" +
-                deviceId + " TEXT PRIMARY KEY, " +
-                registrationDate + " TEXT)";
-        db.execSQL(makeDeviceTableQuery);
-
-        // userDeviceLink table
-        String makeUserDeviceLinkTableQuery = "CREATE TABLE " + userDeviceLink + "(" +
-                "userId INTEGER, " +
-                "deviceId TEXT, " +
-                "PRIMARY KEY (userId, deviceId), " +
-                "FOREIGN KEY (userId) REFERENCES " + userTable + "(" + userId + "), " +
-                "FOREIGN KEY (deviceId) REFERENCES " + devicesTable + "(" + deviceId + "))";
-        db.execSQL(makeUserDeviceLinkTableQuery);
 
         insertDefaultTypes(db);
 
@@ -112,24 +95,28 @@ public class dbConnect extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS "+ userDeviceLink);
         db.execSQL("DROP TABLE IF EXISTS "+ userTable);
         db.execSQL("DROP TABLE IF EXISTS "+ todoTable);
         db.execSQL("DROP TABLE IF EXISTS "+ typeTable);
         db.execSQL("DROP TABLE IF EXISTS "+ stepsTable);
-        db.execSQL("DROP TABLE IF EXISTS "+ devicesTable);
         onCreate(db);
     }
 
     private void insertDefaultTypes(SQLiteDatabase db) {
-        String insertQuery = "INSERT INTO " + typeTable + " (" + typeName + ", " + typeColour + ") VALUES "
-                + "('-', '#5849ff'), " // basic to do color
-                + "('Sport', '#02C8EA'), "
-                + "('Study', '#FF0065'), "
-                + "('Self-Improvement', '#B900FF'), "
-                + "('Work', '#0015FF'), "
-                + "('Hobby', '#47D701');";
+        String insertQuery = "INSERT INTO " + typeTable + " ("
+                + typeName + ", "
+                + typeColour + ", "
+                + sumTargetMinutes + ", "
+                + sumAchievedMinutes + ", "
+                + rewardOverAchievement + ") VALUES "
+                + "('-', '#5849ff', 0, 0, 1), "
+                + "('Sport', '#02C8EA', 0, 0, 1), "
+                + "('Study', '#FF0065', 0, 0, 1), "
+                + "('Self-Improvement', '#B900FF', 0, 0, 1), "
+                + "('Work', '#0015FF', 0, 0, 1), "
+                + "('Hobby', '#47D701', 0, 0, 1);";
 
         db.execSQL(insertQuery);
     }
+
 }

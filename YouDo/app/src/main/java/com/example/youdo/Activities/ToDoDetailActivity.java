@@ -114,10 +114,13 @@ public class ToDoDetailActivity extends AppCompatActivity {
                             if (!enteredTime.isEmpty()) {
                                 int achievedTime = Integer.parseInt(enteredTime);
                                 todo.setAchievedMinutes(achievedTime);
+                                Type todoType = dbConnectToDoType.getToDoTypeById(todo.getTypeId());
+                                if( todoType != null){
+                                    todoType.setSumAchievedMinutes(todoType.getSumAchievedMinutes() + achievedTime);
+                                }
                             } else {
                                 todo.setAchievedMinutes(0);
                             }
-
                             toggleTodoStatus();
                         }
                     });

@@ -21,8 +21,17 @@ public class dbConnectToDoType {
     // Retrieves a single To-Do type by its ID.
     public Type getToDoTypeById(int typeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(dbConnect.typeTable,
-                new String[]{dbConnect.typeId, dbConnect.typeName, dbConnect.typeColour, dbConnect.typeUserId},
+        Cursor cursor = db.query(
+                dbConnect.typeTable,
+                new String[]{
+                        dbConnect.typeId,
+                        dbConnect.typeName,
+                        dbConnect.typeColour,
+                        dbConnect.typeUserId,
+                        dbConnect.sumTargetMinutes,
+                        dbConnect.sumAchievedMinutes,
+                        dbConnect.rewardOverAchievement
+                },
                 dbConnect.typeId + " =?",
                 new String[]{String.valueOf(typeId)},
                 null, null, null);
@@ -34,6 +43,11 @@ public class dbConnectToDoType {
             type.setName(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeName)));
             type.setColour(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeColour)));
             type.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.typeUserId)));
+            type.setSumTargetMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.sumTargetMinutes)));
+            type.setSumAchievedMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.sumAchievedMinutes)));
+            // SQLite-ben a logikai érték általában int, 0 = false, 1 = true
+            int rewardVal = cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.rewardOverAchievement));
+            type.setRewardOverAchievement(rewardVal != 0);
             cursor.close();
         }
         db.close();
@@ -48,6 +62,9 @@ public class dbConnectToDoType {
         values.put(dbConnect.typeName, type.getName());
         values.put(dbConnect.typeColour, type.getColour());
         values.put(dbConnect.typeUserId, type.getUserId());
+        values.put(dbConnect.sumTargetMinutes, type.getSumTargetMinutes());
+        values.put(dbConnect.sumAchievedMinutes, type.getSumAchievedMinutes());
+        values.put(dbConnect.rewardOverAchievement, type.isRewardOverAchievement() ? 1 : 0);
 
         int id = (int) db.insert(dbConnect.typeTable, null, values);
         db.close();
@@ -62,8 +79,15 @@ public class dbConnectToDoType {
         values.put(dbConnect.typeName, type.getName());
         values.put(dbConnect.typeColour, type.getColour());
         values.put(dbConnect.typeUserId, type.getUserId());
+        values.put(dbConnect.sumTargetMinutes, type.getSumTargetMinutes());
+        values.put(dbConnect.sumAchievedMinutes, type.getSumAchievedMinutes());
+        values.put(dbConnect.rewardOverAchievement, type.isRewardOverAchievement() ? 1 : 0);
 
-        int result = db.update(dbConnect.typeTable, values, dbConnect.typeId + " =?", new String[]{String.valueOf(type.getTypeId())});
+        int result = db.update(
+                dbConnect.typeTable,
+                values,
+                dbConnect.typeId + " =?",
+                new String[]{String.valueOf(type.getTypeId())});
         db.close();
         return result > 0;
     }
@@ -71,7 +95,10 @@ public class dbConnectToDoType {
     // Deletes a To-Do type from the database by its ID.
     public boolean deleteToDoTypeById(int typeId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int result = db.delete(dbConnect.typeTable, dbConnect.typeId + " =?", new String[]{String.valueOf(typeId)});
+        int result = db.delete(
+                dbConnect.typeTable,
+                dbConnect.typeId + " =?",
+                new String[]{String.valueOf(typeId)});
         db.close();
         return result > 0;
     }
@@ -81,7 +108,8 @@ public class dbConnectToDoType {
         List<Type> typeList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + dbConnect.typeTable + " WHERE " + dbConnect.typeUserId + " = ? OR " + dbConnect.typeUserId + " IS NULL";
+        String query = "SELECT * FROM " + dbConnect.typeTable + " WHERE " +
+                dbConnect.typeUserId + " = ? OR " + dbConnect.typeUserId + " IS NULL";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
         if (cursor.moveToFirst()) {
@@ -90,10 +118,11 @@ public class dbConnectToDoType {
                 type.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.typeId)));
                 type.setName(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeName)));
                 type.setColour(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeColour)));
-                int userIdIndex = cursor.getColumnIndex(dbConnect.typeUserId);
-                if (userIdIndex != -1 && !cursor.isNull(userIdIndex)) {
-                    type.setUserId(cursor.getInt(userIdIndex));
-                }
+                type.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.typeUserId)));
+                type.setSumTargetMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.sumTargetMinutes)));
+                type.setSumAchievedMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.sumAchievedMinutes)));
+                int rewardVal = cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.rewardOverAchievement));
+                type.setRewardOverAchievement(rewardVal != 0);
                 typeList.add(type);
             } while (cursor.moveToNext());
         }
@@ -107,18 +136,19 @@ public class dbConnectToDoType {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // Count the number of ToDos assigned to the given typeId
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + dbConnect.todoTable + " WHERE " + dbConnect.todoTypeId + " = ?",
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + dbConnect.todoTable +
+                        " WHERE " + dbConnect.todoTypeId + " = ?",
                 new String[]{String.valueOf(typeId)});
 
         if (cursor != null && cursor.moveToFirst()) {
             int count = cursor.getInt(0); // Get the count from the result
             cursor.close();
+            db.close();
             return count > 0; // Return true if there are any ToDos associated with this typeId
         }
-
+        db.close();
         return false; // Return false if no ToDos are found
     }
-
 
     public List<Type> getAllUserToDoTypesForUser(int userId) {
         List<Type> typeList = new ArrayList<>();
@@ -133,10 +163,11 @@ public class dbConnectToDoType {
                 type.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.typeId)));
                 type.setName(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeName)));
                 type.setColour(cursor.getString(cursor.getColumnIndexOrThrow(dbConnect.typeColour)));
-                int userIdIndex = cursor.getColumnIndex(dbConnect.typeUserId);
-                if (userIdIndex != -1 && !cursor.isNull(userIdIndex)) {
-                    type.setUserId(cursor.getInt(userIdIndex));
-                }
+                type.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.typeUserId)));
+                type.setSumTargetMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.sumTargetMinutes)));
+                type.setSumAchievedMinutes(cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.sumAchievedMinutes)));
+                int rewardVal = cursor.getInt(cursor.getColumnIndexOrThrow(dbConnect.rewardOverAchievement));
+                type.setRewardOverAchievement(rewardVal != 0);
                 typeList.add(type);
             } while (cursor.moveToNext());
         }

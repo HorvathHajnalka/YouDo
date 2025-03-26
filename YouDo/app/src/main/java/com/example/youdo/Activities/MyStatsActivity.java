@@ -44,7 +44,6 @@ public class MyStatsActivity extends AppCompatActivity {
         motivationalText = findViewById(R.id.motivationalText);
 
         Intent intent = getIntent();
-        // Receive userId and curr_date from previous activity if provided
         if (intent != null && intent.hasExtra("userId")) {
             userId = intent.getIntExtra("userId", -1);
         }
@@ -55,72 +54,90 @@ public class MyStatsActivity extends AppCompatActivity {
     private void loadStatistics() {
         List<ToDo> completedToDos = db.getToDosBeforeTodayForUser(userId);
 
-        Map<String, Pair<Integer, Integer>> typeStatistics = new HashMap<>();
+        // Típusokhoz tartozó statisztikák tárolása
+        Map<Type, Pair<Integer, Integer>> typeStatistics = new HashMap<>();
+        int totalTarget = 0;
+        int totalAchieved = 0;
+        int totalPercentage = 0;
+        int typeCount = 0;
 
+        // Típusok adatainak gyűjtése és százalékok kiszámítása
         for (ToDo todo : completedToDos) {
             Type curr_type = dbType.getToDoTypeById(todo.getTypeId());
-            if (curr_type != null) {
-                String typeName = curr_type.getName();
 
-                int target = todo.getTargetMinutes();
-                int achieved = todo.getAchievedMinutes();
-
-                if (!typeStatistics.containsKey(typeName)) {
-                    typeStatistics.put(typeName, new Pair<>(target, achieved));
-                } else {
-                    Pair<Integer, Integer> oldValues = typeStatistics.get(typeName);
-                    typeStatistics.put(typeName, new Pair<>(oldValues.first + target, oldValues.second + achieved));
-                }
+            if (curr_type == null) {
+                continue; // Ha nincs Type, ugorjuk át
             }
+
+            int target = todo.getTargetMinutes();
+            int achieved = todo.getAchievedMinutes();
+
+            // RewardOverAchievement flag ellenőrzése és százalék kiszámítása
+            int percentage;
+            if (curr_type.isRewardOverAchievement()) {
+                percentage = (target > 0) ? (achieved * 100 / target) : 0;
+            } else {
+                percentage = (achieved > 0) ? (target * 100 / achieved) : 0;
+            }
+
+            // Típus statisztika frissítése
+            if (!typeStatistics.containsKey(curr_type)) {
+                typeStatistics.put(curr_type, new Pair<>(target, achieved));
+            } else {
+                Pair<Integer, Integer> oldValues = typeStatistics.get(curr_type);
+                typeStatistics.put(curr_type, new Pair<>(oldValues.first + target, oldValues.second + achieved));
+            }
+
+            // Összesített statisztika
+            totalTarget += target;
+            totalAchieved += achieved;
+
+            // Egyedi százalék hozzáadása az összesítési százalékhoz
+            totalPercentage += percentage;
+            typeCount++;
         }
 
-        int maxTargetMinutes = typeStatistics.values().stream().mapToInt(pair -> pair.first).max().orElse(1);
-        int maxAchievedMinutes = typeStatistics.values().stream().mapToInt(pair -> pair.second).max().orElse(1);
-        int maxMinutes = Math.max(maxTargetMinutes, maxAchievedMinutes);
+        // Átlagos összesített teljesítmény százalékának kiszámítása
+        int overallCompletionRate = (totalTarget > 0) ? (totalAchieved * 100 / totalTarget) : 0;
+        int averagePercentage = (typeCount > 0) ? (totalPercentage / typeCount) : 0;
 
-        // Completion percentage calculation
-        int totalTarget = typeStatistics.values().stream().mapToInt(pair -> pair.first).sum();
-        int totalAchieved = typeStatistics.values().stream().mapToInt(pair -> pair.second).sum();
-        int completionRate = (totalTarget > 0) ? (totalAchieved * 100 / totalTarget) : 0;
-        completionPercentage.setText(completionRate + "%");
+        // Kétféle teljesítmény százalék kiírása: összesített és átlagos
+        completionPercentage.setText( averagePercentage + "%");
 
-        String message;
-        if (completionRate > 150) {
-            message = "Okay, slow down!😳";
-        } else if (completionRate > 125) {
-            message = "Wao, you are unstoppable🤪";
-        } else if (completionRate > 100) {
-            message = "You are a true over-achiever!🥳";
-        } else if (completionRate == 100) {
-            message = "Perfectionist...🙄";
-        } else if (completionRate >= 75) {
-            message = "Almost there!😃";
-        } else if (completionRate >= 50) {
-            message = "You got this!😉";
-        } else if (completionRate >= 25) {
-            message = "Keep pushing!💪";
-        } else if (completionRate >= 1) {
-            message = "At least you are trying🙄";
-        } else {
-            message = "'Dolce far niente' means the sweetness of doing nothing🤷‍♀️";
-        }
-
+        // Motiváló üzenet generálása
+        String message = getMotivationalMessage(overallCompletionRate);
         motivationalText.setText(message);
 
+        // Diagram megjelenítése
         int screenWidth = getResources().getDisplayMetrics().widthPixels - 100;
+        chartContainer.removeAllViews();
 
-        chartContainer.removeAllViews(); // Remove previous charts
+        // Legnagyobb perc érték meghatározása a sávok kiszámításához
+        int maxMinutes = typeStatistics.values().stream().mapToInt(pair -> Math.max(pair.first, pair.second)).max().orElse(1);
 
-        // Iterate through the statistics and create bars
-        for (Map.Entry<String, Pair<Integer, Integer>> entry : typeStatistics.entrySet()) {
-            String typeName = entry.getKey();
-            int targetWidth = (entry.getValue().first * screenWidth) / maxMinutes;
-            int achievedWidth = (entry.getValue().second * screenWidth) / maxMinutes;
+        // Minden típushoz diagram sáv létrehozása
+        for (Map.Entry<Type, Pair<Integer, Integer>> entry : typeStatistics.entrySet()) {
+            Type curr_type = entry.getKey();
+            int target = entry.getValue().first;
+            int achieved = entry.getValue().second;
 
-            addBarToChart(typeName, targetWidth, achievedWidth);
+            int percentage;
+            if (curr_type.isRewardOverAchievement()) {
+                percentage = (target > 0) ? (achieved * 100 / target) : 0;
+            } else {
+                percentage = (achieved > 0) ? (target * 100 / achieved) : 0;
+            }
+
+            // Típus és százalékos arány megjelenítése
+            String displayName = curr_type.getName() + " - " + percentage + "%";
+
+            // A sávok szélessége
+            int targetWidth = (target * screenWidth) / maxMinutes;
+            int achievedWidth = (achieved * screenWidth) / maxMinutes;
+
+            addBarToChart(displayName, targetWidth, achievedWidth);
         }
     }
-
 
     private void addBarToChart(String typeName, int targetWidth, int achievedWidth) {
         LinearLayout barLayout = new LinearLayout(this);
@@ -128,7 +145,7 @@ public class MyStatsActivity extends AppCompatActivity {
         barLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         barLayout.setPadding(0, 16, 0, 16);
 
-        // Type name
+        // Típus neve
         TextView title = new TextView(this);
         title.setText(typeName);
         title.setTextColor(Color.WHITE);
@@ -136,13 +153,13 @@ public class MyStatsActivity extends AppCompatActivity {
         title.setTypeface(null, Typeface.BOLD);
         barLayout.addView(title);
 
-        // Target Time (Red)
+        // Tervezett idő sáv
         TextView targetBar = new TextView(this);
         targetBar.setLayoutParams(new LinearLayout.LayoutParams(targetWidth, 40));
         targetBar.setBackgroundColor(Color.parseColor("#FF007A"));
         barLayout.addView(targetBar);
 
-        // Achieved Time (Green)
+        // Elért idő sáv
         TextView achievedBar = new TextView(this);
         achievedBar.setLayoutParams(new LinearLayout.LayoutParams(achievedWidth, 40));
         achievedBar.setBackgroundColor(Color.parseColor("#04E4DB"));
@@ -151,4 +168,25 @@ public class MyStatsActivity extends AppCompatActivity {
         chartContainer.addView(barLayout);
     }
 
+    private String getMotivationalMessage(int completionRate) {
+        if (completionRate > 150) {
+            return "Okay, slow down!😳";
+        } else if (completionRate > 125) {
+            return "Wao, you are unstoppable🤪";
+        } else if (completionRate > 100) {
+            return "You are a true over-achiever!🥳";
+        } else if (completionRate == 100) {
+            return "Perfectionist...🙄";
+        } else if (completionRate >= 75) {
+            return "Almost there!😃";
+        } else if (completionRate >= 50) {
+            return "You got this!😉";
+        } else if (completionRate >= 25) {
+            return "Keep pushing!💪";
+        } else if (completionRate >= 1) {
+            return "At least you are trying🙄";
+        } else {
+            return "'Dolce far niente' means the sweetness of doing nothing🤷‍♀️";
+        }
+    }
 }

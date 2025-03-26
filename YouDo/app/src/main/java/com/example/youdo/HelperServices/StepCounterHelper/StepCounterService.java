@@ -35,7 +35,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     private static boolean isServiceRunningInForeground = false;
     Context context;
     private dbStepCounter dbStepCounter;
-    String deviceId;
+    private String userId;
     String todayDate;
 
     @SuppressLint("ForegroundServiceType")
@@ -43,7 +43,6 @@ public class StepCounterService extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
 
-        deviceId = com.example.youdo.Database.dbStepCounter.getDeviceId();
         todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         dbStepCounter = new dbStepCounter(getApplicationContext());
@@ -69,8 +68,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     // Loads the initial step count from the database for today's date
     private void loadInitialStepCount() {
         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        String deviceId = dbStepCounter.getDeviceId();
-        int storedStepsForToday = dbStepCounter.getStepsByDate(deviceId, todayAsString);
+        int storedStepsForToday = dbStepCounter.getStepsByDate(userId, todayAsString);
         mInitialStepCount = storedStepsForToday;
     }
 
@@ -98,7 +96,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             // Assuming that deviceId and today's date acquisition was properly done earlier
 
             // Using the addSteps function to update the step count
-            dbStepCounter.addSteps(deviceId, todayDate, currentStepCount);
+            dbStepCounter.addSteps(userId, todayDate, currentStepCount);
 
             // Send an intent to update the UI
             Intent intent = new Intent("com.example.youdo.STEP_UPDATE");
@@ -124,8 +122,11 @@ public class StepCounterService extends Service implements SensorEventListener {
         StepCounterActivity.updateServiceState(this, true);
 
         Log.d("Mylogs", "Broadcast receiver started in StepCounterService onStart");
+        if (intent != null && intent.hasExtra("userId")) {
+            userId = intent.getStringExtra("userId");
+        }
         // Retrieve the current step count from the database and broadcast it
-        int currentSteps = dbStepCounter.getStepsByDate(deviceId, todayDate); // Assuming such a function exists in your dbStepCounter class
+        int currentSteps = dbStepCounter.getStepsByDate(userId, todayDate); // Assuming such a function exists in your dbStepCounter class
         Intent updateIntent = new Intent("com.example.youdo.STEP_UPDATE");
         updateIntent.putExtra("steps", currentSteps);
         sendBroadcast(updateIntent); // Sending the broadcast to update any UI listening for it
