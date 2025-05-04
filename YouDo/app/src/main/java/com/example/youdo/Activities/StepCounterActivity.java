@@ -68,27 +68,26 @@ public class StepCounterActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d("Mylogs", "BroadCast receiver started");
             if ("com.example.youdo.STEP_UPDATE".equals(intent.getAction())) {
-                // Number of steps
                 int stepsCount = intent.getIntExtra("steps", 0);
                 userId = Integer.toString(intent.getIntExtra("userId", 0));
 
-                // Since we need to update the UI, make sure we're on the main thread
+                // make sure we're on the main thread
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String todayAsString = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
-                        // Getting the existing step count from the database
+                        // existing step count from the database
                         int existingSteps = db.getStepsByDate(userId, todayAsString);
 
-                        // Calculating the new total step count
+                        // calculating the new total step count
                         int newTotalSteps = existingSteps + (stepsCount - totalSteps);
                         totalSteps = stepsCount; // Updating the totalSteps value with the new total steps
 
-                        // Updating the database with the new step count
+                        // updating the database with the new step count
                         db.addSteps(userId, todayAsString, newTotalSteps);
 
-                        // Updating the UI with the new total step count
+                        // updating the UI with the new total step count
                         steps.setText(String.valueOf(newTotalSteps));
                         progressBar.setProgress(newTotalSteps);
                     }
@@ -132,21 +131,19 @@ public class StepCounterActivity extends AppCompatActivity {
 
         dateText.setText("Step Counts on "+ curr_date);
 
-        // Check for activity recognition permission and request if not granted
+        // check for activity recognition permission and request if not granted
         if (ContextCompat.checkSelfPermission(this, ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{ACTIVITY_RECOGNITION}, 1);
         } else {
-            // If permission already granted, initiate step counter service
+            // initiate step counter service
             initiateStepCounterService();
         }
 
-        // Initialize a permission launcher for notification permission
+        // permission launcher for notification permission
         notificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
-                // Permission granted, start sending notifications
                 Log.d("NotificationPermission", "Notification permission granted.");
             } else {
-                // Permission denied, handle accordingly
                 Toast.makeText(this, "Enable notifications for counting steps in the background.", Toast.LENGTH_SHORT).show();
 
                 Log.d("NotificationPermission", "Notification permission denied.");
@@ -178,7 +175,6 @@ public class StepCounterActivity extends AppCompatActivity {
 
     }
 
-    // Initialize the date picker for selecting dates
     private void initDatePicker() {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -199,22 +195,19 @@ public class StepCounterActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        // Initialize the DatePickerDialog with the current date and the created listener
         datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis()); // Restrict future dates
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis()); // restrict future dates
     }
-
 
     // check if notifications are permitted
     private void checkAndRequestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-                // Notifications are not enabled, guide the user to the app's notification settings
+                // guide the user to the app's notification settings
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                // For Android O and above
                 intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
-                startActivity(intent); // Start the settings activity
+                startActivity(intent);
             }
         }
     }
@@ -225,24 +218,19 @@ public class StepCounterActivity extends AppCompatActivity {
         super.onResume();
         Log.d("Mylogs", "The app is resuming: onResume()");
 
-        // First, load the data
         loadDataFromDatabase();
-        // Update the UI; updateUI() already includes a call to loadData(), so it was redundant to call it here
 
         dateText.setText("Step Counts on " + curr_date);
 
-        // Set up a filter to listen for our custom step update action
         IntentFilter filter = new IntentFilter("com.example.youdo.STEP_UPDATE");
         filter.addAction("ACTION_NOTIFICATION_CLEARED");
-        // Register the broadcast receiver with our filter
         registerReceiver(stepUpdateReceiver, filter, RECEIVER_EXPORTED);
-        // Note: RECEIVER_EXPORTED is a flag that specifies the receiver is allowed to receive messages from sources outside its application
-    }
+       }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // Unregister the broadcast receiver when the activity is not in the foreground
+        // unregister the broadcast receiver when the activity is not in the foreground
         unregisterReceiver(stepUpdateReceiver);
         Log.d("Mylogs", "The app is likely going into the background: onPause()");
     }
@@ -255,7 +243,7 @@ public class StepCounterActivity extends AppCompatActivity {
 
 
 
-    // Reset the step count when a long press is detected
+    // reset the step count when a long press is detected
     private void resetSteps() {
         steps.setOnClickListener(v -> Toast.makeText(StepCounterActivity.this,"Long press to reset steps", Toast.LENGTH_SHORT).show());
 
@@ -287,7 +275,7 @@ public class StepCounterActivity extends AppCompatActivity {
         totalSteps = db.getStepsByDate(userId, todayAsString);
     }
 
-    // Called when the activity is being destroyed
+    // called when the activity is being destroyed
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -295,7 +283,7 @@ public class StepCounterActivity extends AppCompatActivity {
         Log.d("Mylogs", "Service stopped: onDestroy()");
     }
 
-    // Handles the result from requesting permissions, specifically activity recognition for step counting.
+    // handles the result from activity recognition for step counting.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -306,7 +294,7 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
-    // Updates the user interface based on the current step count fetched from the database.
+    // updates the user interface based on the current step count fetched from the database.
     private void updateUI() {
         loadDataFromDatabase();
         Log.d("Mylogs", "total steps: " + totalSteps);
@@ -317,7 +305,7 @@ public class StepCounterActivity extends AppCompatActivity {
         progressBar.setProgress(currentSteps);
     }
 
-    // Updates the shared preferences to reflect the current running state of the step counter service.
+    // updates the shared preferences to reflect the current running state of the step counter service.
     public static void updateServiceState(Context context, boolean isRunning) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -325,13 +313,13 @@ public class StepCounterActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    // Checks if the step counter service is currently running, based on shared preferences.
+    // checks if the step counter service is currently running, based on shared preferences.
     private boolean isServiceRunning() {
         SharedPreferences sharedPreferences = getSharedPreferences("StepCounterPrefs", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("ServiceRunning", false);
     }
 
-    // Initiates the step counter service if it's not already running.
+    // initiates the step counter service if it's not already running.
     private void initiateStepCounterService() {
         if (!isServiceRunning()) {
             Intent serviceIntent = new Intent(this, StepCounterService.class);
@@ -344,13 +332,13 @@ public class StepCounterActivity extends AppCompatActivity {
         }
     }
 
-    // Saves the current step count to the database for today's date.
+    // saves the current step count to the database for today's date.
     private void saveStepsToDatabase() {
 
         db.addSteps(userId, todayAsString, totalSteps);
     }
 
-    // Returns today's date in the format "yyyy-MM-dd".
+    // returns today's date in the format "yyyy-MM-dd".
     private static String getTodaysDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -358,22 +346,17 @@ public class StepCounterActivity extends AppCompatActivity {
     }
 
     private void loadStepsForDate(String date) {
-        // A date paramétert használva lekérjük az adott dátumhoz tartozó lépések számát
         int stepsForDate = db.getStepsByDate(userId, date);
 
-        // Frissítjük a UI elemeit az újonnan betöltött adatokkal
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                // Beállítjuk a lépések szöveges megjelenítését a lekért lépésszámmal
                 steps.setText(String.valueOf(stepsForDate));
 
-                // Beállítjuk a progress bar értékét. Feltételezve, hogy a progressBar maximuma megfelelően van beállítva.
                 progressBar.setProgress(stepsForDate);
             }
         });
 
-        // Naplózás
         Log.d("loadStepsForDate", "Lépések betöltve a dátumra: " + date + ", Lépések száma: " + stepsForDate);
     }
 

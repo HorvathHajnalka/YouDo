@@ -35,7 +35,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 public class ToDoMainActivity extends AppCompatActivity {
 
-    // Initialize variables
     private ActivityResultLauncher<Intent> permissionLauncher;
     GoogleSignInClient googleSignInClient;
     FirebaseAuth firebaseAuth;
@@ -47,7 +46,7 @@ public class ToDoMainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     List<ToDo> todoList;
     com.example.youdo.Database.dbConnectToDo dbConnectToDo;
-    int userId = -1; // has to be updated
+    int userId = -1;
     private DatePickerDialog datePickerDialog;
     String curr_date;
     String todaysDate;
@@ -59,14 +58,11 @@ public class ToDoMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_main);
 
-        // Initialize current and today's date
         todaysDate = getTodaysDate();
         curr_date = todaysDate;
 
-        // Setup DatePicker dialog
         initDatePicker();
 
-        // Link UI elements with their IDs
         addTodoBtn = findViewById(R.id.addToDobtn);
         stepCounterBtn = findViewById(R.id.stepCounterbtn);
         logoutBtn = findViewById(R.id.logoutBtn);
@@ -90,10 +86,9 @@ public class ToDoMainActivity extends AppCompatActivity {
             }
         });
 
-        // Initialize Firebase Auth
+        // initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
 
-        // Initialize Firebase user
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         // get google user
@@ -103,13 +98,11 @@ public class ToDoMainActivity extends AppCompatActivity {
             userId = firebaseUser.getUid().hashCode();
         }
         Intent intent = getIntent();
-        // Receive userId and curr_date from previous activity if provided
         if (intent != null && intent.hasExtra("userId")) {
                 userId = intent.getIntExtra("userId", -1);
                 curr_date = getIntent().getExtras().getString("curr_date", "-1");
         }
 
-        // Initialize database connection
         dbConnectToDo = new dbConnectToDo(this);
 
         addTodoBtn.setOnClickListener(new View.OnClickListener() {
@@ -175,12 +168,12 @@ public class ToDoMainActivity extends AppCompatActivity {
 
 
     private void logout() {
-        // Firebase log out
+        // firebase log out
         firebaseAuth.signOut();
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        // Google log out
+        // google log out
         if (account != null) {
             googleSignInClient.signOut().addOnCompleteListener(this, task -> {
                 Toast.makeText(ToDoMainActivity.this, "Successfully logged out from google account", Toast.LENGTH_SHORT).show();
@@ -200,13 +193,13 @@ public class ToDoMainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        // Load To-Do items for selected date
+        // load To-Do items for selected date
         super.onResume();
         if (!curr_date.equals("-1") && curr_date != null && ! curr_date.equals(getTodaysDate())) loadToDosForDate(curr_date);
         else loadToDosForDate(getTodaysDate());
     }
 
-    // Initialize DatePicker dialog with current date as default
+    // initialize DatePicker dialog with current date as default
     private void initDatePicker() {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -229,19 +222,18 @@ public class ToDoMainActivity extends AppCompatActivity {
         datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
     }
 
-    // Helper method to get today's date in yyyy-MM-dd format
+    // get today's date in yyyy-MM-dd format
     private static String getTodaysDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(calendar.getTime());
     }
 
-    // Load To-Do items from database for a specific date
+    // load To-Do items from database for a specific date
     private void loadToDosForDate(String date) {
         todoList = dbConnectToDo.getToDosByUserAndDate(userId, date);
         ToDoAdapter adapter = new ToDoAdapter(todoList, this, curr_date);
         recyclerView.setAdapter(adapter);
-        // Update the text view to show selected date or indicate "ToDos for today"
         if (! curr_date.equals("-1") && curr_date != null && ! curr_date.equals(getTodaysDate())) {
                 todoText.setText(curr_date);
         }else{

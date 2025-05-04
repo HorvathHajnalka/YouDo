@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initializing UI components
+        // initializing UI components
         userNameLogIn = findViewById(R.id.username);
         passwordLogIn = findViewById(R.id.password);
         loginbtn = findViewById(R.id.loginbtn);
@@ -65,50 +65,46 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 String strUserName = userNameLogIn.getText().toString();
                 String strPassword = passwordLogIn.getText().toString();
 
-                // Authenticate user
+                // authenticate user
                 if (db.checkUser(strUserName, strPassword)) {
                     int userId = db.getUserId(strUserName, strPassword);
                     if (userId != -1) {
-                        // Successful login
+                        // successful login
                         Toast.makeText(LoginActivity.this, "Successfully logged in", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, ToDoMainActivity.class);
                         intent.putExtra("userId", userId);
                         startActivity(intent);
                         finish();
                     } else {
-                        // Login error
+                        // login error
                         Toast.makeText(LoginActivity.this, "Error logging in", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    // Invalid credentials
+                    // invalid credentials
                     Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        // Initialize sign in options the client-id is copied form google-services.json file
+        // initialize sign in options
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("377347138306-nj0is4059uuvhd44ms8rfinja9ika5e3.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
 
-        // Initialize sign in client
+        // initialize sign in client
         googleSignInClient = GoogleSignIn.getClient(LoginActivity.this, googleSignInOptions);
 
         googlebtn.setOnClickListener((View.OnClickListener) view -> {
-            // Initialize sign in intent
             Intent intent = googleSignInClient.getSignInIntent();
-            // Start activity for result
             startActivityForResult(intent, 100);
         });
 
-        // Initialize firebase auth
+        // firebase auth
         firebaseAuth = FirebaseAuth.getInstance();
-        // Initialize firebase user
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        // Check condition
         if (firebaseUser != null) {
-            // When user already sign in redirect to profile activity
+            // redirect to profile activity
             startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
@@ -116,34 +112,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // Check condition
         if (requestCode == 100) {
-            // When request code is equal to 100 initialize task
             Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn.getSignedInAccountFromIntent(data);
-            // check condition
             if (signInAccountTask.isSuccessful()) {
-                // When google sign in successful initialize string
                 String s = "Google sign in successful";
-                // Display Toast
                 displayToast(s);
-                // Initialize sign in account
                 try {
-                    // Initialize sign in account
+                    // initialize sign in account
                     GoogleSignInAccount googleSignInAccount = signInAccountTask.getResult(ApiException.class);
-                    // Check condition
                     if (googleSignInAccount != null) {
-                        // When sign in account is not equal to null initialize auth credential
                         AuthCredential authCredential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
-                        // Check credential
                         firebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                // Check condition
                                 if (task.isSuccessful()) {
-                                    // When task is successful redirect to profile activity display Toast
                                     startActivity(new Intent(LoginActivity.this, ToDoMainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                                 } else {
-                                    // When task is unsuccessful display Toast
                                     displayToast("Authentication Failed :" + task.getException().getMessage());
                                 }
                             }
@@ -160,7 +144,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
     }
 
-    // Handle failed connection to Google Play Services
+    // failed connection to Google Play Services
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Toast.makeText(this, "Connection to Google Play Services failed", Toast.LENGTH_SHORT).show();

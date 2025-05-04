@@ -84,8 +84,6 @@ public class UploadToDoActivity extends AppCompatActivity {
         typePickerBtn = findViewById(R.id.typePickerBtn);
         targetMinutes = 0;
 
-
-        // Get extras passed through the intent that started this activity.
         extras = getIntent().getExtras();
         if (extras != null) {
             userId = extras.getInt("userId", -1);
@@ -94,7 +92,7 @@ public class UploadToDoActivity extends AppCompatActivity {
             curr_date = extras.getString("curr_date", "-1");
         }
 
-        // Check if we're editing an existing To-Do
+        // check if we're editing an existing To-Do
         if (editTodoId != -1) {
             editTodo = db.getTodoById(editTodoId);
             mainTitle.setText("Edit ToDo");
@@ -137,7 +135,6 @@ public class UploadToDoActivity extends AppCompatActivity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setTitle("Set a target time");
 
-                    // Layout
                     LinearLayout layout = new LinearLayout(v.getContext());
                     layout.setOrientation(LinearLayout.VERTICAL);
                     layout.setPadding(50, 40, 50, 10);
@@ -147,14 +144,13 @@ public class UploadToDoActivity extends AppCompatActivity {
                     input.setHint("Give a number");
                     layout.addView(input);
 
-                    // Spinner (Hour/Minute)
+                    // spinner (Hour/Minute)
                     final Spinner spinner = new Spinner(v.getContext());
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(v.getContext(),
                             android.R.layout.simple_spinner_dropdown_item,
                             new String[]{"Minutes", "Hours"});
                     spinner.setAdapter(adapter);
                     layout.addView(spinner);
-                    // set layout for dialog
                     builder.setView(layout);
 
                     // OK
@@ -183,8 +179,6 @@ public class UploadToDoActivity extends AppCompatActivity {
                             }
                         }
                     });
-
-                    // Cancel
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -210,37 +204,35 @@ public class UploadToDoActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(UploadToDoActivity.this);
                 builder.setTitle("Add New Type");
 
-                // Creating a custom layout
                 LinearLayout layout = new LinearLayout(UploadToDoActivity.this);
                 layout.setOrientation(LinearLayout.VERTICAL);
                 layout.setPadding(50, 40, 50, 10);
 
-                // EditText for type name
                 final EditText typeNameInput = new EditText(UploadToDoActivity.this);
                 typeNameInput.setHint("Type Name");
                 layout.addView(typeNameInput);
 
-                // Button to open color picker
+                // open color picker
                 final Button colorPickerBtn = new Button(UploadToDoActivity.this);
                 colorPickerBtn.setText("Pick a Color");
                 layout.addView(colorPickerBtn);
 
-                // TextView to display selected color
+                // display selected color
                 final TextView colorPreview = new TextView(UploadToDoActivity.this);
                 colorPreview.setText("Selected Color");
                 colorPreview.setPadding(10, 20, 10, 20);
                 colorPreview.setTextColor(Color.parseColor("#ffffff"));
                 layout.addView(colorPreview);
 
-                // Checkbox for reward condition
+                // checkbox for reward condition
                 final CheckBox rewardCheckBox = new CheckBox(UploadToDoActivity.this);
                 rewardCheckBox.setText("Reward if completed in less time");
                 layout.addView(rewardCheckBox);
 
                 builder.setView(layout);
 
-                // Color picker event handler
-                final int[] selectedColor = {Color.BLACK}; // Default color
+                // color picker event handler
+                final int[] selectedColor = {Color.BLACK}; // default color
                 colorPickerBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -253,13 +245,11 @@ public class UploadToDoActivity extends AppCompatActivity {
 
                             @Override
                             public void onCancel(AmbilWarnaDialog dialog) {
-                                // Do nothing on cancel
                             }
                         }).show();
                     }
                 });
 
-                // Adding buttons to the dialog
                 builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -296,37 +286,29 @@ public class UploadToDoActivity extends AppCompatActivity {
         delTypeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Create an AlertDialog to ask the user which type to delete
+                // ask the user which type to delete
                 AlertDialog.Builder builder = new AlertDialog.Builder(UploadToDoActivity.this);
                 builder.setTitle("Delete Type");
 
-                // Create a dropdown (Spinner) to select the type to delete
+                // dropdown to select the type to delete
                 final Spinner typeSpinner = new Spinner(UploadToDoActivity.this);
-
-                // Get the list of types from the database
                 List<Type> typeList = dbType.getAllUserToDoTypesForUser(userId);
-
-
-                // Create an ArrayAdapter for the Spinner
                 ArrayAdapter<Type> adapter = new ArrayAdapter<>(UploadToDoActivity.this, android.R.layout.simple_spinner_dropdown_item, typeList);
                 typeSpinner.setAdapter(adapter);
 
                 builder.setView(typeSpinner);
 
-                // Add buttons
                 builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Get the selected type from the Spinner
                         Type selectedType = (Type) typeSpinner.getSelectedItem();
 
                         if (selectedType != null) {
-                            // Check if the type has any associated ToDo items
+                            // check if the type has any associated To-Do items
                             boolean hasAssociatedTodos = dbType.hasToDosAssigned(selectedType.getTypeId());
                             if (hasAssociatedTodos) {
                                 Toast.makeText(UploadToDoActivity.this, "This type cannot be deleted because it has associated ToDos.", Toast.LENGTH_SHORT).show();
                             }else {
-                                // Call the delete method on the database
                                 dbType.deleteToDoTypeById(selectedType.getTypeId());
                                 Toast.makeText(UploadToDoActivity.this, "Type '" + selectedType + "' has been deleted.", Toast.LENGTH_SHORT).show();
                             }
@@ -351,7 +333,6 @@ public class UploadToDoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 List<Type> typeList = dbType.getAllToDoTypesForUser(userId);
-                // Spinner
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                 builder.setTitle("Choose a type for todo");
 
@@ -360,7 +341,6 @@ public class UploadToDoActivity extends AppCompatActivity {
                         android.R.layout.simple_spinner_dropdown_item, typeList);
                 typeSpinner.setAdapter(adapter);
 
-                // Layout
                 LinearLayout layout = new LinearLayout(v.getContext());
                 layout.setOrientation(LinearLayout.VERTICAL);
                 layout.setPadding(50, 40, 50, 10);
@@ -385,7 +365,6 @@ public class UploadToDoActivity extends AppCompatActivity {
                     }
                 });
 
-                // Dialog
                 builder.show();
             }
         });
@@ -401,7 +380,7 @@ public class UploadToDoActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Checking if the user is signed in with Google
+                // checking if the user is signed in with Google
                 GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(UploadToDoActivity.this);
                 googleSignInClient = GoogleSignIn.getClient(UploadToDoActivity.this, new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build());
 
@@ -422,18 +401,16 @@ public class UploadToDoActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        // Month in Java's Calendar class is zero-based so it needs to be incremented by one to get the correct display value.
+        // month in Java's Calendar class is zero-based so it needs to be incremented by one to get the correct display value.
         month = month + 1;
 
         return makeDateString(day, month, year);
     }
 
-    // Initialize the DatePicker dialog.
     private void initDatePicker() {
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                // Month in Java's Calendar class is zero-based so it needs to be incremented by one for display.
                 month = month + 1;
                 String date = makeDateString(dayOfMonth, month, year);
                 datePickerBtn.setText(date);
@@ -446,15 +423,14 @@ public class UploadToDoActivity extends AppCompatActivity {
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        // Creating the DatePickerDialog instance with the current date as the default selection.
         datePickerDialog = new DatePickerDialog(this, R.style.DatePickerDialogTheme, dateSetListener, year, month, day);
-        // Setting the minimum date to the current date, preventing selection of past dates.
+        // setting the minimum date to the current date, preventing selection of past dates.
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
 
 
     }
 
-    // This method formats the date string by converting the month integer to a string abbreviation and appending it with the day and year.
+    // formats the date string by converting the month integer to a string abbreviation and appending it with the day and year.
     private String makeDateString(int dayOfMonth, int month, int year) {
 
 
@@ -476,7 +452,7 @@ public class UploadToDoActivity extends AppCompatActivity {
         else return "Dec";
     }
 
-    // Retrieves the selected date from the DatePicker and sets it as the start time in a Calendar instance.
+    // retrieves the selected date from the DatePicker and sets it as the start time in a Calendar instance.
     private Calendar getStartTime() {
         DatePicker datePicker = datePickerDialog.getDatePicker();
         Calendar startTime = Calendar.getInstance();
@@ -484,13 +460,12 @@ public class UploadToDoActivity extends AppCompatActivity {
         return startTime;
     }
 
-    // Formats a Calendar instance to a string using the specified date format.
+    // formats a Calendar instance to a string
     private String getFormattedDate(Calendar calendar) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(calendar.getTime());
     }
 
-    // Creates a new To-Do item with the provided details and adds it to the database. Optionally, it can integrate with Google Calendar.
     private void createNewToDo(String name, String desc, String date, int targetMinutes, int typeId, GoogleSignInAccount account) {
         ToDo newToDo = new ToDo();
         newToDo.setName(name);
@@ -505,16 +480,14 @@ public class UploadToDoActivity extends AppCompatActivity {
             todoType.setSumTargetMinutes(todoType.getSumTargetMinutes() + targetMinutes);
         }
 
-        // Adding the new To-Do to the database and retrieving its unique ID
         int todoId = db.addToDo(newToDo);
         newToDo.setTodoId(todoId);
         Toast.makeText(UploadToDoActivity.this, "Successfully added to your ToDo list!", Toast.LENGTH_SHORT).show();
 
-        // Optionally handling Google Calendar integration
+        // handling Google Calendar integration
         handleGoogleCalendarEvent(account, newToDo, true);
     }
 
-    // Updates an existing To-Do item with new details.
     private void updateExistingToDo(String name, String desc, String date, int targetMinutes, int typeId, GoogleSignInAccount account) {
         editTodo.setName(name);
         editTodo.setDescription(desc);
@@ -524,7 +497,6 @@ public class UploadToDoActivity extends AppCompatActivity {
             editTodo.setTypeId(typeId);
         }
 
-        // Attempting to update the To-Do item in the database
         boolean updated = db.updateToDo(editTodo);
         if (updated) {
             Toast.makeText(UploadToDoActivity.this, "ToDo has been updated successfully!", Toast.LENGTH_SHORT).show();
@@ -532,11 +504,10 @@ public class UploadToDoActivity extends AppCompatActivity {
             Toast.makeText(UploadToDoActivity.this, "ToDo update failed!", Toast.LENGTH_SHORT).show();
         }
 
-        // Handling potential updates to the associated Google Calendar event
         handleGoogleCalendarEvent(account, editTodo, false);
     }
 
-    // Manages the Google Calendar event associated with a To-Do item
+    // manages the Google Calendar event associated with a To-Do item
     private void handleGoogleCalendarEvent(GoogleSignInAccount account, ToDo todo, boolean isNew) {
         //  return if not signed in to Google
         if (account == null) {
@@ -544,14 +515,13 @@ public class UploadToDoActivity extends AppCompatActivity {
             return;
         }
 
-        // Initialize the GoogleCalendarService with the current account
+        // initialize the GoogleCalendarService with the current account
         googleCalendarService = new GoogleCalendarService(this, account);
         if (isNew) {
-            // Creating a new event in Google Calendar for the new To-Do item
+            // creating a new event in Google Calendar
             googleCalendarService.createAndAddEventToGoogleCalendar(todo, account, todo.getName(), todo.getDescription(), todo.getDate(), new EventCallback() {
                 @Override
                 public void onEventAdded(String eventId) {
-                    // Updating the To-Do item with the Google Calendar event ID
                     todo.setGoogleTodoId(eventId);
                     db.updateToDo(todo);
                     Log.d("GoogleCalendarEvent", "Event added successfully. ID: " + eventId);
@@ -563,21 +533,18 @@ public class UploadToDoActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Updating an existing Google Calendar event for the To-Do item
+            // updating an existing Google Calendar event for the To-Do item
             CompletableFuture.runAsync(() -> {
                 try {
                     googleCalendarService.updateEvent(account, todo.getGoogleTodoId(), todo.getName(), todo.getDescription(), todo.getDate());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }).thenRun(() -> {
-                // This could be used to perform actions after the event update is completed
-            });
+            }).thenRun(() -> { });
             Toast.makeText(UploadToDoActivity.this, "ToDo has been updated in Google Calendar!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Navigates back to the main To-Do activity, passing along any necessary data.
     private void navigateToMainToDoActivity() {
         Intent intent = new Intent(UploadToDoActivity.this, ToDoMainActivity.class);
         intent.putExtra("userId", userId);

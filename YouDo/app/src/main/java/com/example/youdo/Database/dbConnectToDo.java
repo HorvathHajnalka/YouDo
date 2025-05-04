@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-// Manages database operations for To-Do items.
+// manages database operations for To-Do items.
 public class dbConnectToDo {
     private dbConnect dbHelper;
 
@@ -20,8 +20,6 @@ public class dbConnectToDo {
         dbHelper = new dbConnect(context);
     }
 
-
-    // Adds a new To-Do item to the database.
     public int addToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -43,7 +41,6 @@ public class dbConnectToDo {
         return id;
     }
 
-    // Updates an existing To-Do item in the database.
     public boolean updateToDo(ToDo todo){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -63,8 +60,6 @@ public class dbConnectToDo {
         return endResult > 0;
     }
 
-
-    // Deletes a To-Do item from the database by its ID.
     public boolean deleteToDoById(int todoId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int endResult = db.delete(dbConnect.todoTable, dbConnect.todoId + " =?", new String[]{String.valueOf(todoId)});
@@ -72,7 +67,6 @@ public class dbConnectToDo {
         return endResult > 0;
     }
 
-    // Checks if a To-Do item exists in the database based on its Google ID.
     public boolean getToDoByGoogleId(String googleId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -91,7 +85,6 @@ public class dbConnectToDo {
         return exists;
     }
 
-    // Retrieves all To-Do items for a specific user.
     public List<ToDo> getAllToDoPerUser(int uId) {
         List<ToDo> todoList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -158,7 +151,6 @@ public class dbConnectToDo {
         return todoList;
     }
 
-    // Retrieves a single To-Do item by its ID.
     public ToDo getTodoById(int todoId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -204,7 +196,6 @@ public class dbConnectToDo {
         return todo;
     }
 
-    // Retrieves To-Do items for a user on a specific date.
     public List<ToDo> getToDosByUserAndDate(int userId, String date) {
         List<ToDo> filteredToDoList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();

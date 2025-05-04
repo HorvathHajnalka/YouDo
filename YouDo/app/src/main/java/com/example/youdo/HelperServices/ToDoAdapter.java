@@ -42,7 +42,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         this.db = new dbConnectToDoType(context);
     }
 
-    // Inflate the layout for each item in the RecyclerView (each To-Do item will use todo_button_layout)
     @NonNull
     @Override
     public ToDoAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,13 +50,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
-    // Bind data to the views in the ViewHolder (set up the To-Do item in the list at the given position)
+    // set up the To-Do item in the list at the given position
     @Override
     public void onBindViewHolder(@NonNull ToDoAdapter.ViewHolder holder, int position) {
         final ToDo todo = todoList.get(position);
         holder.todoButton.setText(todo.getName());
         if (todo.isDone()) {
-            // If the To-Do is marked as done, change the background color of the button to dark grey
+            // if the To-Do is marked as done, change the background color of the button to dark grey
             int darkGrey = ContextCompat.getColor(context, R.color.grey_00);
             holder.todoButton.setBackgroundColor(darkGrey);
             holder.todoButton.setPaintFlags(holder.todoButton.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -84,13 +83,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         });
     }
 
-    // Return the total number of items in the todoList
+    // total number of items in the todoList
     @Override
     public int getItemCount() {
         return todoList.size();
     }
 
-    // Button representing a single To-Do item
+    // button representing a single To-Do item
     public static class ViewHolder extends RecyclerView.ViewHolder {
         Button todoButton;
 

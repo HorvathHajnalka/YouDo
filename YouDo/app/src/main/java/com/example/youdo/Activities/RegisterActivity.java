@@ -49,13 +49,11 @@ public class RegisterActivity extends AppCompatActivity {
         regbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Retrieving user input from EditText fields
                 String strEmail = emailReg.getText().toString();
                 String strUserName = userNameReg.getText().toString();
                 String strPassword = passwordReg.getText().toString();
                 String strPassword2 = password2Reg.getText().toString();
 
-                // Input validation and registration logic
                 if(strUserName.isEmpty() || strEmail.isEmpty() || strPassword.isEmpty() || strPassword2.isEmpty()) {
                     Toast.makeText(RegisterActivity.this, "Empty fields!", Toast.LENGTH_SHORT).show();
                 }else if(! Patterns.EMAIL_ADDRESS.matcher(strEmail).matches()){
@@ -67,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
                 } else if (! strPassword.equals(strPassword2)) {
                     Toast.makeText(RegisterActivity.this, "Passwords not matching!", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Creating a new user and adding them to the database
+                    // creating a new user and adding them to the database
                     User newuser = new User(strUserName, strEmail, strPassword);
                     db.addUser(newuser);
                     Toast.makeText(RegisterActivity.this, "Successful Registration!", Toast.LENGTH_SHORT).show();

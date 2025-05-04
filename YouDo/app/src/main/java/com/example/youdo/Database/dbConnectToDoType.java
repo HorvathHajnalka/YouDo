@@ -10,7 +10,7 @@ import com.example.youdo.Models.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-// Manages database operations for To-Do types.
+// manages database operations for To-Do types.
 public class dbConnectToDoType {
     private dbConnect dbHelper;
 
@@ -18,7 +18,6 @@ public class dbConnectToDoType {
         dbHelper = new dbConnect(context);
     }
 
-    // Retrieves a single To-Do type by its ID.
     public Type getToDoTypeById(int typeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(
@@ -54,7 +53,6 @@ public class dbConnectToDoType {
         return type;
     }
 
-    // Adds a new To-Do type to the database.
     public int addToDoType(Type type) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -71,7 +69,6 @@ public class dbConnectToDoType {
         return id;
     }
 
-    // Updates an existing To-Do type in the database.
     public boolean updateToDoType(Type type) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -92,7 +89,6 @@ public class dbConnectToDoType {
         return result > 0;
     }
 
-    // Deletes a To-Do type from the database by its ID.
     public boolean deleteToDoTypeById(int typeId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int result = db.delete(
@@ -103,7 +99,6 @@ public class dbConnectToDoType {
         return result > 0;
     }
 
-    // Retrieves all To-Do types for a specific user (including general types where userId is NULL).
     public List<Type> getAllToDoTypesForUser(int userId) {
         List<Type> typeList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -135,19 +130,18 @@ public class dbConnectToDoType {
     public boolean hasToDosAssigned(int typeId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        // Count the number of ToDos assigned to the given typeId
         Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + dbConnect.todoTable +
                         " WHERE " + dbConnect.todoTypeId + " = ?",
                 new String[]{String.valueOf(typeId)});
 
         if (cursor != null && cursor.moveToFirst()) {
-            int count = cursor.getInt(0); // Get the count from the result
+            int count = cursor.getInt(0);
             cursor.close();
             db.close();
-            return count > 0; // Return true if there are any ToDos associated with this typeId
+            return count > 0;
         }
         db.close();
-        return false; // Return false if no ToDos are found
+        return false;
     }
 
     public List<Type> getAllUserToDoTypesForUser(int userId) {

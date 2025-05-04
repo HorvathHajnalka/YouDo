@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.youdo.Models.User;
 
-// Handles database operations for user
+// handles database operations for user
 public class dbConnectUser {
     private dbConnect dbHelper;
 
@@ -20,8 +20,6 @@ public class dbConnectUser {
     String TABLE_USERS = dbConnect.userTable;
     String COLUMN_GOOGLE_ACCOUNT_ID = dbConnect.googleId;
 
-
-    // Checks if the provided email exists in the database.
     public boolean checkEmail(String emailcheck) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + dbConnect.userTable + " WHERE " + dbConnect.email + " =?";
@@ -31,8 +29,6 @@ public class dbConnectUser {
         return hasEmail;
     }
 
-
-    // Checks if the provided username exists in the database.
     public boolean checkName(String namecheck){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + dbConnect.userTable + " WHERE " + dbConnect.userName + " =?";
@@ -42,7 +38,6 @@ public class dbConnectUser {
         return hasName;
     }
 
-    // Adds a new user to the database.
     public void addUser(User user){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -55,7 +50,6 @@ public class dbConnectUser {
         db.insert(dbConnect.userTable, null, values);
     }
 
-    // Updates an existing user in the database.
     public boolean updateUser(User user){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -68,14 +62,12 @@ public class dbConnectUser {
         return endResult > 0;
     }
 
-    // Deletes a user from the database.
     public boolean deleteUser(User user){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int endResult = db.delete(dbConnect.userTable, dbConnect.userId + " =?", new String[]{String.valueOf(user.getUserId())});
         return endResult > 0;
     }
 
-    // Checks if a user exists with the provided username and password.
     public boolean checkUser(String userNameLogIn, String passwordLogIn){
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         String query = "SELECT * FROM " + dbConnect.userTable + " WHERE " + dbConnect.userName + " =? AND " + dbConnect.password + " =?";
@@ -84,8 +76,6 @@ public class dbConnectUser {
         cursor.close();
         return hasUser;
     }
-
-    // Retrieves the user ID for a given username and password.
 
     public int getUserId(String username, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -101,8 +91,6 @@ public class dbConnectUser {
             return -1; // user not found
         }
     }
-
-    //  Retrieves the user ID for a given Google account ID.
 
     @SuppressLint("Range")
     public int getUserIdByGoogleAccountId(String googleAccountId) {
@@ -122,7 +110,4 @@ public class dbConnectUser {
 
         return userId;
     }
-
-
-
 }
