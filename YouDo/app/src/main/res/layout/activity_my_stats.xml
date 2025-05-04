@@ -63,7 +63,7 @@
         android:layout_marginTop="220dp"
         android:padding="16dp">
 
-        <!-- Target Jelmagyarázat -->
+        <!-- target legend-->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
