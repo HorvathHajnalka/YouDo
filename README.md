@@ -1,56 +1,200 @@
-# YouDo Android Task Manager
+# YouDo – Android Task Manager & Productivity Tracker
 
-Hello!😊 Thanks for checking out YouDo, my very first full-stack programme. It started as a hobby project, but as I added features, it grew into something I'm really proud of and I have many ideas for making YouDo even better. It's a simple yet powerful app I created to help manage daily tasks. My goal was to make something that's not just easy to use but also packs in enough features to actually be useful in keeping up with day-to-day activities.
-## Features
+YouDo is an Android productivity application designed to help users organize tasks, monitor time usage, and track daily activity in one unified system. The app combines task management, performance analytics, and physical activity tracking to support more balanced and effective daily routines.
 
-YouDo is packed with features to help you manage your day better:
+---
 
-- **Authentication:** Includes features for Registration, Login, and Google Sign In. 
-- **Google APIs (Calendar Integration):** You can upload, edit, and delete your tasks directly on your Google Calendar via this app.
-- **Step Counter (Sensor Usage):** Stay healthy while being productive. Using your phone's sensors, step counter works in the background (even when the app is closed), monitored through a persistent notification for easy access.
-- **Date-Based Filtering:** Easily sort and view your tasks/steps based on deadlines and dates, allowing for efficient time management.
-- **User Interface:** Intuitive and user-friendly interface for seamless navigation and task management.
-- **Backend System:** A robust system combining SQLite and Firebase, offering a secure and reliable database for your tasks and personal data.
-- **Cross-Platform Compatibility:** Tested and fully functional on Android 13 and 14, providing smooth user experience across devices.
+# Key Features
 
-## App Demonstrations
-To see YouDo in action, you can find images and videos showcasing the app's operation in the demonstrations folder. This resource offers a closer look at the interface and functionality.
-  
-## Security Note
+## Smart Task Management
 
-For security reasons, a few files crucial to the operation of this project are not available in the repository. This measure ensures the integrity and security of the YouDo app, as it contains sensitive information and proprietary code essential for its functionality.
+Create, edit, and manage tasks with a structured lifecycle:
 
-## Development Philosophy
+- Task creation with title, description, date, and optional target duration
+- Mark tasks as completed while recording the actual time spent
+- Edit or delete existing tasks
+- Daily task overview with the ability to browse tasks from other dates
 
-YouDo is a passion project developed with the aim of providing users a smooth task managing experience. As such, this project is not open for external development contributions. However, your feedback and suggestions are always welcome, as they can inspire future updates and enhancements.
+## Custom Task Categories
 
-## Future Plans
+Tasks can be organized into customizable categories:
 
-There are many exciting new features and improvements I plan to implement, including expanding services with Google APIs, analyzing step counter data and making reports, developing compatibility with other Android versions, and enriching the todo functionalities.
+- Built-in default categories (e.g., work, sport, hobby)
+- User-defined categories with custom names and colors
+- Ability to delete unused categories
+- Category-specific productivity logic
 
+## Productivity Score & Performance Metrics
+
+YouDo analyzes how effectively time is spent on tasks.
+
+- Compares **planned time vs. actual time**
+- Calculates **category-based performance percentages**
+- Supports two productivity models:
+  - Overperformance rewarded (e.g., studying longer)
+  - Efficiency rewarded (e.g., completing tasks faster)
+- Generates a **Self-Discipline Score**
+- Displays motivational feedback messages based on performance levels
+
+## Visual Statistics Dashboard
+
+The app provides visual analytics to help users understand their productivity.
+
+- Category-based **bar charts**
+- Comparison of **planned vs. completed time**
+- Performance percentage tracking per category
+- Real-time updates when task data changes
+
+## Step Counter & Activity Tracking
+
+YouDo integrates hardware sensors to track daily activity.
+
+- Uses Android **Step Counter and Step Detector sensors**
+- Runs as a **Foreground Service** to maintain accuracy
+- Tracks daily steps even when the app is not open
+- Automatically updates UI via broadcast messages
+
+## Google Account & Calendar Integration
+
+The app supports Google ecosystem integration.
+
+- Google Sign-In authentication
+- Secure OAuth2 authentication flow
+- Synchronization with **Google Calendar**
+- Tasks can be aligned with calendar events
+
+---
+
+# Technical Stack & Architecture
+
+The project follows a modular structure inspired by the **MVC (Model–View–Controller)** pattern.
+
+## Language
+
+Java (Android SDK)
+
+## UI / UX
+
+- XML Layouts
+- Material Design components
+- Responsive interface structure
+
+![User Interface](Layouts and Design/Layouts.png)
+
+## Database
+
+- **SQLite** – Local persistence and fast data access
+- **Firebase Firestore** – Real-time cloud synchronization
+
+## Authentication
+
+- Firebase Authentication
+- Google Sign-In (OAuth2)
+
+## Hardware Integration
+
+- Android Sensor Manager
+- Step Counter & Step Detector
+
+## Core Application Components
+
+### Layouts
+Defines UI structure and visual components.
+
+### Activities
+Handles user interactions and screen logic.
+
+### Models
+Core data objects:
+
+- `User`
+- `ToDo`
+- `Type` (task categories)
+- `Step`
+
+![Class Diagram](Layouts and Design/classdiagram.png)
+
+### Database Helpers
+Handle CRUD operations and database communication.
+
+---
+
+# Productivity Calculation Logic
+
+Performance is calculated by comparing **planned task duration** with **actual time spent**.
+
+Two possible formulas are used depending on the category configuration.
+
+### Overperformance rewarded
+performance % = (total actual time / total planned time) × 100
+
+### Efficiency rewarded
+
+performance % = (total planned time / total actual time) × 100
+
+Category results are aggregated into an overall **Self-Discipline Score**.
+
+### Performance feedback levels
+
+- **>100%** → Outstanding performance  
+- **100%** → Perfect goal completion  
+- **50–99%** → Moderate performance  
+- **<50%** → Improvement recommended  
+
+---
+
+# App Demonstrations
+
+Application walkthroughs, diagrams, and screen recordings are available in the **/Layouts and Design** directory.
+
+---
+
+# 🔐 Security Note
+
+Sensitive configuration files are excluded from the repository:
+
+- `google-services.json`
+- API keys
+- SHA fingerprints
+
+These must be generated in your own Firebase project.
+
+---
 
 ## Getting Started
 
-To use YouDo in your development environment, follow these steps:
+### Open in Android Studio
+Load the project and allow Gradle to resolve dependencies.
 
-1. **Discuss security files with the owner:** Before proceeding, ensure to coordinate with the project owner regarding the necessary security files. These are crucial for the application's operation and without them, running the program cannot be guaranteed.
+### Install Required SDK
+Ensure **Android SDK API 33+** is installed.
 
-2. **Clone the repository:** Get a copy of the source code on your local machine.
-   
-   ```
-   git clone https://github.com/HorvathHajnalka/YouDo.git
-   ```
+### Configure Firebase
+Add your own `google-services.json` file to enable:
 
-3. **Open the project in Android Studio:** Ensure you have Android Studio installed. Open the project by navigating to `File > Open` and selecting the cloned project directory.
+- Firebase Authentication
+- Firestore
+- Google Sign-In
 
-4. **Install the dependencies:** The project might require you to resolve dependencies or install certain versions of the Android SDK. Follow the prompts in Android Studio to resolve these.
+### Run the Application
+Deployment is optimized for:
 
-5. **Run the application:** Connect an Android device or use the Android emulator to run the project. Make sure the device is compatible with Android 13 or 14.
+- Android 13 (Tiramisu)
+- Android 14 (Upside Down Cake)
 
-6. **Explore YouDo:** Once the app is running, you're ready to explore all its features. Remember, the project is set up for personal use and development learning purposes.
+---
 
-## Contribution and Feedback
+## Future Roadmap
 
-As mentioned earlier, YouDo is a personal development project, and as such, is not open to direct contributions. However, your feedback and suggestions are highly valued. If you have ideas on how to improve the app or encounter any issues, please feel free to open an issue in the repository.
+- AI-based task prioritization
+- Exportable productivity reports (PDF / CSV)
+- Improved historical analytics
+- Extended compatibility for older and newer Android versions
 
-Thank you for your interest in YouDo!😊
+---
+
+## Feedback
+
+This is a personal development project.
+
+Technical feedback and suggestions are welcome via **GitHub Issues**.
