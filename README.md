@@ -79,7 +79,7 @@ Java (Android SDK)
 - Material Design components
 - Responsive interface structure
 
-![User Interface](Layouts and Design/Layouts.png)
+![User Interface](Design/Layouts.png)
 
 ## Database
 
@@ -112,7 +112,7 @@ Core data objects:
 - `Type` (task categories)
 - `Step`
 
-![Class Diagram](Layouts and Design/classdiagram.png)
+![ClassDiagram](Design/classdiagram.png)
 
 ### Database Helpers
 Handle CRUD operations and database communication.
@@ -145,11 +145,11 @@ Category results are aggregated into an overall **Self-Discipline Score**.
 
 # App Demonstrations
 
-Application walkthroughs, diagrams, and screen recordings are available in the **/Layouts and Design** directory.
+Application walkthroughs, diagrams, and screen recordings are available in the **/Design** directory.
 
 ---
 
-# 🔐 Security Note
+# Security Note
 
 Sensitive configuration files are excluded from the repository:
 
