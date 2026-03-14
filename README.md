@@ -79,7 +79,7 @@ Java (Android SDK)
 - Material Design components
 - Responsive interface structure
 
-![User Interface](Design/Layouts.png)
+![User Interface](Design/Layouts.PNG)
 
 ## Database
 
